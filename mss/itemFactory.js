@@ -15,6 +15,7 @@ function GatheringItem() {
 }
 GatheringItem.prototype = new Item();
 
+// Item Types ----------------------
 function Pickaxe() {
     this.itemType = "pickaxe";
 }
@@ -26,7 +27,7 @@ function Gloves() {
 Gloves.prototype = new GatheringItem();
 
 
-
+// Pickaxes ------------------------
 function BadPickaxe() {
     this.name = "Bad Pickaxe"
     this.gatheringRate = 1600
@@ -87,7 +88,7 @@ function IronPickaxe() {
 }
 IronPickaxe.prototype = new Pickaxe();
 
-
+// Gloves --------------------------
 function BadGloves() {
     this.name = "Bad Gloves"
     this.gatheringRate = 3000
@@ -108,7 +109,7 @@ BadGloves.prototype = new Gloves();
 
 function BronzeGloves() {
 	this.name = "Bronze Gloves"
-    this.gatheringRate = 3000
+    this.gatheringRate = 2700
 	this.action = function(player, rng) {
 
 		if (rng <= 40000) {
@@ -132,18 +133,34 @@ function BronzeGloves() {
 }
 BronzeGloves.prototype = new Gloves();
 
+function IronGloves() {
+    this.name = "Iron Gloves"
+    this.gatheringRate = 2500
+    this.action = function(player, rng) {
 
+        if (rng <= 70000) {
+            if (player.ores["Copper"] >= 10 && player.ores["Tin"] >= 10) {
+                player.ores["Copper"] -= 10;
+                player.ores["Tin"] -= 10;
+                player.bars["Bronze"] += 1;
+            }
+        }
 
+        if (rng <= 20000) {
+            if (player.ores["Iron"] >= 10) {
+                player.ores["Iron"] -= 10;
+                player.bars["Iron"] += 1;
+            }
+        }
 
+        if (rng <= 10000) {
+            if (player.ores["Iron"] >= 5 && player.ores["Coal"] >= 10) {
+                player.ores["Iron"] -= 5;
+                player.ores["Coal"] -= 10;
+                player.bars["Steel"] += 1;
+            }
+        }
 
-
-
-
-
-
-
-
-
-
-
-
+    }
+}
+IronGloves.prototype = new Gloves();

@@ -9,7 +9,7 @@
             "clickable" : false,
             "crafted" : false,
             "recipe" : {
-                "Bronze" : 2
+                "Bronze" : 1
             }
         },
         "BronzeGloves" : {
@@ -18,7 +18,7 @@
             "clickable" : false,
             "crafted" : false,
             "recipe" : {
-                "Bronze" : 2
+                "Bronze" : 1,
             }
         },
         "IronPick" : {
@@ -27,7 +27,16 @@
             "clickable" : false,
             "crafted" : false,
             "recipe" : {
-                "Iron" : 10
+                "Iron" : 3
+            }
+        },
+        "IronGloves" : {
+            "instance" : new itemFactory.IronGloves(),
+            "active" : false,
+            "clickable" : false,
+            "crafted" : false,
+            "recipe" : {
+                "Iron" : 6
             }
         }
     }
@@ -66,11 +75,21 @@
         } else {
             player.pickaxe.activate(player);
             mine(0, ticks);
-            updateGui();
+            printOreList();
 
         }
 
 	}
+
+    function printOreList() {
+        var oresList = ""
+        for (ore in player.ores) {
+            var ammount = player.ores[ore]
+            if (ammount === 0) {continue;} // doesn't print ores you don't have
+            oresList += ore + ": " + ammount + "<br>"
+        }
+        document.getElementById("oresList").innerHTML = oresList;
+    }
 
 	function smith(count, ticks) {
 
@@ -91,12 +110,12 @@
 
 	function updateGui() {
 
+        printOreList();
+
 		//Prints current pickaxe
 		document.getElementById("pickaxeName").innerHTML = player.pickaxe.name;
 		//Prints current smithing gloves
 		document.getElementById("glovesName").innerHTML = player.gloves.name;
-
-
 
         var craftingList = ""
         document.getElementById("craftingList").innerHTML = craftingList;
@@ -120,7 +139,7 @@
             if (craftingItems[item]["active"]) {
                 var id = item;
                 var name = craftingItems[item]["instance"].name;
-                var recipe = JSON.stringify(craftingItems[item]["recipe"])
+                var recipe = JSON.stringify(craftingItems[item]["recipe"]).replace("{","").replace(/"/g,"").replace("}"," ").replace(/,/g,", ").replace(/:/g," : ")
 
                 craftingList += "<b>" + name + "</b> -\
                                 <span>" + recipe + "</span>\
@@ -151,16 +170,6 @@
                 });
             }
         }
-
-
-		//Prints ore list
-		var oresList = ""
-		for (ore in player.ores) {
-			var ammount = player.ores[ore]
-			if (ammount === 0) {continue;} // doesn't print ores you don't have
-			oresList += ore + ": " + ammount + "<br>"
-		}
-		document.getElementById("oresList").innerHTML = oresList;
 
 		//Prints bar list
 		var barsList = ""
