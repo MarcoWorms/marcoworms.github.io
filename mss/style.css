@@ -11,20 +11,17 @@ body {
     margin-top: 20px;
     padding: 10px;
     width: 986px;
-    height: 500px;
-
+    height: 600px;
     background-color: rgb(240,240,240);
     color: black;
 }
 
-.skillDiv {
+.skillWindow {
     float: left;
-    margin-left: 10px;
     padding: 10px;
     padding-top: 0px;
     border: 1px solid black;
     border-radius: 5px;
-    width: 300px;
 }
 
 progress {
@@ -32,5 +29,22 @@ progress {
 }
 
 #mineDiv {
-    margin-left: 0px;
+    margin-top: 10px;
+    width: 300px;
+}
+
+#smithDiv {
+    margin-top: 10px;
+    margin-left: 10px;
+    width: 300px;
+}
+
+#slayDiv {
+    margin-top: 10px;
+    margin-left: 10px;
+    width: 300px;
+}
+
+#craftingDiv {
+    width: 966px;
 }
