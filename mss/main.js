@@ -43,7 +43,7 @@
 			"Runite" : 0
 		},
 		"bars" : {
-			"Bronze" : 2,
+			"Bronze" : 0,
 			"Iron" : 0,
 			"Steel" : 0,
 			"Mithril" : 0,

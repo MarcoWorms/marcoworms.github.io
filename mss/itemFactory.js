@@ -32,11 +32,11 @@ function BadPickaxe() {
     this.gatheringRate = 1600
     this.action = function(player, rng) {
 
-        if (rng <= 60000) {
+        if (rng <= 70000) {
             player.ores["Copper"] += 1;
         }
 
-        if (rng >= 40000) {
+        if (rng >= 30000) {
             player.ores["Tin"] += 1;
         }
     }
@@ -45,7 +45,7 @@ BadPickaxe.prototype = new Pickaxe();
 
 function BronzePickaxe() {
 	this.name = "Bronze Pickaxe"
-    this.gatheringRate = 1400
+    this.gatheringRate = 1300
 	this.action = function(player, rng) {
 
 		if (rng <= 70000) {
@@ -65,7 +65,7 @@ BronzePickaxe.prototype = new Pickaxe();
 
 function IronPickaxe() {
     this.name = "Iron Pickaxe"
-    this.gatheringRate = 1200
+    this.gatheringRate = 1150
     this.action = function(player, rng) {
 
         if (rng <= 90000) {
@@ -78,6 +78,10 @@ function IronPickaxe() {
 
         if (rng <= 40000) {
             player.ores["Iron"] += 1;
+        }
+
+        if (rng <= 10000) {
+            player.ores["Coal"] += 1;
         }
     }
 }
