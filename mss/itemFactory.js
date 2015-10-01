@@ -57,7 +57,7 @@ function BronzePickaxe() {
 			player.ores["Tin"] += 1;
 		}
 
-		if (rng <= 10000) {
+		if (rng <= 25000) {
 			player.ores["Iron"] += 1;
 		}
 	}
