@@ -5,8 +5,8 @@
     var craftingItems = {
         "BronzePick" : {
             "instance" : new itemFactory.BronzePickaxe(),
-            "active" : true,
-            "clickable" : false,
+            "avaiable" : true,
+            "playerHaveBars" : false,
             "crafted" : false,
             "recipe" : {
                 "Bronze" : 1
@@ -14,8 +14,8 @@
         },
         "BronzeGloves" : {
             "instance" : new itemFactory.BronzeGloves(),
-            "active" : true,
-            "clickable" : false,
+            "avaiable" : true,
+            "playerHaveBars" : false,
             "crafted" : false,
             "recipe" : {
                 "Bronze" : 1,
@@ -23,8 +23,8 @@
         },
         "IronPick" : {
             "instance" : new itemFactory.IronPickaxe(),
-            "active" : false,
-            "clickable" : false,
+            "avaiable" : false,
+            "playerHaveBars" : false,
             "crafted" : false,
             "recipe" : {
                 "Iron" : 3
@@ -32,8 +32,8 @@
         },
         "IronGloves" : {
             "instance" : new itemFactory.IronGloves(),
-            "active" : false,
-            "clickable" : false,
+            "avaiable" : false,
+            "playerHaveBars" : false,
             "crafted" : false,
             "recipe" : {
                 "Iron" : 6
@@ -130,13 +130,13 @@
                 var recipeAmmount = recipe[material];
 
                 if (barAmmount < recipeAmmount || barAmmount === undefined) {
-                    craftingItems[item]["clickable"] = false
+                    craftingItems[item]["playerHaveBars"] = false
                 } else {
-                    craftingItems[item]["clickable"] = true
-                    craftingItems[item]["active"] = true;
+                    craftingItems[item]["playerHaveBars"] = true
+                    craftingItems[item]["avaiable"] = true;
                 }
             }
-            if (craftingItems[item]["active"]) {
+            if (craftingItems[item]["avaiable"]) {
                 var id = item;
                 var name = craftingItems[item]["instance"].name;
                 var recipe = JSON.stringify(craftingItems[item]["recipe"]).replace("{","").replace(/"/g,"").replace("}"," ").replace(/,/g,", ").replace(/:/g," : ")
@@ -153,7 +153,7 @@
             if (craftingItems[item]["crafted"]) {
                 continue;
             };
-            if (craftingItems[item]["clickable"] && craftingItems[item]["active"]) {
+            if (craftingItems[item]["playerHaveBars"] && craftingItems[item]["avaiable"]) {
                 var id = item;
                 document.getElementById(id).addEventListener("click", function(e) {
                     var item = e.currentTarget.id;
