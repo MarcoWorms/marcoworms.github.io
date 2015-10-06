@@ -5,7 +5,7 @@ var loadState = {
 
         var loadingLabel = game.add.text(80, 150, "Loading...", {font: "30px Arial", fill: "#ffffff"});
 
-        game.load.atlas('megamen', 'assets/atlas.png', 'assets/atlas.json', Phaser.Loader.TEXTURE_ATLAS_JSON_ARRAY);
+        game.load.atlas('megamen', 'assets/atlas.png', 'assets/atlas.json');
         console.log("Atlas loaded")
     },
 
