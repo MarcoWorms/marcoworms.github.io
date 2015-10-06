@@ -1,0 +1,48 @@
+{ "height":100,
+ "layers":[
+        {
+         "compression":"zlib",
+         "data":"eJztw7EJAAAIA7D6\/9POnZ2EBJIAAN\/NIQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANAWTbMAEA==",
+         "encoding":"base64",
+         "height":100,
+         "name":"Tile Layer 1",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":100,
+         "x":0,
+         "y":0
+        }],
+ "nextobjectid":1,
+ "orientation":"orthogonal",
+ "properties":
+    {
+
+    },
+ "renderorder":"right-down",
+ "tileheight":32,
+ "tilesets":[
+        {
+         "firstgid":1,
+         "margin":0,
+         "name":"tiles",
+         "properties":
+            {
+
+            },
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tiles":
+            {
+             "0":
+                {
+                 "image":"open tiles\/13.png"
+                }
+            },
+         "tilewidth":32
+        }],
+ "tilewidth":32,
+ "version":1,
+ "width":100
+}

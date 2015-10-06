@@ -6,7 +6,8 @@ var loadState = {
         var loadingLabel = game.add.text(80, 150, "Loading...", {font: "30px Arial", fill: "#ffffff"});
 
         game.load.atlas('megamen', 'assets/atlas.png', 'assets/atlas.json');
-        console.log("Atlas loaded")
+
+        game.load.tilemap('tilemap', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
     },
 
     create : function() {
