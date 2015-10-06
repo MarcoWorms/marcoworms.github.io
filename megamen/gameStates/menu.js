@@ -5,6 +5,8 @@ var menuState = {
         this.jumpButton = this.cursors.up;
         this.player = new Player(400, 300);
         game.physics.arcade.gravity.y = 700;
+
+        var tutoLabel = game.add.text(80, 50, "<- e -> para andar, ^ para pular",{font: "25px Arial", fill: "#ffffff"});
     },
     update: function() {
 
