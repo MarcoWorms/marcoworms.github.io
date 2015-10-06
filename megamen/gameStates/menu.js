@@ -3,10 +3,15 @@ var menuState = {
         console.log("Game started");
         this.cursors = game.input.keyboard.createCursorKeys();
         this.jumpButton = this.cursors.up;
-        this.player = new Player();
+        this.player = new Player(400, 300);
         game.physics.arcade.gravity.y = 700;
     },
     update: function() {
+
+        if (this.player.isJumping && this.player.sprite.body.onFloor()) {
+            this.player.isJumping = false;
+            this.player.state = "finished jumping"
+        }
 
         if (this.cursors.right.isDown) {
             this.player.moveX(220);
@@ -16,9 +21,10 @@ var menuState = {
             this.player.moveX(0);
         }
 
-        if (this.jumpButton.isDown && this.player.sprite.body.onFloor())
+        if (this.jumpButton.isDown)
         {
-            this.player.sprite.body.velocity.y = -400;
+            this.player.jump();
         }
+
     }
 }

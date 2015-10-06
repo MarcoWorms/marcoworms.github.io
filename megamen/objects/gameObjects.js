@@ -1,9 +1,10 @@
 function Player(x, y) {
 	this.x = x;
 	this.y = y;
-	this.sprite = game.add.sprite(400, 300, "megamen");
+	this.sprite = game.add.sprite(x, y, "megamen");
     this.state = "none";
     this.facing = "none";
+    this.isJumping = false;
 
 
     game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
@@ -13,8 +14,9 @@ function Player(x, y) {
     this.sprite.scale.x = 2;
     this.sprite.scale.y = 2;
 
-    this.sprite.animations.add("spawn", [0,1,2,3,4,5,6], 10);
-    this.sprite.animations.add("walk", [11,12,13,14,15,16,17,18,19,20], 10, true);
+    this.sprite.animations.add("spawn", [0,1,2,3,4,5,6], 18);
+    this.sprite.animations.add("walk", [11,12,13,14,15,16,17,18,19,20], 18, true);
+    this.sprite.animations.add("jump", [21,22,23,24], 12);
 
     var spawn = this.sprite.animations.play("spawn");
     this.state = "spawning";
@@ -31,15 +33,6 @@ function Player(x, y) {
 
         this.sprite.body.velocity.x = velocityX;
 
-        if (velocityX == 0) {
-            if (this.state != "idle") {
-                this.sprite.animations.stop();
-                this.state = "idle";
-                this.sprite.frame = 7;
-            }
-            return;
-        }
-
         if (velocityX > 0 && this.facing != "right") {
             this.sprite.scale.x = 2;
             this.facing = "right"
@@ -50,9 +43,26 @@ function Player(x, y) {
             this.facing = "left"
         }
 
-        if (this.state != "walking") {
+        if (velocityX != 0 && this.state != "walking" && !this.isJumping) {
             this.state = "walking";
             this.sprite.animations.play("walk");
+            return;
+        }
+
+        if (velocityX == 0) {
+            if (!this.isJumping && this.state != "idle") {
+                this.sprite.animations.stop();
+                this.state = "idle";
+                this.sprite.frame = 7;
+            }
+        }
+    }
+
+    this.jump = function() {
+        if (this.sprite.body.onFloor()) {
+            this.sprite.body.velocity.y = -400;
+            this.sprite.animations.play("jump");
+            this.isJumping = true;
         }
     }
 
