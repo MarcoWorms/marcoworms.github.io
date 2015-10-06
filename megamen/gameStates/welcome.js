@@ -14,6 +14,6 @@ var welcomeState = {
         spaceKey.onDown.addOnce(this.start, this);
     },
     start: function() {
-        game.state.start("play");
+        game.state.start("menu");
     }
 }
