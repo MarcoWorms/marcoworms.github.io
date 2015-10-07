@@ -8,11 +8,11 @@ var menuState = {
 
         this.map = this.game.add.tilemap('tilemap');
         this.map.addTilesetImage('tileset', 'tileset');
-        this.levelLayer = this.map.createLayer('levelLayer');
-        this.map.setCollisionBetween(1, 100, true, 'levelLayer');
+        this.levelLayer = this.map.createLayer('level1Layer');
+        this.map.setCollisionBetween(1, 500, true, 'level1Layer');
         this.levelLayer.resizeWorld();
 
-        this.player = new Player(50, 10);
+        this.player = new Player(100, 10);
         game.physics.arcade.gravity.y = 700;
 
         var tutoLabel = game.add.text(80, 50, "<- e -> para andar, ^ para pular",{font: "25px Arial", fill: "#ffffff"});
@@ -39,5 +39,8 @@ var menuState = {
             this.player.jump();
         }
 
+    },
+    render: function() {
+        game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
     }
 }
