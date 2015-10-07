@@ -52,5 +52,6 @@ var menuState = {
     },
     render: function() {
         game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
+        //game.debug.body(this.player.sprite);
     }
 }

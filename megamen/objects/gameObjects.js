@@ -12,8 +12,11 @@ function Player(x, y) {
     this.sprite.body.collideWorldBounds = true;
     this.sprite.anchor.x = 0.5;
     this.sprite.anchor.y = 1;
+    this.sprite.body.setSize(28, 35, 0, 0);
+
     this.sprite.scale.x = 2;
     this.sprite.scale.y = 2;
+
 
     this.sprite.animations.add("spawn", [0,1,2,3,4,5,6], 18);
     this.sprite.animations.add("walk", [11,12,13,14,15,16,17,18,19,20], 18, true);
