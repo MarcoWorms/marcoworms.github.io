@@ -1,10 +1,16 @@
 function Player(x, y) {
-	this.x = x;
+
+    var player = this;
+
+    this.x = x;
 	this.y = y;
 	this.sprite = game.add.sprite(x, y, "megamen");
     this.state = "none";
     this.facing = "none";
     this.isJumping = false;
+    this.jumpingTimer = 0
+    this.isShooting = false;
+    this.shootingTimer = 0
 
     game.camera.follow(this.sprite);
 
@@ -45,12 +51,12 @@ function Player(x, y) {
             this.facing = "left"
         }
 
-        if (velocityX != 0 && this.state != "walking" && !this.isJumping) {
+        if (velocityX != 0 && this.state != "walking" && !this.isJumping && !this.isShooting) {
             this.state = "walking";
             this.sprite.animations.play("walk");
             return;
         } else if (velocityX == 0) {
-            if (!this.isJumping && this.state != "idle") {
+            if (!this.isJumping && this.state != "idle" && !this.isShooting) {
                 this.sprite.animations.stop();
                 this.state = "idle";
                 this.sprite.frame = 7;
@@ -60,10 +66,30 @@ function Player(x, y) {
 
     this.jump = function() {
         if (!this.isJumping) {
+            this.jumpingTimer = game.time.now + 300;
             this.sprite.body.velocity.y = -400;
             this.sprite.animations.play("jump");
             this.isJumping = true;
+            if (this.sprite.body.blocked.left) {
+                this.sprite.body.velocity.x = 220;
+            } else if (this.sprite.body.blocked.right) {
+                this.sprite.body.velocity.x = -220;
+            }
         }
+    }
+
+    this.shoot = function() {
+        this.shootingTimer = game.time.now + 125;
+        this.sprite.animations.stop();
+        if (this.isJumping) {
+            this.sprite.frame = 42;
+        } else {
+            this.sprite.frame = 38;
+        }
+
+        console.log("pew");
+        this.state = "shooting";
+        this.isShooting = true;
     }
 
 }
