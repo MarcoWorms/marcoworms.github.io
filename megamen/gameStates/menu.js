@@ -8,8 +8,11 @@ var menuState = {
 
         this.map = this.game.add.tilemap('tilemap');
         this.map.addTilesetImage('tileset', 'tileset');
+        this.bglLayer = this.map.createLayer('bgLayer');
         this.levelLayer = this.map.createLayer('level1Layer');
+
         this.map.setCollisionBetween(1, 500, true, 'level1Layer');
+
         this.levelLayer.resizeWorld();
 
         this.player = new Player(100, 10);
@@ -37,6 +40,10 @@ var menuState = {
         if (this.jumpButton.isDown)
         {
             this.player.jump();
+        }
+
+        function die() {
+            game.state.start("menu")
         }
 
     },
