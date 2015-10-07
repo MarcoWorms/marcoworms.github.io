@@ -10,8 +10,10 @@ var menuState = {
         this.map.addTilesetImage('tileset', 'tileset');
         this.bglLayer = this.map.createLayer('bgLayer');
         this.levelLayer = this.map.createLayer('level1Layer');
+        this.dieLayer = this.map.createLayer('die1Layer');
 
         this.map.setCollisionBetween(1, 500, true, 'level1Layer');
+        this.map.setCollisionBetween(1, 500, true, 'die1Layer');
 
         this.levelLayer.resizeWorld();
 
@@ -23,6 +25,7 @@ var menuState = {
     update: function() {
 
         game.physics.arcade.collide(this.player.sprite, this.levelLayer);
+        game.physics.arcade.collide(this.player.sprite, this.dieLayer, die, null, this);
 
         if (this.player.isJumping && this.player.sprite.body.onFloor()) {
             this.player.isJumping = false;
