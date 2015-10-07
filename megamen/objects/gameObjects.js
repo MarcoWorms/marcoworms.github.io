@@ -71,9 +71,9 @@ function Player(x, y) {
             this.sprite.animations.play("jump");
             this.isJumping = true;
             if (this.sprite.body.blocked.left) {
-                this.sprite.body.velocity.x = 220;
+                this.moveX(220);
             } else if (this.sprite.body.blocked.right) {
-                this.sprite.body.velocity.x = -220;
+                this.moveX(-220);
             }
         }
     }
