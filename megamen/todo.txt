@@ -1,12 +1,12 @@
--cut player spritesheet
+//-cut player spritesheet
 
 -4 stage menu
 
--player object
+//-player object
 
--plataforms
+//-plataforms
 
--first stage
+//-first stage
 ----------------------
 -player shot
 
