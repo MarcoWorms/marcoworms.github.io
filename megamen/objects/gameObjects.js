@@ -40,9 +40,7 @@ function Player(x, y) {
         if (velocityX > 0 && this.facing != "right") {
             this.sprite.scale.x = 2;
             this.facing = "right"
-        }
-
-        if (velocityX < 0 && this.facing != "left") {
+        } else if (velocityX < 0 && this.facing != "left") {
             this.sprite.scale.x = -2;
             this.facing = "left"
         }
@@ -51,9 +49,7 @@ function Player(x, y) {
             this.state = "walking";
             this.sprite.animations.play("walk");
             return;
-        }
-
-        if (velocityX == 0) {
+        } else if (velocityX == 0) {
             if (!this.isJumping && this.state != "idle") {
                 this.sprite.animations.stop();
                 this.state = "idle";
@@ -63,7 +59,7 @@ function Player(x, y) {
     }
 
     this.jump = function() {
-        if (this.sprite.body.onFloor()) {
+        if (!this.isJumping) {
             this.sprite.body.velocity.y = -400;
             this.sprite.animations.play("jump");
             this.isJumping = true;
