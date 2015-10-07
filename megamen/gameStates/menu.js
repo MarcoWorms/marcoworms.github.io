@@ -28,8 +28,8 @@ var menuState = {
         game.physics.arcade.collide(this.player.sprite, this.dieLayer, die, null, this);
 
         if (this.player.isJumping && this.player.sprite.body.onFloor()) {
-            this.player.isJumping = false;
-            this.player.state = "finished jumping"
+           this.player.isJumping = false;
+           this.player.state = "finished jumping"
         }
 
         if (this.cursors.right.isDown) {
@@ -40,8 +40,7 @@ var menuState = {
             this.player.moveX(0);
         }
 
-        if (this.jumpButton.isDown)
-        {
+        if (this.jumpButton.isDown) {
             this.player.jump();
         }
 
