@@ -7,7 +7,9 @@ var loadState = {
 
         game.load.atlas('megamen', 'assets/atlas.png', 'assets/atlas.json');
 
-        game.load.tilemap('tilemap', 'assets/map.json', null, Phaser.Tilemap.TILED_JSON);
+        game.load.tilemap("tilemap", "assets/map.json", null, Phaser.Tilemap.TILED_JSON);
+        game.load.image("tileset", "assets/tileset.png");
+
     },
 
     create : function() {

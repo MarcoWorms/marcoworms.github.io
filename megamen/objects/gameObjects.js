@@ -6,11 +6,12 @@ function Player(x, y) {
     this.facing = "none";
     this.isJumping = false;
 
+    game.camera.follow(this.sprite);
 
     game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
     this.sprite.body.collideWorldBounds = true;
     this.sprite.anchor.x = 0.5;
-    this.sprite.anchor.y = 0.5;
+    this.sprite.anchor.y = 1;
     this.sprite.scale.x = 2;
     this.sprite.scale.y = 2;
 
