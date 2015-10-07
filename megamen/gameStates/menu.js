@@ -9,7 +9,7 @@ var menuState = {
         this.map = this.game.add.tilemap('tilemap');
         this.map.addTilesetImage('tileset', 'tileset');
         this.levelLayer = this.map.createLayer('levelLayer');
-        this.map.setCollisionBetween(0, 51, true, 'levelLayer');
+        this.map.setCollisionBetween(0, 53, true, 'levelLayer');
         this.levelLayer.resizeWorld();
 
         this.player = new Player(50, 10);
