@@ -8,7 +8,7 @@ var loadState = {
         game.load.atlas('megamen', 'assets/atlas.png', 'assets/atlas.json');
         game.load.image("bullet", "assets/open spritesheet/96.png")
 
-        game.load.tilemap("tilemap", "assets/map.json", null, Phaser.Tilemap.TILED_JSON);
+        game.load.tilemap("tilemap", "assets/map2.json", null, Phaser.Tilemap.TILED_JSON);
         game.load.image("tileset", "assets/tilesettransp.png");
 
         game.load.spritesheet("button1", "assets/button1.png", 200, 60);
