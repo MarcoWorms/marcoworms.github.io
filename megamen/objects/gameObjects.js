@@ -84,7 +84,7 @@ function Player(x, y) {
         }
 
         if (cursors.up.isDown) {
-            this.jump();
+            this.jump(shootKey);
         }
 
     }
@@ -103,7 +103,7 @@ function Player(x, y) {
         if (velocityX != 0 && this.state != "walkingShooting" && this.sprite.body.onFloor() && shootKey.isDown) {
             this.state = "walkingShooting";
             this.sprite.animations.play("walkShooting");
-        } else if (velocityX != 0 && this.state != "walking" && this.sprite.body.onFloor() && !shootKey.isDown) {
+        } else if (velocityX != 0 && this.state != "walking" && this.sprite.body.onFloor() && !this.isShooting) {
             this.state = "walking";
             this.sprite.animations.play("walk");
         } else if (this.sprite.body.blocked.left || this.sprite.body.blocked.right) {
@@ -117,16 +117,16 @@ function Player(x, y) {
         }
     }
 
-    this.jump = function() {
+    this.jump = function(shootKey) {
         if (!this.isJumping) {
             this.jumpingTimer = game.time.now + 300;
             this.sprite.body.velocity.y = -500;
             this.sprite.animations.play("jump");
             this.isJumping = true;
             if (this.sprite.body.blocked.left) {
-                this.moveX(220);
+                this.moveX(220, shootKey);
             } else if (this.sprite.body.blocked.right) {
-                this.moveX(-220);
+                this.moveX(-220, shootKey);
             }
         }
     }
