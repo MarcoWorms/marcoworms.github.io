@@ -48,6 +48,7 @@ function Player(x, y) {
 
     this.sprite.animations.add("spawn", [0,1,2,3,4,5,6], 10);
     this.sprite.animations.add("walk", [11,12,13,14,15,16,17,18,19,20], 18, true);
+    this.sprite.animations.add("walkShooting", [29,30,31,32,33,34,35,36,37,38], 18, true);
     this.sprite.animations.add("jump", [21,22,23,24], 12);
     this.sprite.animations.add("win", [50,51,52,53,54], 8);
     this.sprite.animations.add("die", [84,85,86,87,88,89,90,91,92], 10);
@@ -59,7 +60,7 @@ function Player(x, y) {
         this.sprite.frame = 7;
     }, this);
 
-    this.update = function(cursors) {
+    this.update = function(cursors, shootKey) {
 
         if (this.state == "uncontrollable") {
             return;
@@ -70,12 +71,16 @@ function Player(x, y) {
            this.state = "finished jumping"
         }
 
+        if (this.isShooting && game.time.now > this.shootingTimer) {
+            this.isShooting = false;
+        }
+
         if (cursors.right.isDown && game.time.now > this.jumpingTimer) {
-            this.moveX(220);
+            this.moveX(220, shootKey);
         } else if (cursors.left.isDown && game.time.now > this.jumpingTimer) {
-            this.moveX(-220);
+            this.moveX(-220, shootKey);
         } else if (game.time.now > this.jumpingTimer) {
-            this.moveX(0);
+            this.moveX(0, shootKey);
         }
 
         if (cursors.up.isDown) {
@@ -84,7 +89,7 @@ function Player(x, y) {
 
     }
 
-    this.moveX = function(velocityX) {
+    this.moveX = function(velocityX, shootKey) {
 
         this.sprite.body.velocity.x = velocityX;
 
@@ -95,8 +100,10 @@ function Player(x, y) {
             this.sprite.scale.x = -2;
             this.facing = "left"
         }
-
-        if (velocityX != 0 && this.state != "walking" && this.sprite.body.onFloor() && !this.isShooting) {
+        if (velocityX != 0 && this.state != "walkingShooting" && this.sprite.body.onFloor() && shootKey.isDown) {
+            this.state = "walkingShooting";
+            this.sprite.animations.play("walkShooting");
+        } else if (velocityX != 0 && this.state != "walking" && this.sprite.body.onFloor() && !shootKey.isDown) {
             this.state = "walking";
             this.sprite.animations.play("walk");
         } else if (this.sprite.body.blocked.left || this.sprite.body.blocked.right) {
@@ -126,14 +133,12 @@ function Player(x, y) {
 
     this.shoot = function() {
         this.shootingTimer = game.time.now + 200;
-        this.sprite.animations.stop();
+        this.isShooting = true;
         if (this.isJumping) {
             this.sprite.frame = 42;
-        } else {
-            this.sprite.frame = 45;
+        } else if (this.state == "idle") {
+            this.sprite.frame = 7;
         }
-        this.state = "shooting";
-        this.isShooting = true;
     }
 
     this.die = function() {

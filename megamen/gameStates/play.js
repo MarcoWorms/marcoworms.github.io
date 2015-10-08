@@ -46,8 +46,7 @@ var playState = {
             console.log("ay");
         })
 
-
-        this.player.update(this.cursors);
+        this.player.update(this.cursors, this.shootKey);
 
         if (this.player.state != "uncontrollable" && this.shootKey.isDown && !this.player.isShooting && !this.player.sprite.body.blocked.right && !this.player.sprite.body.blocked.left) {
 
@@ -69,10 +68,6 @@ var playState = {
             }
         }
 
-        if (this.player.isShooting && game.time.now > this.player.shootingTimer) {
-            this.player.isShooting = false;
-            this.player.state = "finished shooting"
-        }
 
         function die() {
             this.player.die();
