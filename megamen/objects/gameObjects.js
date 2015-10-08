@@ -1,3 +1,13 @@
+function Enemy(x, y) {
+    this.x = x;
+    this.y = y;
+    this.sprite = undefined;
+    this.isJumper = false;
+    this.isWalker = false;
+    this.walkSpeed = 300;
+    this.jumpTimer = 400;
+}
+
 function Player(x, y) {
 
     var player = this;
@@ -24,18 +34,24 @@ function Player(x, y) {
     this.sprite.scale.y = 2;
 
 
-    this.sprite.animations.add("spawn", [0,1,2,3,4,5,6], 12);
+    this.sprite.animations.add("spawn", [0,1,2,3,4,5,6], 10);
     this.sprite.animations.add("walk", [11,12,13,14,15,16,17,18,19,20], 18, true);
     this.sprite.animations.add("jump", [21,22,23,24], 12);
+    this.sprite.animations.add("win", [50,51,52,53,54], 8);
+    this.sprite.animations.add("die", [84,85,86,87,88,89,90,91,92], 12);
 
     var spawn = this.sprite.animations.play("spawn");
-    this.state = "spawning";
+    this.state = "uncontrollable";
     spawn.onComplete.add(function(){
         this.state = "idle";
         this.sprite.frame = 7;
     }, this);
 
     this.update = function(cursors) {
+
+        if (this.state == "uncontrollable") {
+            return;
+        }
 
         if (this.isJumping && game.time.now > this.jumpingTimer && (this.sprite.body.onFloor() || this.sprite.body.blocked.left || this.sprite.body.blocked.right)) {
            this.isJumping = false;
@@ -58,10 +74,6 @@ function Player(x, y) {
 
     this.moveX = function(velocityX) {
 
-        if (this.state == "spawning") {
-            return;
-        }
-
         this.sprite.body.velocity.x = velocityX;
 
         if (velocityX > 0 && this.facing != "right") {
@@ -72,10 +84,11 @@ function Player(x, y) {
             this.facing = "left"
         }
 
-        if (velocityX != 0 && this.state != "walking" && !this.isJumping && !this.isShooting) {
+        if (velocityX != 0 && this.state != "walking" && this.sprite.body.onFloor() && !this.isShooting) {
             this.state = "walking";
             this.sprite.animations.play("walk");
-            return;
+        } else if (this.sprite.body.blocked.left || this.sprite.body.blocked.right) {
+            this.sprite.frame = 66;
         } else if (velocityX == 0) {
             if (!this.isJumping && this.state != "idle" && !this.isShooting) {
                 this.sprite.animations.stop();
@@ -113,4 +126,39 @@ function Player(x, y) {
         this.isShooting = true;
     }
 
+    this.die = function() {
+        var die = this.sprite.animations.play("die");
+        this.state = "uncontrollable";
+        die.onComplete.add(function(){
+            this.gotoMenu();
+        }, this);
+    }
+
+
+    this.win = function() {
+        var win = this.sprite.animations.play("win");
+        this.state = "uncontrollable";
+        win.onComplete.add(function(){
+            this.gotoMenu();
+        }, this);
+    }
+
+    this.gotoMenu = function() {
+        game.state.start("menu")
+    }
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+

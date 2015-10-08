@@ -1,8 +1,6 @@
 var playState = {
     create: function() {
 
-        game.stage.backgroundColor = "#005C34";
-
         this.cursors = game.input.keyboard.createCursorKeys();
         this.shootKey = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
@@ -19,7 +17,7 @@ var playState = {
 
         this.levelLayer.resizeWorld();
 
-        this.player = new Player(100, 300);
+        this.player = new Player(100, 350);
 
 
 
@@ -45,11 +43,11 @@ var playState = {
         }
 
         function die() {
-            game.state.start("menu")
+            this.player.die();
         }
 
         function win() {
-            game.state.start("menu")
+            this.player.win();
         }
 
     },
