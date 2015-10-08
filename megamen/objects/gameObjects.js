@@ -103,7 +103,7 @@ function Player(x, y) {
         if (velocityX != 0 && this.state != "walkingShooting" && this.sprite.body.onFloor() && shootKey.isDown) {
             this.state = "walkingShooting";
             this.sprite.animations.play("walkShooting");
-        } else if (velocityX != 0 && this.state != "walking" && this.sprite.body.onFloor() && !this.isShooting) {
+        } else if (velocityX != 0 && this.state != "walking" && this.sprite.body.onFloor() && !shootKey.isDown) {
             this.state = "walking";
             this.sprite.animations.play("walk");
         } else if (this.sprite.body.blocked.left || this.sprite.body.blocked.right) {
@@ -137,7 +137,7 @@ function Player(x, y) {
         if (this.isJumping) {
             this.sprite.frame = 42;
         } else if (this.state == "idle") {
-            this.sprite.frame = 7;
+            this.sprite.frame = 55;
         }
     }
 
