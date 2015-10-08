@@ -25,7 +25,10 @@ function Player(x, y) {
     game.camera.follow(this.sprite);
 
     game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
+    this.sprite.body.gravity.y = 700;
+
     this.sprite.body.collideWorldBounds = true;
+
     this.sprite.anchor.x = 0.5;
     this.sprite.anchor.y = 1;
     this.sprite.body.setSize(28, 35, 0, 0);
@@ -38,7 +41,7 @@ function Player(x, y) {
     this.sprite.animations.add("walk", [11,12,13,14,15,16,17,18,19,20], 18, true);
     this.sprite.animations.add("jump", [21,22,23,24], 12);
     this.sprite.animations.add("win", [50,51,52,53,54], 8);
-    this.sprite.animations.add("die", [84,85,86,87,88,89,90,91,92], 12);
+    this.sprite.animations.add("die", [84,85,86,87,88,89,90,91,92], 10);
 
     var spawn = this.sprite.animations.play("spawn");
     this.state = "uncontrollable";

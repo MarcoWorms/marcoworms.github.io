@@ -17,11 +17,17 @@ var playState = {
 
         this.levelLayer.resizeWorld();
 
-        this.player = new Player(100, 350);
+        this.player = new Player(100, 450);
 
-
-
-        game.physics.arcade.gravity.y = 700;
+        this.bullets = game.add.group();
+        var firingRate = 100;
+        var nextFire = 0;
+        this.bullets.enableBody = true;
+        this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        this.bullets.createMultiple(50, 'bullet');
+        this.bullets.frame =  96;
+        this.bullets.setAll('checkWorldBounds', true);
+        this.bullets.setAll('outOfBoundsKill', true);
 
     },
     update: function() {
@@ -34,6 +40,16 @@ var playState = {
 
         if (this.shootKey.isDown && !this.player.isShooting) {
             this.player.shoot();
+            var bullet = this.bullets.getFirstDead();
+
+            if (this.player.facing == "right") {
+                bullet.reset(this.player.sprite.x + 20, this.player.sprite.y - 40);
+                game.physics.arcade.moveToXY(bullet, game.world.width, bullet.y, 500);
+            } else if (this.player.facing == "left") {
+                bullet.reset(this.player.sprite.x - 20, this.player.sprite.y - 40);
+                game.physics.arcade.moveToXY(bullet, 0, bullet.y, 500);
+            }
+
         } else if (!this.shootKey.isDown && this.player.isShooting && game.time.now > this.player.shootingTimer) {
             this.player.isShooting = false;
             this.player.state = "finished shooting"
@@ -52,8 +68,7 @@ var playState = {
 
     },
     render: function() {
-        game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
+        //game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
         //game.debug.bodyInfo(this.player.sprite, 10, 10);
-        //game.debug.body(this.player.sprite);
     }
 }
