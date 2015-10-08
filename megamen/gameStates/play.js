@@ -32,7 +32,17 @@ var playState = {
         game.physics.arcade.collide(this.player.sprite, this.dieLayer, die, null, this);
         game.physics.arcade.collide(this.player.sprite, this.winLayer, win, null, this);
 
-        this.player.update(this.cursors, this.shootKey);
+        this.player.update(this.cursors);
+
+        if (this.shootKey.isDown && !this.isShooting) {
+            this.shoot();
+        } else if (!this.shootKey.isDown && this.player.isShooting && game.time.now > this.player.shootingTimer) {
+            this.player.isShooting = false;
+            this.player.state = "finished shooting"
+            if (this.player.isJumping) {
+                this.player.sprite.frame = 24;
+            }
+        }
 
     },
     render: function() {
