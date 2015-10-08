@@ -35,6 +35,44 @@ function Player(x, y) {
         this.sprite.frame = 7;
     }, this);
 
+    this.update = function(cursors) {
+
+        if (this.isJumping && game.time.now > this.jumpingTimer && (this.sprite.body.onFloor() || this.sprite.body.blocked.left || this.sprite.body.blocked.right)) {
+           this.isJumping = false;
+           this.state = "finished jumping"
+        }
+
+        if (cursors.right.isDown && game.time.now > this.jumpingTimer) {
+            this.moveX(220);
+        } else if (cursors.left.isDown && game.time.now > this.jumpingTimer) {
+            this.moveX(-220);
+        } else if (game.time.now > this.jumpingTimer) {
+            this.moveX(0);
+        }
+
+        if (cursors.up.isDown) {
+            this.jump();
+        }
+
+        if (this.shootKey.isDown && !this.isShooting) {
+            this.shoot();
+        } else if (!this.shootKey.isDown && this.isShooting && game.time.now > this.shootingTimer) {
+            this.isShooting = false;
+            this.state = "finished shooting"
+            if (this.isJumping) {
+                this.sprite.frame = 24;
+            }
+        }
+
+        function die() {
+            game.state.start("menu")
+        }
+
+        function win() {
+            game.state.start("menu")
+        }
+    }
+
     this.moveX = function(velocityX) {
 
         if (this.state == "spawning") {

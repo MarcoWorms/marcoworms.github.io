@@ -32,41 +32,7 @@ var playState = {
         game.physics.arcade.collide(this.player.sprite, this.dieLayer, die, null, this);
         game.physics.arcade.collide(this.player.sprite, this.winLayer, win, null, this);
 
-        if (this.player.isJumping && game.time.now > this.player.jumpingTimer && (this.player.sprite.body.onFloor() || this.player.sprite.body.blocked.left || this.player.sprite.body.blocked.right)) {
-           this.player.isJumping = false;
-           this.player.state = "finished jumping"
-        }
-
-        if (this.cursors.right.isDown && game.time.now > this.player.jumpingTimer) {
-            this.player.moveX(220);
-        } else if (this.cursors.left.isDown && game.time.now > this.player.jumpingTimer) {
-            this.player.moveX(-220);
-        } else if (game.time.now > this.player.jumpingTimer) {
-            this.player.moveX(0);
-        }
-
-        if (this.cursors.up.isDown) {
-            this.player.jump();
-        }
-
-        if (this.shootKey.isDown && !this.player.isShooting) {
-            this.player.shoot();
-        } else if (!this.shootKey.isDown && this.player.isShooting && game.time.now > this.player.shootingTimer) {
-            this.player.isShooting = false;
-            if (this.player.isJumping) {
-                this.player.sprite.frame = 24;
-            }
-        }
-
-
-
-        function die() {
-            game.state.start("menu")
-        }
-
-        function win() {
-            game.state.start("menu")
-        }
+        this.player.update(this.cursors);
 
     },
     render: function() {
