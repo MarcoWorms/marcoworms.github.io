@@ -1,19 +1,28 @@
-function Enemy(x, y) {
-    this.x = x;
-    this.y = y;
-    this.sprite = undefined;
+function Enemy(x, y, atlas, framesNumber) {
+    this.framesNumber = framesNumber;
+    this.sprite = game.add.sprite(x, y, atlas);
     this.isJumper = false;
     this.isWalker = false;
     this.walkSpeed = 300;
     this.jumpTimer = 400;
+
+    this.sprite.anchor.x = 0.5;
+    this.sprite.anchor.y = 1;
+
+    this.sprite.scale.x = 1.1
+    this.sprite.scale.y = 1.1
+
+    game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
+    this.sprite.body.gravity.y = 1000;
+    this.sprite.animations.add("animation", Phaser.ArrayUtils.numberArray(0,this.framesnumber-1), 12, true);
+    this.sprite.animations.play("animation");
+
 }
 
 function Player(x, y) {
 
     var player = this;
 
-    this.x = x;
-	this.y = y;
 	this.sprite = game.add.sprite(x, y, "megamen");
     this.state = "none";
     this.facing = "none";
@@ -25,7 +34,7 @@ function Player(x, y) {
     game.camera.follow(this.sprite);
 
     game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
-    this.sprite.body.gravity.y = 700;
+    this.sprite.body.gravity.y = 1000;
 
     this.sprite.body.collideWorldBounds = true;
 
@@ -104,7 +113,7 @@ function Player(x, y) {
     this.jump = function() {
         if (!this.isJumping) {
             this.jumpingTimer = game.time.now + 300;
-            this.sprite.body.velocity.y = -400;
+            this.sprite.body.velocity.y = -500;
             this.sprite.animations.play("jump");
             this.isJumping = true;
             if (this.sprite.body.blocked.left) {

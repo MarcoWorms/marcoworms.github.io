@@ -17,7 +17,9 @@ var playState = {
 
         this.levelLayer.resizeWorld();
 
-        this.player = new Player(100, 450);
+        this.player = new Player(100, 470);
+
+        this.enemy1 = new Enemy(950, 670, 'enemy1', 21);
 
         this.bullets = game.add.group();
         this.bullets.enableBody = true;
@@ -31,8 +33,19 @@ var playState = {
     update: function() {
 
         game.physics.arcade.collide(this.player.sprite, this.levelLayer);
+        game.physics.arcade.collide(this.enemy1.sprite, this.levelLayer);
         game.physics.arcade.collide(this.player.sprite, this.dieLayer, die, null, this);
+        game.physics.arcade.collide(this.player.sprite, this.enemy1.sprite, die, null, this);
         game.physics.arcade.collide(this.player.sprite, this.winLayer, win, null, this);
+        game.physics.arcade.collide(this.bullets, this.levelLayer, function(bullet, level) {
+            bullet.kill();
+        })
+        game.physics.arcade.collide(this.bullets, this.enemy1.sprite, function(bullet, enemy) {
+            bullet.kill();
+            enemy.destroy();
+            console.log("ay");
+        })
+
 
         this.player.update(this.cursors);
 
@@ -71,7 +84,7 @@ var playState = {
 
     },
     render: function() {
-        //game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
-        //game.debug.bodyInfo(this.player.sprite, 10, 10);
+        game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
+        game.debug.bodyInfo(this.player.sprite, 10, 10);
     }
 }
