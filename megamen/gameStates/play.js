@@ -34,8 +34,8 @@ var playState = {
 
         this.player.update(this.cursors);
 
-        if (this.shootKey.isDown && !this.isShooting) {
-            this.shoot();
+        if (this.shootKey.isDown && !this.player.isShooting) {
+            this.player.shoot();
         } else if (!this.shootKey.isDown && this.player.isShooting && game.time.now > this.player.shootingTimer) {
             this.player.isShooting = false;
             this.player.state = "finished shooting"
