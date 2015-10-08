@@ -130,10 +130,8 @@ function Player(x, y) {
         if (this.isJumping) {
             this.sprite.frame = 42;
         } else {
-            this.sprite.frame = 38;
+            this.sprite.frame = 45;
         }
-
-        console.log("pew");
         this.state = "shooting";
         this.isShooting = true;
     }
