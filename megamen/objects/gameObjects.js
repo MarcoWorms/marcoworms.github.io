@@ -54,15 +54,6 @@ function Player(x, y) {
             this.jump();
         }
 
-
-
-        function die() {
-            game.state.start("menu")
-        }
-
-        function win() {
-            game.state.start("menu")
-        }
     }
 
     this.moveX = function(velocityX) {

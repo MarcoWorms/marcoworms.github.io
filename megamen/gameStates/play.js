@@ -44,6 +44,14 @@ var playState = {
             }
         }
 
+        function die() {
+            game.state.start("menu")
+        }
+
+        function win() {
+            game.state.start("menu")
+        }
+
     },
     render: function() {
         game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
