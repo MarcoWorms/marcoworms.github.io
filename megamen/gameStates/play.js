@@ -38,7 +38,7 @@ var playState = {
 
         this.player.update(this.cursors);
 
-        if (this.shootKey.isDown && !this.player.isShooting) {
+        if (this.player.state != "uncontrollable" && this.shootKey.isDown && !this.player.isShooting) {
             this.player.shoot();
             var bullet = this.bullets.getFirstDead();
 
