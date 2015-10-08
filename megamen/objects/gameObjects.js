@@ -132,8 +132,9 @@ function Player(x, y) {
     this.die = function() {
         var die = this.sprite.animations.play("die");
         this.state = "uncontrollable";
+        this.sprite.body.velocity.x = 0
         die.onComplete.add(function(){
-            this.gotoMenu();
+            game.state.start(game.state.current);
         }, this);
     }
 
@@ -141,13 +142,14 @@ function Player(x, y) {
     this.win = function() {
         var win = this.sprite.animations.play("win");
         this.state = "uncontrollable";
+        this.sprite.body.velocity.x = 0
         win.onComplete.add(function(){
-            this.gotoMenu();
+            this.gotoState("menu");
         }, this);
     }
 
-    this.gotoMenu = function() {
-        game.state.start("menu")
+    this.gotoState = function(state) {
+        game.state.start(state)
     }
 
 
