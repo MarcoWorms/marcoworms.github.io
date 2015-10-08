@@ -35,7 +35,7 @@ function Player(x, y) {
         this.sprite.frame = 7;
     }, this);
 
-    this.update = function(cursors) {
+    this.update = function(cursors, shootKey) {
 
         if (this.isJumping && game.time.now > this.jumpingTimer && (this.sprite.body.onFloor() || this.sprite.body.blocked.left || this.sprite.body.blocked.right)) {
            this.isJumping = false;
@@ -54,9 +54,9 @@ function Player(x, y) {
             this.jump();
         }
 
-        if (this.shootKey.isDown && !this.isShooting) {
+        if (shootKey.isDown && !this.isShooting) {
             this.shoot();
-        } else if (!this.shootKey.isDown && this.isShooting && game.time.now > this.shootingTimer) {
+        } else if (!shootKey.isDown && this.isShooting && game.time.now > this.shootingTimer) {
             this.isShooting = false;
             this.state = "finished shooting"
             if (this.isJumping) {

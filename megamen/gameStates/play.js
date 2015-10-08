@@ -32,7 +32,7 @@ var playState = {
         game.physics.arcade.collide(this.player.sprite, this.dieLayer, die, null, this);
         game.physics.arcade.collide(this.player.sprite, this.winLayer, win, null, this);
 
-        this.player.update(this.cursors);
+        this.player.update(this.cursors, this.shootKey);
 
     },
     render: function() {
