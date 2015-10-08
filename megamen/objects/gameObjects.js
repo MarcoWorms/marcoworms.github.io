@@ -116,7 +116,7 @@ function Player(x, y) {
     }
 
     this.shoot = function() {
-        this.shootingTimer = game.time.now + 125;
+        this.shootingTimer = game.time.now + 200;
         this.sprite.animations.stop();
         if (this.isJumping) {
             this.sprite.frame = 42;

@@ -20,11 +20,9 @@ var playState = {
         this.player = new Player(100, 450);
 
         this.bullets = game.add.group();
-        var firingRate = 100;
-        var nextFire = 0;
         this.bullets.enableBody = true;
         this.bullets.physicsBodyType = Phaser.Physics.ARCADE;
-        this.bullets.createMultiple(50, 'bullet');
+        this.bullets.createMultiple(20, 'bullet');
         this.bullets.frame =  96;
         this.bullets.setAll('checkWorldBounds', true);
         this.bullets.setAll('outOfBoundsKill', true);
@@ -38,24 +36,29 @@ var playState = {
 
         this.player.update(this.cursors);
 
-        if (this.player.state != "uncontrollable" && this.shootKey.isDown && !this.player.isShooting) {
+        if (this.player.state != "uncontrollable" && this.shootKey.isDown && !this.player.isShooting && !this.player.sprite.body.blocked.right && !this.player.sprite.body.blocked.left) {
+
             this.player.shoot();
             var bullet = this.bullets.getFirstDead();
+            var yOffset = 40;
+            var xOffset = 20;
+
+            if (this.player.isJumping) {
+                yOffset += 15;
+            }
 
             if (this.player.facing == "right") {
-                bullet.reset(this.player.sprite.x + 20, this.player.sprite.y - 40);
+                bullet.reset(this.player.sprite.x + xOffset, this.player.sprite.y - yOffset);
                 game.physics.arcade.moveToXY(bullet, game.world.width, bullet.y, 500);
             } else if (this.player.facing == "left") {
-                bullet.reset(this.player.sprite.x - 20, this.player.sprite.y - 40);
+                bullet.reset(this.player.sprite.x - xOffset, this.player.sprite.y - yOffset);
                 game.physics.arcade.moveToXY(bullet, 0, bullet.y, 500);
             }
+        }
 
-        } else if (!this.shootKey.isDown && this.player.isShooting && game.time.now > this.player.shootingTimer) {
+        if (this.player.isShooting && game.time.now > this.player.shootingTimer) {
             this.player.isShooting = false;
             this.player.state = "finished shooting"
-            if (this.player.isJumping) {
-                this.player.sprite.frame = 24;
-            }
         }
 
         function die() {
