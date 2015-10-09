@@ -11,7 +11,7 @@ var menuState = {
     	}
 
     	function button2Click() {
-    		game.state.start("play");
+    		game.state.start("play2");
     	}
     }
 }

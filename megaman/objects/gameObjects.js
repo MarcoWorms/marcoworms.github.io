@@ -1,4 +1,6 @@
-function Enemy(x, y, atlas, framesNumber) {
+function Enemy(x, y, atlas, framesNumber, type, speed) {
+    if (type === undefined) { type = "none" }
+
     this.framesNumber = framesNumber;
     this.sprite = game.add.sprite(x, y, atlas);
     this.isJumper = false;
@@ -6,16 +8,30 @@ function Enemy(x, y, atlas, framesNumber) {
     this.walkSpeed = 300;
     this.jumpTimer = 400;
 
-    this.sprite.anchor.x = 0.5;
-    this.sprite.anchor.y = 1;
+
 
     this.sprite.scale.x = 1.1
     this.sprite.scale.y = 1.1
 
+    if (type === "none") {
+        this.sprite.scale.x = -1.1
+    }
+
+    this.sprite.anchor.x = 0.5;
+    this.sprite.anchor.y = 1;
+
     game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
     this.sprite.body.gravity.y = 1000;
-    this.sprite.animations.add("animation", Phaser.ArrayUtils.numberArray(0,this.framesnumber-1), 12, true);
+    this.sprite.animations.add("animation", Phaser.ArrayUtils.numberArray(0,this.framesnumber-1), speed, true);
     this.sprite.animations.play("animation");
+
+    if (type === "jumper" || type === "walker") {
+        this.sprite.body.bounce.set(1);
+    }
+
+    if (type === "walker") {
+        this.sprite.body.velocity.x = 100;
+    }
 
 }
 
