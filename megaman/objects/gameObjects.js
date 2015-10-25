@@ -62,7 +62,7 @@ function Player(x, y) {
     this.sprite.scale.y = 2;
 
 
-    this.sprite.animations.add("spawn", [0,1,2,3,4,5,6], 10);
+    this.sprite.animations.add("spawn", [0,1,2,3,4,5,6], 8);
     this.sprite.animations.add("walk", [11,12,13,14,15,16,17,18,19,20], 18, true);
     this.sprite.animations.add("walkShooting", [29,30,31,32,33,34,35,36,37,38], 18, true);
     this.sprite.animations.add("jump", [21,22,23,24], 12);

@@ -88,7 +88,7 @@ var playState2 = {
     },
     render: function() {
         //game.debug.text(game.time.fps || '--', 2, 14, "#00ff00");
-        //game.debug.bodyInfo(this.player.sprite, 20, 20);
+        game.debug.bodyInfo(this.player.sprite, 20, 20);
         //game.debug.text(this.player.state || '--', 2, 14, "#00ff00");
     }
 }
