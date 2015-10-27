@@ -21,7 +21,6 @@ function ObjectWithGravity() {
     this.g = 100;
 
     this.preUpdate = function(deltaTime) {
-        console.log(deltaTime)
         this.vy += this.g * deltaTime;
         this.x += this.vx * deltaTime;
         this.y += this.vy * deltaTime;
