@@ -9,8 +9,8 @@ function Simulation(width, height) {
     this.timeLastFrame = new Date().getTime();
 
     this.start = function() {
-        var sphereWithGravity = new SphereWithGravity();
-        this.objects = [sphereWithGravity];
+        var ball = new BouncingSphereWithGravity();
+        this.objects = [ball];
 
         window.cancelAnimationFrame(this.loop);
         this.mainLoop();
