@@ -5,6 +5,12 @@ function Object() {
     this.e = 0.95; // elasticity
     this.vx = 500; // velocity X
     this.vy = -100; // velocity Y
+    this.v = function() {
+        return Math.sqrt(Math.pow(this.vx, 2) + Math.pow(this.vy, 2))
+    }
+    this.angle = function() {
+
+    }
 
     this.preUpdate = function(deltaTime) {
 
@@ -15,6 +21,21 @@ function Object() {
     this.draw = function(context) {
 
     }
+
+    this.toRadians = function(angle) {
+        return angle * (Math.PI / 180);
+    }
+
+    this.setAngleAndVelocity = function(angle, speed) {
+        this.vx = speed * Math.cos(this.toRadians(angle));
+        this.vy = speed * -Math.sin(this.toRadians(angle));
+    }
+
+    this.bounce = function(toAngle) {//tbd
+        this.vx = this.vx * Math.cos(this.toRadians(angle));
+        this.vy = this.vy * -Math.sin(this.toRadians(angle));
+    }
+
     // To be rewritten with a single bounce(angle).
     this.bounceX = function() {
         this.vx *= -this.e;
@@ -51,6 +72,7 @@ SphereWithGravity.prototype = new ObjectWithGravity();
 
 function BouncingSphereWithGravity() {
     this.update = function() {
+        console.log(this.v())
         var bottomBound = this.y + this.r;
         if (bottomBound > 600) {
             this.y += 600 - bottomBound
