@@ -31,9 +31,9 @@ function Object() {
         this.vy = speed * -Math.sin(this.toRadians(angle));
     }
 
-    this.bounce = function(toAngle) {//tbd
-        this.vx = this.vx * Math.cos(this.toRadians(angle));
-        this.vy = this.vy * -Math.sin(this.toRadians(angle));
+    this.bounce = function(toAngle) {
+        this.vx = this.vx * Math.cos(this.toRadians(toAngle)) * this.e;
+        this.vy = this.vy * -Math.sin(this.toRadians(toAngle)) * this.e;
     }
 
     // To be rewritten with a single bounce(angle).
