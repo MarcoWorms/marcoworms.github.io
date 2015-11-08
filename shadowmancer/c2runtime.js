@@ -19921,6 +19921,7 @@ cr.getObjectRefTable = function () { return [
 	cr.system_object.prototype.acts.ResetGlobals,
 	cr.system_object.prototype.acts.ResetPersisted,
 	cr.plugins_.Arr.prototype.acts.Clear,
+	cr.system_object.prototype.acts.GoToLayout,
 	cr.plugins_.Mouse.prototype.acts.SetCursor,
 	cr.plugins_.AJAX.prototype.acts.RequestFile,
 	cr.plugins_.AJAX.prototype.cnds.OnComplete,
@@ -19931,7 +19932,6 @@ cr.getObjectRefTable = function () { return [
 	cr.behaviors.Pin.prototype.acts.Pin,
 	cr.behaviors.Fade.prototype.cnds.OnFadeOutEnd,
 	cr.behaviors.Fade.prototype.acts.RestartFade,
-	cr.system_object.prototype.acts.GoToLayout,
 	cr.plugins_.Button.prototype.cnds.OnClicked,
 	cr.plugins_.TextBox.prototype.exps.Text,
 	cr.plugins_.Arr.prototype.acts.JSONDownload
