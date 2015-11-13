@@ -20365,6 +20365,8 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Sprite.prototype.acts.SetWidth,
 	cr.plugins_.Sprite.prototype.exps.Width,
 	cr.system_object.prototype.exps.dt,
+	cr.plugins_.Sprite.prototype.acts.SetSize,
+	cr.plugins_.Sprite.prototype.exps.Height,
 	cr.system_object.prototype.acts.AddVar,
 	cr.behaviors.EightDir.prototype.acts.SetMaxSpeed,
 	cr.behaviors.EightDir.prototype.exps.MaxSpeed,
