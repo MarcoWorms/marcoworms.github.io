@@ -20368,12 +20368,14 @@ cr.getObjectRefTable = function () { return [
 	cr.system_object.prototype.acts.AddVar,
 	cr.behaviors.EightDir.prototype.acts.SetMaxSpeed,
 	cr.behaviors.EightDir.prototype.exps.MaxSpeed,
-	cr.behaviors.Physics.prototype.cnds.CompareVelocity,
+	cr.plugins_.Function.prototype.acts.CallFunction,
+	cr.plugins_.Sprite.prototype.exps.X,
+	cr.plugins_.Sprite.prototype.exps.Y,
 	cr.behaviors.Physics.prototype.exps.VelocityX,
 	cr.behaviors.Physics.prototype.exps.VelocityY,
-	cr.system_object.prototype.cnds.Else,
-	cr.plugins_.Sprite.prototype.acts.Spawn,
 	cr.system_object.prototype.cnds.CompareVar,
 	cr.plugins_.LocalStorage.prototype.acts.SetItem,
-	cr.system_object.prototype.acts.RestartLayout
+	cr.system_object.prototype.acts.RestartLayout,
+	cr.plugins_.Function.prototype.cnds.OnFunction,
+	cr.plugins_.Function.prototype.exps.Param
 ];};
