@@ -21318,45 +21318,6 @@ cr.behaviors.Pin = function(runtime)
 }());
 ;
 ;
-cr.behaviors.destroy = function(runtime)
-{
-	this.runtime = runtime;
-};
-(function ()
-{
-	var behaviorProto = cr.behaviors.destroy.prototype;
-	behaviorProto.Type = function(behavior, objtype)
-	{
-		this.behavior = behavior;
-		this.objtype = objtype;
-		this.runtime = behavior.runtime;
-	};
-	var behtypeProto = behaviorProto.Type.prototype;
-	behtypeProto.onCreate = function()
-	{
-	};
-	behaviorProto.Instance = function(type, inst)
-	{
-		this.type = type;
-		this.behavior = type.behavior;
-		this.inst = inst;				// associated object instance to modify
-		this.runtime = type.runtime;
-	};
-	var behinstProto = behaviorProto.Instance.prototype;
-	behinstProto.onCreate = function()
-	{
-	};
-	behinstProto.tick = function ()
-	{
-		this.inst.update_bbox();
-		var bbox = this.inst.bbox;
-		var layout = this.inst.layer.layout;
-		if (bbox.right < 0 || bbox.bottom < 0 || bbox.left > layout.width || bbox.top > layout.height)
-			this.runtime.DestroyInstance(this.inst);
-	};
-}());
-;
-;
 cr.behaviors.solid = function(runtime)
 {
 	this.runtime = runtime;
@@ -21414,7 +21375,6 @@ cr.getObjectRefTable = function () { return [
 	cr.behaviors.Bullet,
 	cr.behaviors.Pin,
 	cr.behaviors.Fade,
-	cr.behaviors.destroy,
 	cr.system_object.prototype.cnds.OnLayoutStart,
 	cr.behaviors.Pin.prototype.acts.Pin,
 	cr.behaviors.Physics.prototype.acts.SetWorldGravity,
@@ -21433,16 +21393,18 @@ cr.getObjectRefTable = function () { return [
 	cr.behaviors.Bullet.prototype.exps.Speed,
 	cr.plugins_.Sprite.prototype.cnds.OnCollision,
 	cr.plugins_.Sprite.prototype.acts.Destroy,
-	cr.behaviors.Fade.prototype.acts.StartFade,
 	cr.plugins_.Function.prototype.acts.CallFunction,
+	cr.plugins_.Sprite.prototype.exps.X,
+	cr.plugins_.Sprite.prototype.exps.Y,
+	cr.behaviors.Fade.prototype.acts.StartFade,
 	cr.system_object.prototype.acts.RestartLayout,
 	cr.plugins_.Function.prototype.cnds.OnFunction,
+	cr.system_object.prototype.acts.SetVar,
+	cr.plugins_.Function.prototype.exps.Param,
 	cr.system_object.prototype.cnds.For,
 	cr.system_object.prototype.acts.Wait,
 	cr.system_object.prototype.exps.loopindex,
 	cr.system_object.prototype.acts.CreateObject,
-	cr.plugins_.Sprite.prototype.exps.X,
-	cr.plugins_.Sprite.prototype.exps.Y,
 	cr.behaviors.Bullet.prototype.acts.SetAngleOfMotion,
 	cr.system_object.prototype.exps.random,
 	cr.system_object.prototype.cnds.Every,
