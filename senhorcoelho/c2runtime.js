@@ -14750,69 +14750,285 @@ cr.system_object.prototype.loadFromJSON = function (o)
 	};
 })();
 cr.shaders = {};
-cr.shaders["waterbg"] = {src: ["varying mediump vec2 vTex;",
-"uniform lowp sampler2D samplerFront;",
-"uniform lowp sampler2D samplerBack;",
-"uniform mediump vec2 destStart;",
-"uniform mediump vec2 destEnd;",
-"precision mediump float;",
-"uniform float seconds;",
-"uniform float pixelWidth;",
-"uniform float pixelHeight;",
-"const float PI = 3.1415926535897932;",
-"uniform float speed;",
-"uniform float speed_x;",
-"uniform float speed_y;",
-"uniform float intensity;",
-"const int steps = 8;",
-"uniform float frequency;",
-"uniform float angle; // better when a prime",
-"uniform float delta;",
-"uniform float intence;",
-"uniform float emboss;",
-"float col(vec2 coord)",
-"{",
-"float delta_theta = 2.0 * PI / angle;",
-"float col = 0.0;",
-"float theta = 0.0;",
-"for (int i = 0; i < steps; i++)",
-"{",
-"vec2 adjc = coord;",
-"theta = delta_theta*float(i);",
-"adjc.x += cos(theta)*seconds*speed + seconds * speed_x;",
-"adjc.y -= sin(theta)*seconds*speed - seconds * speed_y;",
-"col = col + cos( (adjc.x*cos(theta) - adjc.y*sin(theta))*frequency)*intensity;",
-"}",
-"return cos(col);",
-"}",
-"void main(void)",
-"{",
-"vec2 p = vTex, c1 = p, c2 = p;",
-"float cc1 = col(c1);",
-"c2.x += (1.0 / pixelWidth) / delta;",
-"float dx = emboss*(cc1-col(c2))/delta;",
-"c2.x = p.x;",
-"c2.y += (1.0 / pixelHeight) / delta;",
-"float dy = emboss*(cc1-col(c2))/delta;",
-"c1.x += dx;",
-"c1.y = -(c1.y+dy);",
-"float alpha = 1.+dot(dx,dy)*intence;",
-"c1.y = -c1.y;",
-"lowp vec4 front = texture2D(samplerFront,c1) * alpha;",
-"lowp vec4 result;",
-"if (front.a == 0.0)",
-"result = front + texture2D(samplerBack, mix(destStart, destEnd, vTex)) * (1.0 - front.a);",
-"else",
-"result = front + texture2D(samplerBack, mix(destStart, destEnd, c1)) * (1.0 - front.a);",
-"gl_FragColor = result;",
-"}"
-].join("\n"),
-	extendBoxHorizontal: 25,
-	extendBoxVertical: 25,
-	crossSampling: true,
-	preservesOpaqueness: false,
-	animated: true,
-	parameters: [["speed", 0, 1], ["speed_x", 0, 1], ["speed_y", 0, 1], ["intensity", 0, 0], ["frequency", 0, 0], ["angle", 0, 0], ["delta", 0, 0], ["intence", 0, 0], ["emboss", 0, 1]] }
+;
+;
+cr.plugins_.Button = function(runtime)
+{
+	this.runtime = runtime;
+};
+(function ()
+{
+	var pluginProto = cr.plugins_.Button.prototype;
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+	var typeProto = pluginProto.Type.prototype;
+	typeProto.onCreate = function()
+	{
+	};
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+	};
+	var instanceProto = pluginProto.Instance.prototype;
+	instanceProto.onCreate = function()
+	{
+		if (this.runtime.isDomFree)
+		{
+			cr.logexport("[Construct 2] Button plugin not supported on this platform - the object will not be created");
+			return;
+		}
+		this.isCheckbox = (this.properties[0] === 1);
+		this.inputElem = document.createElement("input");
+		if (this.isCheckbox)
+			this.elem = document.createElement("label");
+		else
+			this.elem = this.inputElem;
+		this.labelText = null;
+		this.inputElem.type = (this.isCheckbox ? "checkbox" : "button");
+		this.inputElem.id = this.properties[6];
+		jQuery(this.elem).appendTo(this.runtime.canvasdiv ? this.runtime.canvasdiv : "body");
+		if (this.isCheckbox)
+		{
+			jQuery(this.inputElem).appendTo(this.elem);
+			this.labelText = document.createTextNode(this.properties[1]);
+			jQuery(this.elem).append(this.labelText);
+			this.inputElem.checked = (this.properties[7] !== 0);
+			jQuery(this.elem).css("font-family", "sans-serif");
+			jQuery(this.elem).css("display", "inline-block");
+			jQuery(this.elem).css("color", "black");
+		}
+		else
+			this.inputElem.value = this.properties[1];
+		this.elem.title = this.properties[2];
+		this.inputElem.disabled = (this.properties[4] === 0);
+		this.autoFontSize = (this.properties[5] !== 0);
+		this.element_hidden = false;
+		if (this.properties[3] === 0)
+		{
+			jQuery(this.elem).hide();
+			this.visible = false;
+			this.element_hidden = true;
+		}
+		this.inputElem.onclick = (function (self) {
+			return function(e) {
+				e.stopPropagation();
+				self.runtime.isInUserInputEvent = true;
+				self.runtime.trigger(cr.plugins_.Button.prototype.cnds.OnClicked, self);
+				self.runtime.isInUserInputEvent = false;
+			};
+		})(this);
+		this.elem.addEventListener("touchstart", function (e) {
+			e.stopPropagation();
+		}, false);
+		this.elem.addEventListener("touchmove", function (e) {
+			e.stopPropagation();
+		}, false);
+		this.elem.addEventListener("touchend", function (e) {
+			e.stopPropagation();
+		}, false);
+		jQuery(this.elem).mousedown(function (e) {
+			e.stopPropagation();
+		});
+		jQuery(this.elem).mouseup(function (e) {
+			e.stopPropagation();
+		});
+		jQuery(this.elem).keydown(function (e) {
+			e.stopPropagation();
+		});
+		jQuery(this.elem).keyup(function (e) {
+			e.stopPropagation();
+		});
+		this.lastLeft = 0;
+		this.lastTop = 0;
+		this.lastRight = 0;
+		this.lastBottom = 0;
+		this.lastWinWidth = 0;
+		this.lastWinHeight = 0;
+		this.updatePosition(true);
+		this.runtime.tickMe(this);
+	};
+	instanceProto.saveToJSON = function ()
+	{
+		var o = {
+			"tooltip": this.elem.title,
+			"disabled": !!this.inputElem.disabled
+		};
+		if (this.isCheckbox)
+		{
+			o["checked"] = !!this.inputElem.checked;
+			o["text"] = this.labelText.nodeValue;
+		}
+		else
+		{
+			o["text"] = this.elem.value;
+		}
+		return o;
+	};
+	instanceProto.loadFromJSON = function (o)
+	{
+		this.elem.title = o["tooltip"];
+		this.inputElem.disabled = o["disabled"];
+		if (this.isCheckbox)
+		{
+			this.inputElem.checked = o["checked"];
+			this.labelText.nodeValue = o["text"];
+		}
+		else
+		{
+			this.elem.value = o["text"];
+		}
+	};
+	instanceProto.onDestroy = function ()
+	{
+		if (this.runtime.isDomFree)
+			return;
+		jQuery(this.elem).remove();
+		this.elem = null;
+	};
+	instanceProto.tick = function ()
+	{
+		this.updatePosition();
+	};
+	var last_canvas_offset = null;
+	var last_checked_tick = -1;
+	instanceProto.updatePosition = function (first)
+	{
+		if (this.runtime.isDomFree)
+			return;
+		var left = this.layer.layerToCanvas(this.x, this.y, true);
+		var top = this.layer.layerToCanvas(this.x, this.y, false);
+		var right = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, true);
+		var bottom = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, false);
+		var rightEdge = this.runtime.width / this.runtime.devicePixelRatio;
+		var bottomEdge = this.runtime.height / this.runtime.devicePixelRatio;
+		if (!this.visible || !this.layer.visible || right <= 0 || bottom <= 0 || left >= rightEdge || top >= bottomEdge)
+		{
+			if (!this.element_hidden)
+				jQuery(this.elem).hide();
+			this.element_hidden = true;
+			return;
+		}
+		if (left < 1)
+			left = 1;
+		if (top < 1)
+			top = 1;
+		if (right >= rightEdge)
+			right = rightEdge - 1;
+		if (bottom >= bottomEdge)
+			bottom = bottomEdge - 1;
+		var curWinWidth = window.innerWidth;
+		var curWinHeight = window.innerHeight;
+		if (!first && this.lastLeft === left && this.lastTop === top && this.lastRight === right && this.lastBottom === bottom && this.lastWinWidth === curWinWidth && this.lastWinHeight === curWinHeight)
+		{
+			if (this.element_hidden)
+			{
+				jQuery(this.elem).show();
+				this.element_hidden = false;
+			}
+			return;
+		}
+		this.lastLeft = left;
+		this.lastTop = top;
+		this.lastRight = right;
+		this.lastBottom = bottom;
+		this.lastWinWidth = curWinWidth;
+		this.lastWinHeight = curWinHeight;
+		if (this.element_hidden)
+		{
+			jQuery(this.elem).show();
+			this.element_hidden = false;
+		}
+		var offx = Math.round(left) + jQuery(this.runtime.canvas).offset().left;
+		var offy = Math.round(top) + jQuery(this.runtime.canvas).offset().top;
+		jQuery(this.elem).css("position", "absolute");
+		jQuery(this.elem).offset({left: offx, top: offy});
+		jQuery(this.elem).width(Math.round(right - left));
+		jQuery(this.elem).height(Math.round(bottom - top));
+		if (this.autoFontSize)
+			jQuery(this.elem).css("font-size", ((this.layer.getScale(true) / this.runtime.devicePixelRatio) - 0.2) + "em");
+	};
+	instanceProto.draw = function(ctx)
+	{
+	};
+	instanceProto.drawGL = function(glw)
+	{
+	};
+	function Cnds() {};
+	Cnds.prototype.OnClicked = function ()
+	{
+		return true;
+	};
+	Cnds.prototype.IsChecked = function ()
+	{
+		return this.isCheckbox && this.inputElem.checked;
+	};
+	pluginProto.cnds = new Cnds();
+	function Acts() {};
+	Acts.prototype.SetText = function (text)
+	{
+		if (this.runtime.isDomFree)
+			return;
+		if (this.isCheckbox)
+			this.labelText.nodeValue = text;
+		else
+			this.elem.value = text;
+	};
+	Acts.prototype.SetTooltip = function (text)
+	{
+		if (this.runtime.isDomFree)
+			return;
+		this.elem.title = text;
+	};
+	Acts.prototype.SetVisible = function (vis)
+	{
+		if (this.runtime.isDomFree)
+			return;
+		this.visible = (vis !== 0);
+	};
+	Acts.prototype.SetEnabled = function (en)
+	{
+		if (this.runtime.isDomFree)
+			return;
+		this.inputElem.disabled = (en === 0);
+	};
+	Acts.prototype.SetFocus = function ()
+	{
+		if (this.runtime.isDomFree)
+			return;
+		this.inputElem.focus();
+	};
+	Acts.prototype.SetBlur = function ()
+	{
+		if (this.runtime.isDomFree)
+			return;
+		this.inputElem.blur();
+	};
+	Acts.prototype.SetCSSStyle = function (p, v)
+	{
+		if (this.runtime.isDomFree)
+			return;
+		jQuery(this.elem).css(p, v);
+	};
+	Acts.prototype.SetChecked = function (c)
+	{
+		if (this.runtime.isDomFree || !this.isCheckbox)
+			return;
+		this.inputElem.checked = (c === 1);
+	};
+	Acts.prototype.ToggleChecked = function ()
+	{
+		if (this.runtime.isDomFree || !this.isCheckbox)
+			return;
+		this.inputElem.checked = !this.inputElem.checked;
+	};
+	pluginProto.acts = new Acts();
+	function Exps() {};
+	pluginProto.exps = new Exps();
+}());
 ;
 ;
 cr.plugins_.Function = function(runtime)
@@ -17083,803 +17299,15 @@ cr.plugins_.Sprite = function(runtime)
 	};
 	pluginProto.exps = new Exps();
 }());
-/* global cr,log,assert2 */
-/* jshint globalstrict: true */
-/* jshint strict: true */
 ;
 ;
-cr.plugins_.Spritefont2 = function(runtime)
+cr.plugins_.Touch = function(runtime)
 {
 	this.runtime = runtime;
 };
 (function ()
 {
-	var pluginProto = cr.plugins_.Spritefont2.prototype;
-	pluginProto.onCreate = function ()
-	{
-	};
-	pluginProto.Type = function(plugin)
-	{
-		this.plugin = plugin;
-		this.runtime = plugin.runtime;
-	};
-	var typeProto = pluginProto.Type.prototype;
-	typeProto.onCreate = function()
-	{
-		if (this.is_family)
-			return;
-		this.texture_img = new Image();
-		this.runtime.waitForImageLoad(this.texture_img, this.texture_file);
-		this.webGL_texture = null;
-	};
-	typeProto.onLostWebGLContext = function ()
-	{
-		if (this.is_family)
-			return;
-		this.webGL_texture = null;
-	};
-	typeProto.onRestoreWebGLContext = function ()
-	{
-		if (this.is_family || !this.instances.length)
-			return;
-		if (!this.webGL_texture)
-		{
-			this.webGL_texture = this.runtime.glwrap.loadTexture(this.texture_img, false, this.runtime.linearSampling, this.texture_pixelformat);
-		}
-		var i, len;
-		for (i = 0, len = this.instances.length; i < len; i++)
-			this.instances[i].webGL_texture = this.webGL_texture;
-	};
-	typeProto.unloadTextures = function ()
-	{
-		if (this.is_family || this.instances.length || !this.webGL_texture)
-			return;
-		this.runtime.glwrap.deleteTexture(this.webGL_texture);
-		this.webGL_texture = null;
-	};
-	typeProto.preloadCanvas2D = function (ctx)
-	{
-		ctx.drawImage(this.texture_img, 0, 0);
-	};
-	pluginProto.Instance = function(type)
-	{
-		this.type = type;
-		this.runtime = type.runtime;
-	};
-	var instanceProto = pluginProto.Instance.prototype;
-	instanceProto.onDestroy = function()
-	{
-		freeAllLines (this.lines);
-		freeAllClip  (this.clipList);
-		freeAllClipUV(this.clipUV);
-		cr.wipe(this.characterWidthList);
-	};
-	instanceProto.onCreate = function()
-	{
-		this.texture_img      = this.type.texture_img;
-		this.characterWidth   = this.properties[0];
-		this.characterHeight  = this.properties[1];
-		this.characterSet     = this.properties[2];
-		this.text             = this.properties[3];
-		this.characterScale   = this.properties[4];
-		this.visible          = (this.properties[5] === 0);	// 0=visible, 1=invisible
-		this.halign           = this.properties[6]/2.0;		// 0=left, 1=center, 2=right
-		this.valign           = this.properties[7]/2.0;		// 0=top, 1=center, 2=bottom
-		this.wrapbyword       = (this.properties[9] === 0);	// 0=word, 1=character
-		this.characterSpacing = this.properties[10];
-		this.lineHeight       = this.properties[11];
-		this.textWidth  = 0;
-		this.textHeight = 0;
-		if (this.recycled)
-		{
-			cr.clearArray(this.lines);
-			cr.wipe(this.clipList);
-			cr.wipe(this.clipUV);
-			cr.wipe(this.characterWidthList);
-		}
-		else
-		{
-			this.lines = [];
-			this.clipList = {};
-			this.clipUV = {};
-			this.characterWidthList = {};
-		}
-		this.text_changed = true;
-		this.lastwrapwidth = this.width;
-		if (this.runtime.glwrap)
-		{
-			if (!this.type.webGL_texture)
-			{
-				this.type.webGL_texture = this.runtime.glwrap.loadTexture(this.type.texture_img, false, this.runtime.linearSampling, this.type.texture_pixelformat);
-			}
-			this.webGL_texture = this.type.webGL_texture;
-		}
-		this.SplitSheet();
-	};
-	instanceProto.saveToJSON = function ()
-	{
-		var save = {
-			"t": this.text,
-			"csc": this.characterScale,
-			"csp": this.characterSpacing,
-			"lh": this.lineHeight,
-			"tw": this.textWidth,
-			"th": this.textHeight,
-			"lrt": this.last_render_tick,
-			"ha": this.halign,
-			"va": this.valign,
-			"cw": {}
-		};
-		for (var ch in this.characterWidthList)
-			save["cw"][ch] = this.characterWidthList[ch];
-		return save;
-	};
-	instanceProto.loadFromJSON = function (o)
-	{
-		this.text = o["t"];
-		this.characterScale = o["csc"];
-		this.characterSpacing = o["csp"];
-		this.lineHeight = o["lh"];
-		this.textWidth = o["tw"];
-		this.textHeight = o["th"];
-		this.last_render_tick = o["lrt"];
-		if (o.hasOwnProperty("ha"))
-			this.halign = o["ha"];
-		if (o.hasOwnProperty("va"))
-			this.valign = o["va"];
-		for(var ch in o["cw"])
-			this.characterWidthList[ch] = o["cw"][ch];
-		this.text_changed = true;
-		this.lastwrapwidth = this.width;
-	};
-	function trimRight(text)
-	{
-		return text.replace(/\s\s*$/, '');
-	}
-	var MAX_CACHE_SIZE = 1000;
-	function alloc(cache,Constructor)
-	{
-		if (cache.length)
-			return cache.pop();
-		else
-			return new Constructor();
-	}
-	function free(cache,data)
-	{
-		if (cache.length < MAX_CACHE_SIZE)
-		{
-			cache.push(data);
-		}
-	}
-	function freeAll(cache,dataList,isArray)
-	{
-		if (isArray) {
-			var i, len;
-			for (i = 0, len = dataList.length; i < len; i++)
-			{
-				free(cache,dataList[i]);
-			}
-			cr.clearArray(dataList);
-		} else {
-			var prop;
-			for(prop in dataList) {
-				if(Object.prototype.hasOwnProperty.call(dataList,prop)) {
-					free(cache,dataList[prop]);
-					delete dataList[prop];
-				}
-			}
-		}
-	}
-	function addLine(inst,lineIndex,cur_line) {
-		var lines = inst.lines;
-		var line;
-		cur_line = trimRight(cur_line);
-		if (lineIndex >= lines.length)
-			lines.push(allocLine());
-		line = lines[lineIndex];
-		line.text = cur_line;
-		line.width = inst.measureWidth(cur_line);
-		inst.textWidth = cr.max(inst.textWidth,line.width);
-	}
-	var linesCache = [];
-	function allocLine()       { return alloc(linesCache,Object); }
-	function freeLine(l)       { free(linesCache,l); }
-	function freeAllLines(arr) { freeAll(linesCache,arr,true); }
-	function addClip(obj,property,x,y,w,h) {
-		if (obj[property] === undefined) {
-			obj[property] = alloc(clipCache,Object);
-		}
-		obj[property].x = x;
-		obj[property].y = y;
-		obj[property].w = w;
-		obj[property].h = h;
-	}
-	var clipCache = [];
-	function allocClip()      { return alloc(clipCache,Object); }
-	function freeAllClip(obj) { freeAll(clipCache,obj,false);}
-	function addClipUV(obj,property,left,top,right,bottom) {
-		if (obj[property] === undefined) {
-			obj[property] = alloc(clipUVCache,cr.rect);
-		}
-		obj[property].left   = left;
-		obj[property].top    = top;
-		obj[property].right  = right;
-		obj[property].bottom = bottom;
-	}
-	var clipUVCache = [];
-	function allocClipUV()      { return alloc(clipUVCache,cr.rect);}
-	function freeAllClipUV(obj) { freeAll(clipUVCache,obj,false);}
-	instanceProto.SplitSheet = function() {
-		var texture      = this.texture_img;
-		var texWidth     = texture.width;
-		var texHeight    = texture.height;
-		var charWidth    = this.characterWidth;
-		var charHeight   = this.characterHeight;
-		var charU        = charWidth /texWidth;
-		var charV        = charHeight/texHeight;
-		var charSet      = this.characterSet ;
-		var cols = Math.floor(texWidth/charWidth);
-		var rows = Math.floor(texHeight/charHeight);
-		for ( var c = 0; c < charSet.length; c++) {
-			if  (c >= cols * rows) break;
-			var x = c%cols;
-			var y = Math.floor(c/cols);
-			var letter = charSet.charAt(c);
-			if (this.runtime.glwrap) {
-				addClipUV(
-					this.clipUV, letter,
-					x * charU ,
-					y * charV ,
-					(x+1) * charU ,
-					(y+1) * charV
-				);
-			} else {
-				addClip(
-					this.clipList, letter,
-					x * charWidth,
-					y * charHeight,
-					charWidth,
-					charHeight
-				);
-			}
-		}
-	};
-	/*
-     *	Word-Wrapping
-     */
-	var wordsCache = [];
-	pluginProto.TokeniseWords = function (text)
-	{
-		cr.clearArray(wordsCache);
-		var cur_word = "";
-		var ch;
-		var i = 0;
-		while (i < text.length)
-		{
-			ch = text.charAt(i);
-			if (ch === "\n")
-			{
-				if (cur_word.length)
-				{
-					wordsCache.push(cur_word);
-					cur_word = "";
-				}
-				wordsCache.push("\n");
-				++i;
-			}
-			else if (ch === " " || ch === "\t" || ch === "-")
-			{
-				do {
-					cur_word += text.charAt(i);
-					i++;
-				}
-				while (i < text.length && (text.charAt(i) === " " || text.charAt(i) === "\t"));
-				wordsCache.push(cur_word);
-				cur_word = "";
-			}
-			else if (i < text.length)
-			{
-				cur_word += ch;
-				i++;
-			}
-		}
-		if (cur_word.length)
-			wordsCache.push(cur_word);
-	};
-	pluginProto.WordWrap = function (inst)
-	{
-		var text = inst.text;
-		var lines = inst.lines;
-		if (!text || !text.length)
-		{
-			freeAllLines(lines);
-			return;
-		}
-		var width = inst.width;
-		if (width <= 2.0)
-		{
-			freeAllLines(lines);
-			return;
-		}
-		var charWidth = inst.characterWidth;
-		var charScale = inst.characterScale;
-		var charSpacing = inst.characterSpacing;
-		if ( (text.length * (charWidth * charScale + charSpacing) - charSpacing) <= width && text.indexOf("\n") === -1)
-		{
-			var all_width = inst.measureWidth(text);
-			if (all_width <= width)
-			{
-				freeAllLines(lines);
-				lines.push(allocLine());
-				lines[0].text = text;
-				lines[0].width = all_width;
-				inst.textWidth  = all_width;
-				inst.textHeight = inst.characterHeight * charScale + inst.lineHeight;
-				return;
-			}
-		}
-		var wrapbyword = inst.wrapbyword;
-		this.WrapText(inst);
-		inst.textHeight = lines.length * (inst.characterHeight * charScale + inst.lineHeight);
-	};
-	pluginProto.WrapText = function (inst)
-	{
-		var wrapbyword = inst.wrapbyword;
-		var text       = inst.text;
-		var lines      = inst.lines;
-		var width      = inst.width;
-		var wordArray;
-		if (wrapbyword) {
-			this.TokeniseWords(text);	// writes to wordsCache
-			wordArray = wordsCache;
-		} else {
-			wordArray = text;
-		}
-		var cur_line = "";
-		var prev_line;
-		var line_width;
-		var i;
-		var lineIndex = 0;
-		var line;
-		var ignore_newline = false;
-		for (i = 0; i < wordArray.length; i++)
-		{
-			if (wordArray[i] === "\n")
-			{
-				if (ignore_newline === true) {
-					ignore_newline = false;
-				} else {
-					addLine(inst,lineIndex,cur_line);
-					lineIndex++;
-				}
-				cur_line = "";
-				continue;
-			}
-			ignore_newline = false;
-			prev_line = cur_line;
-			cur_line += wordArray[i];
-			line_width = inst.measureWidth(trimRight(cur_line));
-			if (line_width > width)
-			{
-				if (prev_line === "") {
-					addLine(inst,lineIndex,cur_line);
-					cur_line = "";
-					ignore_newline = true;
-				} else {
-					addLine(inst,lineIndex,prev_line);
-					cur_line = wordArray[i];
-				}
-				lineIndex++;
-				if (!wrapbyword && cur_line === " ")
-					cur_line = "";
-			}
-		}
-		if (trimRight(cur_line).length)
-		{
-			addLine(inst,lineIndex,cur_line);
-			lineIndex++;
-		}
-		for (i = lineIndex; i < lines.length; i++)
-			freeLine(lines[i]);
-		lines.length = lineIndex;
-	};
-	instanceProto.measureWidth = function(text) {
-		var spacing = this.characterSpacing;
-		var len     = text.length;
-		var width   = 0;
-		for (var i = 0; i < len; i++) {
-			width += this.getCharacterWidth(text.charAt(i)) * this.characterScale + spacing;
-		}
-		width -= (width > 0) ? spacing : 0;
-		return width;
-	};
-	/***/
-	instanceProto.getCharacterWidth = function(character) {
-		var widthList = this.characterWidthList;
-		if (widthList[character] !== undefined) {
-			return widthList[character];
-		} else {
-			return this.characterWidth;
-		}
-	};
-	instanceProto.rebuildText = function() {
-		if (this.text_changed || this.width !== this.lastwrapwidth) {
-			this.textWidth = 0;
-			this.textHeight = 0;
-			this.type.plugin.WordWrap(this);
-			this.text_changed = false;
-			this.lastwrapwidth = this.width;
-		}
-	};
-	var EPSILON = 0.00001;
-	instanceProto.draw = function(ctx, glmode)
-	{
-		var texture = this.texture_img;
-		if (this.text !== "" && texture != null) {
-			this.rebuildText();
-			if (this.height < this.characterHeight*this.characterScale + this.lineHeight) {
-				return;
-			}
-			ctx.globalAlpha = this.opacity;
-			var myx = this.x;
-			var myy = this.y;
-			if (this.runtime.pixel_rounding)
-			{
-				myx = Math.round(myx);
-				myy = Math.round(myy);
-			}
-			var viewLeft = this.layer.viewLeft;
-			var viewTop = this.layer.viewTop;
-			var viewRight = this.layer.viewRight;
-			var viewBottom = this.layer.viewBottom;
-			ctx.save();
-			ctx.translate(myx, myy);
-			ctx.rotate(this.angle);
-			var ha         = this.halign;
-			var va         = this.valign;
-			var scale      = this.characterScale;
-			var charHeight = this.characterHeight * scale;
-			var lineHeight = this.lineHeight;
-			var charSpace  = this.characterSpacing;
-			var lines = this.lines;
-			var textHeight = this.textHeight;
-			var letterWidth;
-			var halign;
-			var valign = va * cr.max(0,(this.height - textHeight));
-			var offx = -(this.hotspotX * this.width);
-			var offy = -(this.hotspotY * this.height);
-			offy += valign;
-			var drawX ;
-			var drawY = offy;
-			var roundX, roundY;
-			for(var i = 0; i < lines.length; i++) {
-				var line = lines[i].text;
-				var len  = lines[i].width;
-				halign = ha * cr.max(0,this.width - len);
-				drawX = offx + halign;
-				drawY += lineHeight;
-				if (myy + drawY + charHeight < viewTop)
-				{
-					drawY += charHeight;
-					continue;
-				}
-				for(var j = 0; j < line.length; j++) {
-					var letter = line.charAt(j);
-					letterWidth = this.getCharacterWidth(letter);
-					var clip = this.clipList[letter];
-					if (myx + drawX + letterWidth * scale + charSpace < viewLeft)
-					{
-						drawX += letterWidth * scale + charSpace;
-						continue;
-					}
-					if ( drawX + letterWidth * scale > this.width + EPSILON ) {
-						break;
-					}
-					if (clip !== undefined) {
-						roundX = drawX;
-						roundY = drawY;
-						if (this.angle === 0)
-						{
-							roundX = Math.round(roundX);
-							roundY = Math.round(roundY);
-						}
-						ctx.drawImage( this.texture_img,
-									 clip.x, clip.y, clip.w, clip.h,
-									 roundX,roundY,clip.w*scale,clip.h*scale);
-					}
-					drawX += letterWidth * scale + charSpace;
-					if (myx + drawX > viewRight)
-						break;
-				}
-				drawY += charHeight;
-				if (drawY + charHeight + lineHeight > this.height || myy + drawY > viewBottom)
-				{
-					break;
-				}
-			}
-			ctx.restore();
-		}
-	};
-	var dQuad = new cr.quad();
-	function rotateQuad(quad,cosa,sina) {
-		var x_temp;
-		x_temp   = (quad.tlx * cosa) - (quad.tly * sina);
-		quad.tly = (quad.tly * cosa) + (quad.tlx * sina);
-		quad.tlx = x_temp;
-		x_temp    = (quad.trx * cosa) - (quad.try_ * sina);
-		quad.try_ = (quad.try_ * cosa) + (quad.trx * sina);
-		quad.trx  = x_temp;
-		x_temp   = (quad.blx * cosa) - (quad.bly * sina);
-		quad.bly = (quad.bly * cosa) + (quad.blx * sina);
-		quad.blx = x_temp;
-		x_temp    = (quad.brx * cosa) - (quad.bry * sina);
-		quad.bry = (quad.bry * cosa) + (quad.brx * sina);
-		quad.brx  = x_temp;
-	}
-	instanceProto.drawGL = function(glw)
-	{
-		glw.setTexture(this.webGL_texture);
-		glw.setOpacity(this.opacity);
-		if (!this.text)
-			return;
-		this.rebuildText();
-		if (this.height < this.characterHeight*this.characterScale + this.lineHeight) {
-			return;
-		}
-		this.update_bbox();
-		var q = this.bquad;
-		var ox = 0;
-		var oy = 0;
-		if (this.runtime.pixel_rounding)
-		{
-			ox = Math.round(this.x) - this.x;
-			oy = Math.round(this.y) - this.y;
-		}
-		var viewLeft = this.layer.viewLeft;
-		var viewTop = this.layer.viewTop;
-		var viewRight = this.layer.viewRight;
-		var viewBottom = this.layer.viewBottom;
-		var angle      = this.angle;
-		var ha         = this.halign;
-		var va         = this.valign;
-		var scale      = this.characterScale;
-		var charHeight = this.characterHeight * scale;   // to precalculate in onCreate or on change
-		var lineHeight = this.lineHeight;
-		var charSpace  = this.characterSpacing;
-		var lines = this.lines;
-		var textHeight = this.textHeight;
-		var letterWidth;
-		var cosa,sina;
-		if (angle !== 0)
-		{
-			cosa = Math.cos(angle);
-			sina = Math.sin(angle);
-		}
-		var halign;
-		var valign = va * cr.max(0,(this.height - textHeight));
-		var offx = q.tlx + ox;
-		var offy = q.tly + oy;
-		var drawX ;
-		var drawY = valign;
-		var roundX, roundY;
-		for(var i = 0; i < lines.length; i++) {
-			var line       = lines[i].text;
-			var lineWidth  = lines[i].width;
-			halign = ha * cr.max(0,this.width - lineWidth);
-			drawX = halign;
-			drawY += lineHeight;
-			if (angle === 0 && offy + drawY + charHeight < viewTop)
-			{
-				drawY += charHeight;
-				continue;
-			}
-			for(var j = 0; j < line.length; j++) {
-				var letter = line.charAt(j);
-				letterWidth = this.getCharacterWidth(letter);
-				var clipUV = this.clipUV[letter];
-				if (offx + drawX + letterWidth * scale + charSpace < viewLeft)
-				{
-					drawX += letterWidth * scale + charSpace;
-					continue;
-				}
-				if (drawX + letterWidth * scale > this.width + EPSILON)
-				{
-					break;
-				}
-				if (clipUV !== undefined) {
-					var clipWidth  = this.characterWidth*scale;
-					var clipHeight = this.characterHeight*scale;
-					roundX = drawX;
-					roundY = drawY;
-					if (angle === 0)
-					{
-						roundX = Math.round(roundX);
-						roundY = Math.round(roundY);
-					}
-					dQuad.tlx  = roundX;
-					dQuad.tly  = roundY;
-					dQuad.trx  = roundX + clipWidth;
-					dQuad.try_ = roundY ;
-					dQuad.blx  = roundX;
-					dQuad.bly  = roundY + clipHeight;
-					dQuad.brx  = roundX + clipWidth;
-					dQuad.bry  = roundY + clipHeight;
-					if(angle !== 0)
-					{
-						rotateQuad(dQuad,cosa,sina);
-					}
-					dQuad.offset(offx,offy);
-					glw.quadTex(
-						dQuad.tlx, dQuad.tly,
-						dQuad.trx, dQuad.try_,
-						dQuad.brx, dQuad.bry,
-						dQuad.blx, dQuad.bly,
-						clipUV
-					);
-				}
-				drawX += letterWidth * scale + charSpace;
-				if (angle === 0 && offx + drawX > viewRight)
-					break;
-			}
-			drawY += charHeight;
-			if (drawY + charHeight + lineHeight > this.height || offy + drawY > viewBottom)
-			{
-				break;
-			}
-		}
-	};
-	function Cnds() {}
-	Cnds.prototype.CompareText = function(text_to_compare, case_sensitive)
-	{
-		if (case_sensitive)
-			return this.text == text_to_compare;
-		else
-			return cr.equals_nocase(this.text, text_to_compare);
-	};
-	pluginProto.cnds = new Cnds();
-	function Acts() {}
-	Acts.prototype.SetText = function(param)
-	{
-		if (cr.is_number(param) && param < 1e9)
-			param = Math.round(param * 1e10) / 1e10;	// round to nearest ten billionth - hides floating point errors
-		var text_to_set = param.toString();
-		if (this.text !== text_to_set)
-		{
-			this.text = text_to_set;
-			this.text_changed = true;
-			this.runtime.redraw = true;
-		}
-	};
-	Acts.prototype.AppendText = function(param)
-	{
-		if (cr.is_number(param))
-			param = Math.round(param * 1e10) / 1e10;	// round to nearest ten billionth - hides floating point errors
-		var text_to_append = param.toString();
-		if (text_to_append)	// not empty
-		{
-			this.text += text_to_append;
-			this.text_changed = true;
-			this.runtime.redraw = true;
-		}
-	};
-	Acts.prototype.SetScale = function(param)
-	{
-		if (param !== this.characterScale) {
-			this.characterScale = param;
-			this.text_changed = true;
-			this.runtime.redraw = true;
-		}
-	};
-	Acts.prototype.SetCharacterSpacing = function(param)
-	{
-		if (param !== this.CharacterSpacing) {
-			this.characterSpacing = param;
-			this.text_changed = true;
-			this.runtime.redraw = true;
-		}
-	};
-	Acts.prototype.SetLineHeight = function(param)
-	{
-		if (param !== this.lineHeight) {
-			this.lineHeight = param;
-			this.text_changed = true;
-			this.runtime.redraw = true;
-		}
-	};
-	instanceProto.SetCharWidth = function(character,width) {
-		var w = parseInt(width,10);
-		if (this.characterWidthList[character] !== w) {
-			this.characterWidthList[character] = w;
-			this.text_changed = true;
-			this.runtime.redraw = true;
-		}
-	};
-	Acts.prototype.SetCharacterWidth = function(characterSet,width)
-	{
-		if (characterSet !== "") {
-			for(var c = 0; c < characterSet.length; c++) {
-				this.SetCharWidth(characterSet.charAt(c),width);
-			}
-		}
-	};
-	Acts.prototype.SetEffect = function (effect)
-	{
-		this.blend_mode = effect;
-		this.compositeOp = cr.effectToCompositeOp(effect);
-		cr.setGLBlend(this, effect, this.runtime.gl);
-		this.runtime.redraw = true;
-	};
-	Acts.prototype.SetHAlign = function (a)
-	{
-		this.halign = a / 2.0;
-		this.text_changed = true;
-		this.runtime.redraw = true;
-	};
-	Acts.prototype.SetVAlign = function (a)
-	{
-		this.valign = a / 2.0;
-		this.text_changed = true;
-		this.runtime.redraw = true;
-	};
-	pluginProto.acts = new Acts();
-	function Exps() {}
-	Exps.prototype.CharacterWidth = function(ret,character)
-	{
-		ret.set_int(this.getCharacterWidth(character));
-	};
-	Exps.prototype.CharacterHeight = function(ret)
-	{
-		ret.set_int(this.characterHeight);
-	};
-	Exps.prototype.CharacterScale = function(ret)
-	{
-		ret.set_float(this.characterScale);
-	};
-	Exps.prototype.CharacterSpacing = function(ret)
-	{
-		ret.set_int(this.characterSpacing);
-	};
-	Exps.prototype.LineHeight = function(ret)
-	{
-		ret.set_int(this.lineHeight);
-	};
-	Exps.prototype.Text = function(ret)
-	{
-		ret.set_string(this.text);
-	};
-	Exps.prototype.TextWidth = function (ret)
-	{
-		this.rebuildText();
-		ret.set_float(this.textWidth);
-	};
-	Exps.prototype.TextHeight = function (ret)
-	{
-		this.rebuildText();
-		ret.set_float(this.textHeight);
-	};
-	pluginProto.exps = new Exps();
-}());
-;
-;
-cr.plugins_.Text = function(runtime)
-{
-	this.runtime = runtime;
-};
-(function ()
-{
-	var pluginProto = cr.plugins_.Text.prototype;
-	pluginProto.onCreate = function ()
-	{
-		pluginProto.acts.SetWidth = function (w)
-		{
-			if (this.width !== w)
-			{
-				this.width = w;
-				this.text_changed = true;	// also recalculate text wrapping
-				this.set_bbox_changed();
-			}
-		};
-	};
+	var pluginProto = cr.plugins_.Touch.prototype;
 	pluginProto.Type = function(plugin)
 	{
 		this.plugin = plugin;
@@ -17889,2211 +17317,1341 @@ cr.plugins_.Text = function(runtime)
 	typeProto.onCreate = function()
 	{
 	};
-	typeProto.onLostWebGLContext = function ()
-	{
-		if (this.is_family)
-			return;
-		var i, len, inst;
-		for (i = 0, len = this.instances.length; i < len; i++)
-		{
-			inst = this.instances[i];
-			inst.mycanvas = null;
-			inst.myctx = null;
-			inst.mytex = null;
-		}
-	};
 	pluginProto.Instance = function(type)
 	{
 		this.type = type;
 		this.runtime = type.runtime;
-		if (this.recycled)
-			cr.clearArray(this.lines);
-		else
-			this.lines = [];		// for word wrapping
-		this.text_changed = true;
+		this.touches = [];
+		this.mouseDown = false;
 	};
 	var instanceProto = pluginProto.Instance.prototype;
-	var requestedWebFonts = {};		// already requested web fonts have an entry here
-	instanceProto.onCreate = function()
-	{
-		this.text = this.properties[0];
-		this.visible = (this.properties[1] === 0);		// 0=visible, 1=invisible
-		this.font = this.properties[2];
-		this.color = this.properties[3];
-		this.halign = this.properties[4];				// 0=left, 1=center, 2=right
-		this.valign = this.properties[5];				// 0=top, 1=center, 2=bottom
-		this.wrapbyword = (this.properties[7] === 0);	// 0=word, 1=character
-		this.lastwidth = this.width;
-		this.lastwrapwidth = this.width;
-		this.lastheight = this.height;
-		this.line_height_offset = this.properties[8];
-		this.facename = "";
-		this.fontstyle = "";
-		this.ptSize = 0;
-		this.textWidth = 0;
-		this.textHeight = 0;
-		this.parseFont();
-		this.mycanvas = null;
-		this.myctx = null;
-		this.mytex = null;
-		this.need_text_redraw = false;
-		this.last_render_tick = this.runtime.tickcount;
-		if (this.recycled)
-			this.rcTex.set(0, 0, 1, 1);
-		else
-			this.rcTex = new cr.rect(0, 0, 1, 1);
-		if (this.runtime.glwrap)
-			this.runtime.tickMe(this);
-;
-	};
-	instanceProto.parseFont = function ()
-	{
-		var arr = this.font.split(" ");
-		var i;
-		for (i = 0; i < arr.length; i++)
-		{
-			if (arr[i].substr(arr[i].length - 2, 2) === "pt")
-			{
-				this.ptSize = parseInt(arr[i].substr(0, arr[i].length - 2));
-				this.pxHeight = Math.ceil((this.ptSize / 72.0) * 96.0) + 4;	// assume 96dpi...
-				if (i > 0)
-					this.fontstyle = arr[i - 1];
-				this.facename = arr[i + 1];
-				for (i = i + 2; i < arr.length; i++)
-					this.facename += " " + arr[i];
-				break;
-			}
-		}
-	};
-	instanceProto.saveToJSON = function ()
-	{
-		return {
-			"t": this.text,
-			"f": this.font,
-			"c": this.color,
-			"ha": this.halign,
-			"va": this.valign,
-			"wr": this.wrapbyword,
-			"lho": this.line_height_offset,
-			"fn": this.facename,
-			"fs": this.fontstyle,
-			"ps": this.ptSize,
-			"pxh": this.pxHeight,
-			"tw": this.textWidth,
-			"th": this.textHeight,
-			"lrt": this.last_render_tick
-		};
-	};
-	instanceProto.loadFromJSON = function (o)
-	{
-		this.text = o["t"];
-		this.font = o["f"];
-		this.color = o["c"];
-		this.halign = o["ha"];
-		this.valign = o["va"];
-		this.wrapbyword = o["wr"];
-		this.line_height_offset = o["lho"];
-		this.facename = o["fn"];
-		this.fontstyle = o["fs"];
-		this.ptSize = o["ps"];
-		this.pxHeight = o["pxh"];
-		this.textWidth = o["tw"];
-		this.textHeight = o["th"];
-		this.last_render_tick = o["lrt"];
-		this.text_changed = true;
-		this.lastwidth = this.width;
-		this.lastwrapwidth = this.width;
-		this.lastheight = this.height;
-	};
-	instanceProto.tick = function ()
-	{
-		if (this.runtime.glwrap && this.mytex && (this.runtime.tickcount - this.last_render_tick >= 300))
-		{
-			var layer = this.layer;
-            this.update_bbox();
-            var bbox = this.bbox;
-            if (bbox.right < layer.viewLeft || bbox.bottom < layer.viewTop || bbox.left > layer.viewRight || bbox.top > layer.viewBottom)
-			{
-				this.runtime.glwrap.deleteTexture(this.mytex);
-				this.mytex = null;
-				this.myctx = null;
-				this.mycanvas = null;
-			}
-		}
-	};
-	instanceProto.onDestroy = function ()
-	{
-		this.myctx = null;
-		this.mycanvas = null;
-		if (this.runtime.glwrap && this.mytex)
-			this.runtime.glwrap.deleteTexture(this.mytex);
-		this.mytex = null;
-	};
-	instanceProto.updateFont = function ()
-	{
-		this.font = this.fontstyle + " " + this.ptSize.toString() + "pt " + this.facename;
-		this.text_changed = true;
-		this.runtime.redraw = true;
-	};
-	instanceProto.draw = function(ctx, glmode)
-	{
-		ctx.font = this.font;
-		ctx.textBaseline = "top";
-		ctx.fillStyle = this.color;
-		ctx.globalAlpha = glmode ? 1 : this.opacity;
-		var myscale = 1;
-		if (glmode)
-		{
-			myscale = this.layer.getScale();
-			ctx.save();
-			ctx.scale(myscale, myscale);
-		}
-		if (this.text_changed || this.width !== this.lastwrapwidth)
-		{
-			this.type.plugin.WordWrap(this.text, this.lines, ctx, this.width, this.wrapbyword);
-			this.text_changed = false;
-			this.lastwrapwidth = this.width;
-		}
-		this.update_bbox();
-		var penX = glmode ? 0 : this.bquad.tlx;
-		var penY = glmode ? 0 : this.bquad.tly;
-		if (this.runtime.pixel_rounding)
-		{
-			penX = (penX + 0.5) | 0;
-			penY = (penY + 0.5) | 0;
-		}
-		if (this.angle !== 0 && !glmode)
-		{
-			ctx.save();
-			ctx.translate(penX, penY);
-			ctx.rotate(this.angle);
-			penX = 0;
-			penY = 0;
-		}
-		var endY = penY + this.height;
-		var line_height = this.pxHeight;
-		line_height += this.line_height_offset;
-		var drawX;
-		var i;
-		if (this.valign === 1)		// center
-			penY += Math.max(this.height / 2 - (this.lines.length * line_height) / 2, 0);
-		else if (this.valign === 2)	// bottom
-			penY += Math.max(this.height - (this.lines.length * line_height) - 2, 0);
-		for (i = 0; i < this.lines.length; i++)
-		{
-			drawX = penX;
-			if (this.halign === 1)		// center
-				drawX = penX + (this.width - this.lines[i].width) / 2;
-			else if (this.halign === 2)	// right
-				drawX = penX + (this.width - this.lines[i].width);
-			ctx.fillText(this.lines[i].text, drawX, penY);
-			penY += line_height;
-			if (penY >= endY - line_height)
-				break;
-		}
-		if (this.angle !== 0 || glmode)
-			ctx.restore();
-		this.last_render_tick = this.runtime.tickcount;
-	};
-	instanceProto.drawGL = function(glw)
-	{
-		if (this.width < 1 || this.height < 1)
-			return;
-		var need_redraw = this.text_changed || this.need_text_redraw;
-		this.need_text_redraw = false;
-		var layer_scale = this.layer.getScale();
-		var layer_angle = this.layer.getAngle();
-		var rcTex = this.rcTex;
-		var floatscaledwidth = layer_scale * this.width;
-		var floatscaledheight = layer_scale * this.height;
-		var scaledwidth = Math.ceil(floatscaledwidth);
-		var scaledheight = Math.ceil(floatscaledheight);
-		var halfw = this.runtime.draw_width / 2;
-		var halfh = this.runtime.draw_height / 2;
-		if (!this.myctx)
-		{
-			this.mycanvas = document.createElement("canvas");
-			this.mycanvas.width = scaledwidth;
-			this.mycanvas.height = scaledheight;
-			this.lastwidth = scaledwidth;
-			this.lastheight = scaledheight;
-			need_redraw = true;
-			this.myctx = this.mycanvas.getContext("2d");
-		}
-		if (scaledwidth !== this.lastwidth || scaledheight !== this.lastheight)
-		{
-			this.mycanvas.width = scaledwidth;
-			this.mycanvas.height = scaledheight;
-			if (this.mytex)
-			{
-				glw.deleteTexture(this.mytex);
-				this.mytex = null;
-			}
-			need_redraw = true;
-		}
-		if (need_redraw)
-		{
-			this.myctx.clearRect(0, 0, scaledwidth, scaledheight);
-			this.draw(this.myctx, true);
-			if (!this.mytex)
-				this.mytex = glw.createEmptyTexture(scaledwidth, scaledheight, this.runtime.linearSampling, this.runtime.isMobile);
-			glw.videoToTexture(this.mycanvas, this.mytex, this.runtime.isMobile);
-		}
-		this.lastwidth = scaledwidth;
-		this.lastheight = scaledheight;
-		glw.setTexture(this.mytex);
-		glw.setOpacity(this.opacity);
-		glw.resetModelView();
-		glw.translate(-halfw, -halfh);
-		glw.updateModelView();
-		var q = this.bquad;
-		var tlx = this.layer.layerToCanvas(q.tlx, q.tly, true, true);
-		var tly = this.layer.layerToCanvas(q.tlx, q.tly, false, true);
-		var trx = this.layer.layerToCanvas(q.trx, q.try_, true, true);
-		var try_ = this.layer.layerToCanvas(q.trx, q.try_, false, true);
-		var brx = this.layer.layerToCanvas(q.brx, q.bry, true, true);
-		var bry = this.layer.layerToCanvas(q.brx, q.bry, false, true);
-		var blx = this.layer.layerToCanvas(q.blx, q.bly, true, true);
-		var bly = this.layer.layerToCanvas(q.blx, q.bly, false, true);
-		if (this.runtime.pixel_rounding || (this.angle === 0 && layer_angle === 0))
-		{
-			var ox = ((tlx + 0.5) | 0) - tlx;
-			var oy = ((tly + 0.5) | 0) - tly
-			tlx += ox;
-			tly += oy;
-			trx += ox;
-			try_ += oy;
-			brx += ox;
-			bry += oy;
-			blx += ox;
-			bly += oy;
-		}
-		if (this.angle === 0 && layer_angle === 0)
-		{
-			trx = tlx + scaledwidth;
-			try_ = tly;
-			brx = trx;
-			bry = tly + scaledheight;
-			blx = tlx;
-			bly = bry;
-			rcTex.right = 1;
-			rcTex.bottom = 1;
-		}
-		else
-		{
-			rcTex.right = floatscaledwidth / scaledwidth;
-			rcTex.bottom = floatscaledheight / scaledheight;
-		}
-		glw.quadTex(tlx, tly, trx, try_, brx, bry, blx, bly, rcTex);
-		glw.resetModelView();
-		glw.scale(layer_scale, layer_scale);
-		glw.rotateZ(-this.layer.getAngle());
-		glw.translate((this.layer.viewLeft + this.layer.viewRight) / -2, (this.layer.viewTop + this.layer.viewBottom) / -2);
-		glw.updateModelView();
-		this.last_render_tick = this.runtime.tickcount;
-	};
-	var wordsCache = [];
-	pluginProto.TokeniseWords = function (text)
-	{
-		cr.clearArray(wordsCache);
-		var cur_word = "";
-		var ch;
-		var i = 0;
-		while (i < text.length)
-		{
-			ch = text.charAt(i);
-			if (ch === "\n")
-			{
-				if (cur_word.length)
-				{
-					wordsCache.push(cur_word);
-					cur_word = "";
-				}
-				wordsCache.push("\n");
-				++i;
-			}
-			else if (ch === " " || ch === "\t" || ch === "-")
-			{
-				do {
-					cur_word += text.charAt(i);
-					i++;
-				}
-				while (i < text.length && (text.charAt(i) === " " || text.charAt(i) === "\t"));
-				wordsCache.push(cur_word);
-				cur_word = "";
-			}
-			else if (i < text.length)
-			{
-				cur_word += ch;
-				i++;
-			}
-		}
-		if (cur_word.length)
-			wordsCache.push(cur_word);
-	};
-	var linesCache = [];
-	function allocLine()
-	{
-		if (linesCache.length)
-			return linesCache.pop();
-		else
-			return {};
-	};
-	function freeLine(l)
-	{
-		linesCache.push(l);
-	};
-	function freeAllLines(arr)
+	var dummyoffset = {left: 0, top: 0};
+	instanceProto.findTouch = function (id)
 	{
 		var i, len;
-		for (i = 0, len = arr.length; i < len; i++)
+		for (i = 0, len = this.touches.length; i < len; i++)
 		{
-			freeLine(arr[i]);
+			if (this.touches[i]["id"] === id)
+				return i;
 		}
-		cr.clearArray(arr);
+		return -1;
 	};
-	pluginProto.WordWrap = function (text, lines, ctx, width, wrapbyword)
+	var appmobi_accx = 0;
+	var appmobi_accy = 0;
+	var appmobi_accz = 0;
+	function AppMobiGetAcceleration(evt)
 	{
-		if (!text || !text.length)
-		{
-			freeAllLines(lines);
-			return;
-		}
-		if (width <= 2.0)
-		{
-			freeAllLines(lines);
-			return;
-		}
-		if (text.length <= 100 && text.indexOf("\n") === -1)
-		{
-			var all_width = ctx.measureText(text).width;
-			if (all_width <= width)
-			{
-				freeAllLines(lines);
-				lines.push(allocLine());
-				lines[0].text = text;
-				lines[0].width = all_width;
-				return;
-			}
-		}
-		this.WrapText(text, lines, ctx, width, wrapbyword);
+		appmobi_accx = evt.x;
+		appmobi_accy = evt.y;
+		appmobi_accz = evt.z;
 	};
-	function trimSingleSpaceRight(str)
+	var pg_accx = 0;
+	var pg_accy = 0;
+	var pg_accz = 0;
+	function PhoneGapGetAcceleration(evt)
 	{
-		if (!str.length || str.charAt(str.length - 1) !== " ")
-			return str;
-		return str.substring(0, str.length - 1);
+		pg_accx = evt.x;
+		pg_accy = evt.y;
+		pg_accz = evt.z;
 	};
-	pluginProto.WrapText = function (text, lines, ctx, width, wrapbyword)
-	{
-		var wordArray;
-		if (wrapbyword)
-		{
-			this.TokeniseWords(text);	// writes to wordsCache
-			wordArray = wordsCache;
-		}
-		else
-			wordArray = text;
-		var cur_line = "";
-		var prev_line;
-		var line_width;
-		var i;
-		var lineIndex = 0;
-		var line;
-		for (i = 0; i < wordArray.length; i++)
-		{
-			if (wordArray[i] === "\n")
-			{
-				if (lineIndex >= lines.length)
-					lines.push(allocLine());
-				cur_line = trimSingleSpaceRight(cur_line);		// for correct center/right alignment
-				line = lines[lineIndex];
-				line.text = cur_line;
-				line.width = ctx.measureText(cur_line).width;
-				lineIndex++;
-				cur_line = "";
-				continue;
-			}
-			prev_line = cur_line;
-			cur_line += wordArray[i];
-			line_width = ctx.measureText(cur_line).width;
-			if (line_width >= width)
-			{
-				if (lineIndex >= lines.length)
-					lines.push(allocLine());
-				prev_line = trimSingleSpaceRight(prev_line);
-				line = lines[lineIndex];
-				line.text = prev_line;
-				line.width = ctx.measureText(prev_line).width;
-				lineIndex++;
-				cur_line = wordArray[i];
-				if (!wrapbyword && cur_line === " ")
-					cur_line = "";
-			}
-		}
-		if (cur_line.length)
-		{
-			if (lineIndex >= lines.length)
-				lines.push(allocLine());
-			cur_line = trimSingleSpaceRight(cur_line);
-			line = lines[lineIndex];
-			line.text = cur_line;
-			line.width = ctx.measureText(cur_line).width;
-			lineIndex++;
-		}
-		for (i = lineIndex; i < lines.length; i++)
-			freeLine(lines[i]);
-		lines.length = lineIndex;
-	};
-	function Cnds() {};
-	Cnds.prototype.CompareText = function(text_to_compare, case_sensitive)
-	{
-		if (case_sensitive)
-			return this.text == text_to_compare;
-		else
-			return cr.equals_nocase(this.text, text_to_compare);
-	};
-	pluginProto.cnds = new Cnds();
-	function Acts() {};
-	Acts.prototype.SetText = function(param)
-	{
-		if (cr.is_number(param) && param < 1e9)
-			param = Math.round(param * 1e10) / 1e10;	// round to nearest ten billionth - hides floating point errors
-		var text_to_set = param.toString();
-		if (this.text !== text_to_set)
-		{
-			this.text = text_to_set;
-			this.text_changed = true;
-			this.runtime.redraw = true;
-		}
-	};
-	Acts.prototype.AppendText = function(param)
-	{
-		if (cr.is_number(param))
-			param = Math.round(param * 1e10) / 1e10;	// round to nearest ten billionth - hides floating point errors
-		var text_to_append = param.toString();
-		if (text_to_append)	// not empty
-		{
-			this.text += text_to_append;
-			this.text_changed = true;
-			this.runtime.redraw = true;
-		}
-	};
-	Acts.prototype.SetFontFace = function (face_, style_)
-	{
-		var newstyle = "";
-		switch (style_) {
-		case 1: newstyle = "bold"; break;
-		case 2: newstyle = "italic"; break;
-		case 3: newstyle = "bold italic"; break;
-		}
-		if (face_ === this.facename && newstyle === this.fontstyle)
-			return;		// no change
-		this.facename = face_;
-		this.fontstyle = newstyle;
-		this.updateFont();
-	};
-	Acts.prototype.SetFontSize = function (size_)
-	{
-		if (this.ptSize === size_)
-			return;
-		this.ptSize = size_;
-		this.pxHeight = Math.ceil((this.ptSize / 72.0) * 96.0) + 4;	// assume 96dpi...
-		this.updateFont();
-	};
-	Acts.prototype.SetFontColor = function (rgb)
-	{
-		var newcolor = "rgb(" + cr.GetRValue(rgb).toString() + "," + cr.GetGValue(rgb).toString() + "," + cr.GetBValue(rgb).toString() + ")";
-		if (newcolor === this.color)
-			return;
-		this.color = newcolor;
-		this.need_text_redraw = true;
-		this.runtime.redraw = true;
-	};
-	Acts.prototype.SetWebFont = function (familyname_, cssurl_)
-	{
-		if (this.runtime.isDomFree)
-		{
-			cr.logexport("[Construct 2] Text plugin: 'Set web font' not supported on this platform - the action has been ignored");
-			return;		// DC todo
-		}
-		var self = this;
-		var refreshFunc = (function () {
-							self.runtime.redraw = true;
-							self.text_changed = true;
-						});
-		if (requestedWebFonts.hasOwnProperty(cssurl_))
-		{
-			var newfacename = "'" + familyname_ + "'";
-			if (this.facename === newfacename)
-				return;	// no change
-			this.facename = newfacename;
-			this.updateFont();
-			for (var i = 1; i < 10; i++)
-			{
-				setTimeout(refreshFunc, i * 100);
-				setTimeout(refreshFunc, i * 1000);
-			}
-			return;
-		}
-		var wf = document.createElement("link");
-		wf.href = cssurl_;
-		wf.rel = "stylesheet";
-		wf.type = "text/css";
-		wf.onload = refreshFunc;
-		document.getElementsByTagName('head')[0].appendChild(wf);
-		requestedWebFonts[cssurl_] = true;
-		this.facename = "'" + familyname_ + "'";
-		this.updateFont();
-		for (var i = 1; i < 10; i++)
-		{
-			setTimeout(refreshFunc, i * 100);
-			setTimeout(refreshFunc, i * 1000);
-		}
-;
-	};
-	Acts.prototype.SetEffect = function (effect)
-	{
-		this.blend_mode = effect;
-		this.compositeOp = cr.effectToCompositeOp(effect);
-		cr.setGLBlend(this, effect, this.runtime.gl);
-		this.runtime.redraw = true;
-	};
-	pluginProto.acts = new Acts();
-	function Exps() {};
-	Exps.prototype.Text = function(ret)
-	{
-		ret.set_string(this.text);
-	};
-	Exps.prototype.FaceName = function (ret)
-	{
-		ret.set_string(this.facename);
-	};
-	Exps.prototype.FaceSize = function (ret)
-	{
-		ret.set_int(this.ptSize);
-	};
-	Exps.prototype.TextWidth = function (ret)
-	{
-		var w = 0;
-		var i, len, x;
-		for (i = 0, len = this.lines.length; i < len; i++)
-		{
-			x = this.lines[i].width;
-			if (w < x)
-				w = x;
-		}
-		ret.set_int(w);
-	};
-	Exps.prototype.TextHeight = function (ret)
-	{
-		ret.set_int(this.lines.length * (this.pxHeight + this.line_height_offset) - this.line_height_offset);
-	};
-	pluginProto.exps = new Exps();
-}());
-;
-;
-cr.plugins_.Tilemap = function(runtime)
-{
-	this.runtime = runtime;
-};
-(function ()
-{
-	var pluginProto = cr.plugins_.Tilemap.prototype;
-	pluginProto.Type = function(plugin)
-	{
-		this.plugin = plugin;
-		this.runtime = plugin.runtime;
-	};
-	var typeProto = pluginProto.Type.prototype;
-	typeProto.onCreate = function()
-	{
-		var i, len, p;
-		if (this.is_family)
-			return;
-		this.texture_img = new Image();
-		this.texture_img.cr_filesize = this.texture_filesize;
-		this.runtime.waitForImageLoad(this.texture_img, this.texture_file);
-		this.cut_tiles = [];
-		this.cut_tiles_valid = false;
-		this.tile_polys = [];
-		this.tile_polys_cached = false;		// first instance will cache polys with the tile width/height
-		if (this.tile_poly_data && this.tile_poly_data.length)
-		{
-			for (i = 0, len = this.tile_poly_data.length; i < len; ++i)
-			{
-				p = this.tile_poly_data[i];
-				if (p)
-				{
-					this.tile_polys.push({
-						poly: p,
-						flipmap: [[[null, null], [null, null]], [[null, null], [null, null]]]
-					});
-				}
-				else
-					this.tile_polys.push(null);
-			}
-		}
-	};
-	typeProto.cacheTilePoly = function (tileid, tilewidth, tileheight, fliph, flipv, flipd)
-	{
-		if (tileid < 0 || tileid >= this.tile_polys.length)
-			return;
-		if (!this.tile_polys[tileid])
-			return;		// no poly for this tile
-		var poly = this.tile_polys[tileid].poly;
-		var flipmap = this.tile_polys[tileid].flipmap;
-		var cached_poly = new cr.CollisionPoly(poly);
-		cached_poly.cache_poly(tilewidth, tileheight, 0);
-		if (flipd)
-			cached_poly.diag();
-		if (fliph)
-			cached_poly.mirror(tilewidth / 2);
-		if (flipv)
-			cached_poly.flip(tileheight / 2);
-		flipmap[fliph?1:0][flipv?1:0][flipd?1:0] = cached_poly;
-	};
-	typeProto.getTilePoly = function (id)
-	{
-		if (id === -1)
-			return null;
-		var tileid = (id & TILE_ID_MASK);
-		if (tileid < 0 || tileid >= this.tile_polys.length)
-			return null;		// out of range
-		if (!this.tile_polys[tileid])
-			return null;		// no poly for this tile
-		var fliph = (id & TILE_FLIPPED_HORIZONTAL) ? 1 : 0;
-		var flipv = (id & TILE_FLIPPED_VERTICAL) ? 1 : 0;
-		var flipd = (id & TILE_FLIPPED_DIAGONAL) ? 1 : 0;
-		return this.tile_polys[tileid].flipmap[fliph][flipv][flipd];
-	};
-	typeProto.freeCutTiles = function ()
-	{
-		var i, len;
-		var glwrap = this.runtime.glwrap;
-		if (glwrap)
-		{
-			for (i = 0, len = this.cut_tiles.length; i < len; ++i)
-				glwrap.deleteTexture(this.cut_tiles[i]);
-		}
-		cr.clearArray(this.cut_tiles);
-		this.cut_tiles_valid = false;
-	}
-	typeProto.maybeCutTiles = function (tw, th, offx, offy, sepx, sepy, seamless)
-	{
-		if (this.cut_tiles_valid)
-			return;		// no changed
-		if (tw <= 0 || th <= 0)
-			return;
-		this.freeCutTiles();
-		var img_width = this.texture_img.width;
-		var img_height = this.texture_img.height;
-		var x, y;
-		for (y = offy; y + th <= img_height; y += (th + sepy))
-		{
-			for (x = offx; x + tw <= img_width; x += (tw + sepx))
-			{
-				this.cut_tiles.push(this.CutTileImage(x, y, tw, th, seamless));
-			}
-		}
-		this.cut_tiles_valid = true;
-	};
-	typeProto.CutTileImage = function(x, y, w, h, seamless)
-	{
-		if (this.runtime.glwrap)
-		{
-			return this.DoCutTileImage(x, y, w, h, false, false, false, seamless);
-		}
-		else
-		{
-			var flipmap = [[[null, null], [null, null]], [[null, null], [null, null]]];
-			flipmap[0][0][0] = this.DoCutTileImage(x, y, w, h, false, false, false, seamless);
-			return {
-				flipmap: flipmap,
-				x: x,
-				y: y,
-				w: w,
-				h: h
-			};
-		}
-	};
-	typeProto.GetFlippedTileImage = function (tileid, fliph, flipv, flipd, seamless)
-	{
-		if (tileid < 0 || tileid >= this.cut_tiles.length)
-			return null;
-		var tile = this.cut_tiles[tileid];
-		var flipmap = tile.flipmap;
-		var hi = (fliph ? 1 : 0);
-		var vi = (flipv ? 1 : 0);
-		var di = (flipd ? 1 : 0);
-		var ret = flipmap[hi][vi][di];
-		if (ret)
-		{
-			return ret;
-		}
-		else
-		{
-			ret = this.DoCutTileImage(tile.x, tile.y, tile.w, tile.h, hi!==0, vi!==0, di!==0, seamless);
-			flipmap[hi][vi][di] = ret;
-			return ret;
-		}
-	};
-	typeProto.DoCutTileImage = function(x, y, w, h, fliph, flipv, flipd, seamless)
-	{
-		var dw = w;
-		var dh = h;
-		if (this.runtime.glwrap && !seamless)
-		{
-			if (!cr.isPOT(dw))
-				dw = cr.nextHighestPowerOfTwo(dw);
-			if (!cr.isPOT(dh))
-				dh = cr.nextHighestPowerOfTwo(dh);
-		}
-		var tmpcanvas = document.createElement("canvas");
-		tmpcanvas.width = dw;
-		tmpcanvas.height = dh;
-		var tmpctx = tmpcanvas.getContext("2d");
-		if (this.runtime.ctx)
-		{
-			if (fliph)
-			{
-				if (flipv)
-				{
-					if (flipd)
-					{
-						tmpctx.rotate(Math.PI / 2);
-						tmpctx.scale(-1, 1);
-						tmpctx.translate(-dw, -dh);
-					}
-					else
-					{
-						tmpctx.scale(-1, -1);
-						tmpctx.translate(-dw, -dh);
-					}
-				}
-				else
-				{
-					if (flipd)
-					{
-						tmpctx.rotate(Math.PI / 2);
-						tmpctx.translate(0, -dh);
-					}
-					else
-					{
-						tmpctx.scale(-1, 1);
-						tmpctx.translate(-dw, 0);
-					}
-				}
-			}
-			else
-			{
-				if (flipv)
-				{
-					if (flipd)
-					{
-						tmpctx.rotate(-Math.PI / 2);
-						tmpctx.translate(-dw, 0);
-					}
-					else
-					{
-						tmpctx.scale(1, -1);
-						tmpctx.translate(0, -dh);
-					}
-				}
-				else
-				{
-					if (flipd)
-					{
-						tmpctx.scale(-1, 1);
-						tmpctx.rotate(Math.PI / 2);
-					}
-				}
-			}
-			tmpctx.drawImage(this.texture_img, x, y, w, h, 0, 0, dw, dh);
-			if (seamless)
-				return tmpcanvas;
-			else
-				return this.runtime.ctx.createPattern(tmpcanvas, "repeat");
-		}
-		else
-		{
-;
-			tmpctx.drawImage(this.texture_img, x, y, w, h, 0, 0, dw, dh);
-			var tex = this.runtime.glwrap.createEmptyTexture(dw, dh, this.runtime.linearSampling, false, !seamless);
-			this.runtime.glwrap.videoToTexture(tmpcanvas, tex);
-			return tex;
-		}
-	};
-	typeProto.onLostWebGLContext = function ()
-	{
-		if (this.is_family)
-			return;
-		this.freeCutTiles();
-	};
-	typeProto.onRestoreWebGLContext = function ()
-	{
-	};
-	typeProto.loadTextures = function ()
-	{
-	};
-	typeProto.unloadTextures = function ()
-	{
-		if (this.is_family || this.instances.length)
-			return;
-		this.freeCutTiles();
-	};
-	typeProto.preloadCanvas2D = function (ctx)
-	{
-	};
-	pluginProto.Instance = function(type)
-	{
-		this.type = type;
-		this.runtime = type.runtime;
-	};
-	var instanceProto = pluginProto.Instance.prototype;
-	var TILE_FLIPPED_HORIZONTAL = -0x80000000		// note: pretend is a signed int, so negate
-	var TILE_FLIPPED_VERTICAL = 0x40000000
-	var TILE_FLIPPED_DIAGONAL = 0x20000000
-	var TILE_FLAGS_MASK = 0xE0000000
-	var TILE_ID_MASK = 0x1FFFFFFF
-	function TileQuad()
-	{
-		this.id = -1;
-		this.tileid = -1;
-		this.horiz_flip = false;
-		this.vert_flip = false;
-		this.diag_flip = false;
-		this.any_flip = false;
-		this.rc = new cr.rect(0, 0, 0, 0);
-	};
-	var tilequad_cache = [];
-	function allocTileQuad()
-	{
-		if (tilequad_cache.length)
-			return tilequad_cache.pop();
-		else
-			return new TileQuad();
-	};
-	function freeTileQuad(tq)
-	{
-		if (tilequad_cache.length < 10000)
-			tilequad_cache.push(tq);
-	};
-	function TileCollisionRect()
-	{
-		this.id = -1;
-		this.rc = new cr.rect(0, 0, 0, 0);
-		this.poly = null;
-	}
-	var collrect_cache = [];
-	function allocCollRect()
-	{
-		if (collrect_cache.length)
-			return collrect_cache.pop();
-		else
-			return new TileCollisionRect();
-	};
-	function freeCollRect(r)
-	{
-		if (collrect_cache.length < 10000)
-			collrect_cache.push(r);
-	};
-	var tile_cell_cache = [];
-	function allocTileCell(inst_, x_, y_)
+	var theInstance = null;
+	var touchinfo_cache = [];
+	function AllocTouchInfo(x, y, id, index)
 	{
 		var ret;
-		if (tile_cell_cache.length)
-		{
-			ret = tile_cell_cache.pop();
-			ret.inst = inst_;
-			ret.x = x_;
-			ret.y = y_;
-			ret.left = ret.x * ret.inst.cellwidth * ret.inst.tilewidth;
-			ret.top = ret.y * ret.inst.cellheight * ret.inst.tileheight;
-			ret.clear();
-			ret.quadmap_valid = false;
-			return ret;
-		}
+		if (touchinfo_cache.length)
+			ret = touchinfo_cache.pop();
 		else
-			return new TileCell(inst_, x_, y_);
+			ret = new TouchInfo();
+		ret.init(x, y, id, index);
+		return ret;
 	};
-	function freeTileCell(tc)
+	function ReleaseTouchInfo(ti)
 	{
-		var i, len;
-		for (i = 0, len = tc.quads.length; i < len; ++i)
-			freeTileQuad(tc.quads[i]);
-		cr.clearArray(tc.quads);
-		for (i = 0, len = tc.collision_rects.length; i < len; ++i)
-			freeCollRect(tc.collision_rects[i]);
-		cr.clearArray(tc.collision_rects);
-		if (tile_cell_cache.length < 1000)
-			tile_cell_cache.push(tc);
+		if (touchinfo_cache.length < 100)
+			touchinfo_cache.push(ti);
 	};
-	function TileCell(inst_, x_, y_)
+	var GESTURE_HOLD_THRESHOLD = 15;		// max px motion for hold gesture to register
+	var GESTURE_HOLD_TIMEOUT = 500;			// time for hold gesture to register
+	var GESTURE_TAP_TIMEOUT = 333;			// time for tap gesture to register
+	var GESTURE_DOUBLETAP_THRESHOLD = 25;	// max distance apart for taps to be
+	function TouchInfo()
 	{
-		this.inst = inst_;
-		this.x = x_;
-		this.y = y_;
-		this.left = this.x * this.inst.cellwidth * this.inst.tilewidth;
-		this.top = this.y * this.inst.cellheight * this.inst.tileheight;
-		this.tiles = [];
-		this.quads = [];
-		this.collision_rects = [];
-		this.quadmap_valid = false;
-		var i, len, j, lenj, arr;
-		for (i = 0, len = this.inst.cellheight; i < len; ++i)
+		this.starttime = 0;
+		this.time = 0;
+		this.lasttime = 0;
+		this.startx = 0;
+		this.starty = 0;
+		this.x = 0;
+		this.y = 0;
+		this.lastx = 0;
+		this.lasty = 0;
+		this["id"] = 0;
+		this.startindex = 0;
+		this.triggeredHold = false;
+		this.tooFarForHold = false;
+	};
+	TouchInfo.prototype.init = function (x, y, id, index)
+	{
+		var nowtime = cr.performance_now();
+		this.time = nowtime;
+		this.lasttime = nowtime;
+		this.starttime = nowtime;
+		this.startx = x;
+		this.starty = y;
+		this.x = x;
+		this.y = y;
+		this.lastx = x;
+		this.lasty = y;
+		this["id"] = id;
+		this.startindex = index;
+		this.triggeredHold = false;
+		this.tooFarForHold = false;
+	};
+	TouchInfo.prototype.update = function (nowtime, x, y)
+	{
+		this.lasttime = this.time;
+		this.time = nowtime;
+		this.lastx = this.x;
+		this.lasty = this.y;
+		this.x = x;
+		this.y = y;
+		if (!this.tooFarForHold && cr.distanceTo(this.startx, this.starty, this.x, this.y) >= GESTURE_HOLD_THRESHOLD)
 		{
-			arr = [];
-			for (j = 0, lenj = this.inst.cellwidth; j < lenj; ++j)
-				arr.push(-1);
-			this.tiles.push(arr);
+			this.tooFarForHold = true;
 		}
 	};
-	TileCell.prototype.clear = function ()
+	TouchInfo.prototype.maybeTriggerHold = function (inst, index)
 	{
-		var i, len, j, lenj, arr;
-		this.tiles.length = this.inst.cellheight;
-		for (i = 0, len = this.tiles.length; i < len; ++i)
+		if (this.triggeredHold)
+			return;		// already triggered this gesture
+		var nowtime = cr.performance_now();
+		if (nowtime - this.starttime >= GESTURE_HOLD_TIMEOUT && !this.tooFarForHold && cr.distanceTo(this.startx, this.starty, this.x, this.y) < GESTURE_HOLD_THRESHOLD)
 		{
-			arr = this.tiles[i];
-			if (!arr)
-			{
-				arr = [];
-				this.tiles[i] = arr;
-			}
-			arr.length = this.inst.cellwidth;
-			for (j = 0, lenj = arr.length; j < lenj; ++j)
-				arr[j] = -1;
+			this.triggeredHold = true;
+			inst.trigger_index = this.startindex;
+			inst.trigger_id = this["id"];
+			inst.getTouchIndex = index;
+			inst.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnHoldGesture, inst);
+			inst.curTouchX = this.x;
+			inst.curTouchY = this.y;
+			inst.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnHoldGestureObject, inst);
+			inst.getTouchIndex = 0;
 		}
 	};
-	TileCell.prototype.maybeBuildQuadMap = function ()
+	var lastTapX = -1000;
+	var lastTapY = -1000;
+	var lastTapTime = -10000;
+	TouchInfo.prototype.maybeTriggerTap = function (inst, index)
 	{
-		if (this.quadmap_valid)
-			return;		// not changed
-		var tilewidth = this.inst.tilewidth;
-		var tileheight = this.inst.tileheight;
-		if (tilewidth <= 0 || tileheight <= 0)
+		if (this.triggeredHold)
 			return;
-		var i, j, len, y, leny, x, lenx, arr, t, p, q;
-		for (i = 0, len = this.quads.length; i < len; ++i)
-			freeTileQuad(this.quads[i]);
-		for (i = 0, len = this.collision_rects.length; i < len; ++i)
-			freeCollRect(this.collision_rects[i]);
-		cr.clearArray(this.quads);
-		cr.clearArray(this.collision_rects);
-		var extentwidth = Math.floor(this.inst.width / tilewidth);
-		var extentheight = Math.floor(this.inst.height / tileheight);
-		extentwidth -= this.left / tilewidth;
-		extentheight -= this.top / tileheight;
-		if (extentwidth > this.inst.cellwidth)
-			extentwidth = this.inst.cellwidth;
-		if (extentheight > this.inst.cellheight)
-			extentheight = this.inst.cellheight;
-		var seamless = this.inst.seamless;
-		var cur_quad = null;
-		for (y = 0, leny = extentheight; y < leny; ++y)
+		var nowtime = cr.performance_now();
+		if (nowtime - this.starttime <= GESTURE_TAP_TIMEOUT && !this.tooFarForHold && cr.distanceTo(this.startx, this.starty, this.x, this.y) < GESTURE_HOLD_THRESHOLD)
 		{
-			arr = this.tiles[y];
-			for (x = 0, lenx = extentwidth; x < lenx; ++x)
+			inst.trigger_index = this.startindex;
+			inst.trigger_id = this["id"];
+			inst.getTouchIndex = index;
+			if ((nowtime - lastTapTime <= GESTURE_TAP_TIMEOUT * 2) && cr.distanceTo(lastTapX, lastTapY, this.x, this.y) < GESTURE_DOUBLETAP_THRESHOLD)
 			{
-				t = arr[x];
-				if (t === -1)
-				{
-					if (cur_quad)
-					{
-						this.quads.push(cur_quad);
-						cur_quad = null;
-					}
-					continue;
-				}
-				if (seamless || !cur_quad || t !== cur_quad.id)
-				{
-					if (cur_quad)
-						this.quads.push(cur_quad);
-					cur_quad = allocTileQuad();
-					cur_quad.id = t;
-					cur_quad.tileid = (t & TILE_ID_MASK);
-					cur_quad.horiz_flip = (t & TILE_FLIPPED_HORIZONTAL) !== 0;
-					cur_quad.vert_flip = (t & TILE_FLIPPED_VERTICAL) !== 0;
-					cur_quad.diag_flip = (t & TILE_FLIPPED_DIAGONAL) !== 0;
-					cur_quad.any_flip = (cur_quad.horiz_flip || cur_quad.vert_flip || cur_quad.diag_flip);
-					cur_quad.rc.left = x * tilewidth + this.left;
-					cur_quad.rc.top = y * tileheight + this.top;
-					cur_quad.rc.right = cur_quad.rc.left + tilewidth;
-					cur_quad.rc.bottom = cur_quad.rc.top + tileheight;
-				}
-				else
-				{
-					cur_quad.rc.right += tilewidth;
-				}
+				inst.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnDoubleTapGesture, inst);
+				inst.curTouchX = this.x;
+				inst.curTouchY = this.y;
+				inst.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnDoubleTapGestureObject, inst);
+				lastTapX = -1000;
+				lastTapY = -1000;
+				lastTapTime = -10000;
 			}
-			if (cur_quad)
+			else
 			{
-				this.quads.push(cur_quad);
-				cur_quad = null;
+				inst.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTapGesture, inst);
+				inst.curTouchX = this.x;
+				inst.curTouchY = this.y;
+				inst.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTapGestureObject, inst);
+				lastTapX = this.x;
+				lastTapY = this.y;
+				lastTapTime = nowtime;
 			}
-		}
-		var cur_rect = null;
-		var tileid, tilepoly;
-		var cur_has_poly = false;
-		var rc;
-		for (y = 0, leny = extentheight; y < leny; ++y)
-		{
-			arr = this.tiles[y];
-			for (x = 0, lenx = extentwidth; x < lenx; ++x)
-			{
-				t = arr[x];
-				if (t === -1)
-				{
-					if (cur_rect)
-					{
-						this.collision_rects.push(cur_rect);
-						cur_rect = null;
-						cur_has_poly = false;
-					}
-					continue;
-				}
-				tileid = (t & TILE_ID_MASK);
-				tilepoly = this.inst.type.getTilePoly(t);
-				if (!cur_rect || tilepoly || cur_has_poly)
-				{
-					if (cur_rect)
-					{
-						this.collision_rects.push(cur_rect);
-						cur_rect = null;
-					}
-;
-					cur_rect = allocCollRect();
-					cur_rect.id = t;
-					cur_rect.poly = tilepoly ? tilepoly : null;
-					rc = cur_rect.rc;
-					rc.left = x * tilewidth + this.left;
-					rc.top = y * tileheight + this.top;
-					rc.right = rc.left + tilewidth;
-					rc.bottom = rc.top + tileheight;
-					cur_has_poly = !!tilepoly;
-				}
-				else
-				{
-					cur_rect.rc.right += tilewidth;
-				}
-			}
-			if (cur_rect)
-			{
-				this.collision_rects.push(cur_rect);
-				cur_rect = null;
-				cur_has_poly = false;
-			}
-		}
-		if (!seamless)
-		{
-			len = this.quads.length;
-			for (i = 0; i < len; ++i)
-			{
-				q = this.quads[i];
-				for (j = i + 1; j < len; ++j)
-				{
-					p = this.quads[j];
-					if (p.rc.top < q.rc.bottom)
-						continue;
-					if (p.rc.top > q.rc.bottom)
-						break;
-					if (p.rc.right > q.rc.right || p.rc.left > q.rc.left)
-						break;
-					if (p.id === q.id && p.rc.left === q.rc.left && p.rc.right === q.rc.right)
-					{
-						freeTileQuad(this.quads[j]);
-						this.quads.splice(j, 1);
-						--len;
-						q.rc.bottom += tileheight;
-						--j;		// look at same j index again
-					}
-				}
-			}
-		}
-		len = this.collision_rects.length;
-		var prc, qrc;
-		for (i = 0; i < len; ++i)
-		{
-			q = this.collision_rects[i];
-			if (q.poly)
-				continue;
-			qrc = q.rc;
-			for (j = i + 1; j < len; ++j)
-			{
-				p = this.collision_rects[j];
-				prc = p.rc;
-				if (prc.top < qrc.bottom)
-					continue;
-				if (prc.top > qrc.bottom)
-					break;
-				if (prc.right > qrc.right || prc.left > qrc.left)
-					break;
-				if (p.poly)
-					continue;
-				if (prc.left === qrc.left && prc.right === qrc.right)
-				{
-					freeCollRect(this.collision_rects[j]);
-					this.collision_rects.splice(j, 1);
-					--len;
-					qrc.bottom += tileheight;
-					--j;		// look at same j index again
-				}
-			}
-		}
-		this.quadmap_valid = true;
-	};
-	TileCell.prototype.setTileAt = function (x_, y_, t_)
-	{
-		if (this.tiles[y_][x_] !== t_)
-		{
-			this.tiles[y_][x_] = t_;
-			this.quadmap_valid = false;
-			this.inst.any_quadmap_changed = true;
-			this.inst.physics_changed = true;
-			this.inst.runtime.redraw = true;
+			inst.getTouchIndex = 0;
 		}
 	};
 	instanceProto.onCreate = function()
 	{
-;
-		var i, len, p;
-		this.visible = (this.properties[0] === 0);
-		this.tilewidth = this.properties[1];
-		this.tileheight = this.properties[2];
-		this.tilexoffset = this.properties[3];
-		this.tileyoffset = this.properties[4];
-		this.tilexspacing = this.properties[5];
-		this.tileyspacing = this.properties[6];
-		this.seamless = (this.properties[7] !== 0);
-		this.mapwidth = this.tilemap_width;
-		this.mapheight = this.tilemap_height;
-		this.lastwidth = this.width;
-		this.lastheight = this.height;
-		var tw = this.tilewidth;
-		var th = this.tileheight;
-		if (tw === 0)
-			tw = 1;
-		if (th === 0)
-			th = 1;
-		this.cellwidth = Math.ceil(this.runtime.original_width / tw);
-		this.cellheight = Math.ceil(this.runtime.original_height / th);
-		if (!this.type.tile_polys_cached)
+		theInstance = this;
+		this.isWindows8 = !!(typeof window["c2isWindows8"] !== "undefined" && window["c2isWindows8"]);
+		this.orient_alpha = 0;
+		this.orient_beta = 0;
+		this.orient_gamma = 0;
+		this.acc_g_x = 0;
+		this.acc_g_y = 0;
+		this.acc_g_z = 0;
+		this.acc_x = 0;
+		this.acc_y = 0;
+		this.acc_z = 0;
+		this.curTouchX = 0;
+		this.curTouchY = 0;
+		this.trigger_index = 0;
+		this.trigger_id = 0;
+		this.getTouchIndex = 0;
+		this.useMouseInput = (this.properties[0] !== 0);
+		var elem = (this.runtime.fullscreen_mode > 0) ? document : this.runtime.canvas;
+		var elem2 = document;
+		if (this.runtime.isDirectCanvas)
+			elem2 = elem = window["Canvas"];
+		else if (this.runtime.isCocoonJs)
+			elem2 = elem = window;
+		var self = this;
+		if (window.navigator["pointerEnabled"])
 		{
-			this.type.tile_polys_cached = true;
-			for (i = 0, len = this.type.tile_polys.length; i < len; ++i)
+			elem.addEventListener("pointerdown",
+				function(info) {
+					self.onPointerStart(info);
+				},
+				false
+			);
+			elem.addEventListener("pointermove",
+				function(info) {
+					self.onPointerMove(info);
+				},
+				false
+			);
+			elem2.addEventListener("pointerup",
+				function(info) {
+					self.onPointerEnd(info, false);
+				},
+				false
+			);
+			elem2.addEventListener("pointercancel",
+				function(info) {
+					self.onPointerEnd(info, true);
+				},
+				false
+			);
+			if (this.runtime.canvas)
 			{
-				p = this.type.tile_polys[i];
-				if (!p)
-					continue;
-				this.type.cacheTilePoly(i, tw, th, false, false, false);
-				this.type.cacheTilePoly(i, tw, th, false, false, true);
-				this.type.cacheTilePoly(i, tw, th, false, true, false);
-				this.type.cacheTilePoly(i, tw, th, false, true, true);
-				this.type.cacheTilePoly(i, tw, th, true, false, false);
-				this.type.cacheTilePoly(i, tw, th, true, false, true);
-				this.type.cacheTilePoly(i, tw, th, true, true, false);
-				this.type.cacheTilePoly(i, tw, th, true, true, true);
+				this.runtime.canvas.addEventListener("MSGestureHold", function(e) {
+					e.preventDefault();
+				}, false);
+				document.addEventListener("MSGestureHold", function(e) {
+					e.preventDefault();
+				}, false);
+				this.runtime.canvas.addEventListener("gesturehold", function(e) {
+					e.preventDefault();
+				}, false);
+				document.addEventListener("gesturehold", function(e) {
+					e.preventDefault();
+				}, false);
 			}
 		}
-		if (!this.recycled)
-			this.tilecells = [];
-		this.maybeResizeTilemap(true);
-		this.setTilesFromRLECSV(this.tilemap_data);
-		this.type.maybeCutTiles(this.tilewidth, this.tileheight, this.tilexoffset, this.tileyoffset, this.tilexspacing, this.tileyspacing, this.seamless);
-		this.physics_changed = false;		// to indicate to physics behavior to recreate body
-		this.any_quadmap_changed = true;
-		this.maybeBuildAllQuadMap();
-	};
-	instanceProto.maybeBuildAllQuadMap = function ()
-	{
-		if (!this.any_quadmap_changed)
-			return;		// no change
-		var i, len, j, lenj, arr;
-		for (i = 0, len = this.tilecells.length; i < len; ++i)
+		else if (window.navigator["msPointerEnabled"])
 		{
-			arr = this.tilecells[i];
-			for (j = 0, lenj = arr.length; j < lenj; ++j)
+			elem.addEventListener("MSPointerDown",
+				function(info) {
+					self.onPointerStart(info);
+				},
+				false
+			);
+			elem.addEventListener("MSPointerMove",
+				function(info) {
+					self.onPointerMove(info);
+				},
+				false
+			);
+			elem2.addEventListener("MSPointerUp",
+				function(info) {
+					self.onPointerEnd(info, false);
+				},
+				false
+			);
+			elem2.addEventListener("MSPointerCancel",
+				function(info) {
+					self.onPointerEnd(info, true);
+				},
+				false
+			);
+			if (this.runtime.canvas)
 			{
-				arr[j].maybeBuildQuadMap();
+				this.runtime.canvas.addEventListener("MSGestureHold", function(e) {
+					e.preventDefault();
+				}, false);
+				document.addEventListener("MSGestureHold", function(e) {
+					e.preventDefault();
+				}, false);
 			}
-		}
-		this.any_quadmap_changed = false;
-	};
-	instanceProto.setAllQuadMapChanged = function ()
-	{
-		var i, len, j, lenj, arr;
-		for (i = 0, len = this.tilecells.length; i < len; ++i)
-		{
-			arr = this.tilecells[i];
-			for (j = 0, lenj = arr.length; j < lenj; ++j)
-			{
-				arr[j].quadmap_valid = false;
-			}
-		}
-		this.any_quadmap_changed = true;
-	};
-	function RunLengthDecode(str)
-	{
-		var ret = [];
-		var parts = str.split(",");
-		var i, len, p, x, n, t, part;
-		for (i = 0, len = parts.length; i < len; ++i)
-		{
-			p = parts[i];
-			x = p.indexOf("x");
-			if (x > -1)
-			{
-				n = parseInt(p.substring(0, x), 10);
-				part = p.substring(x + 1);
-				t = parseInt(part, 10);
-				if (part.indexOf("h") > -1)
-					t = t | TILE_FLIPPED_HORIZONTAL;
-				if (part.indexOf("v") > -1)
-					t = t | TILE_FLIPPED_VERTICAL;
-				if (part.indexOf("d") > -1)
-					t = t | TILE_FLIPPED_DIAGONAL;
-				for ( ; n > 0; --n)
-					ret.push(t);
-			}
-			else
-			{
-				t = parseInt(p, 10);
-				if (p.indexOf("h") > -1)
-					t = t | TILE_FLIPPED_HORIZONTAL;
-				if (p.indexOf("v") > -1)
-					t = t | TILE_FLIPPED_VERTICAL;
-				if (p.indexOf("d") > -1)
-					t = t | TILE_FLIPPED_DIAGONAL;
-				ret.push(t);
-			}
-		}
-		return ret;
-	};
-	instanceProto.maybeResizeTilemap = function (force)
-	{
-		var curwidth = cr.floor(this.width / this.tilewidth);
-		var curheight = cr.floor(this.height / this.tileheight);
-		if (curwidth <= this.mapwidth && curheight <= this.mapheight && !force)
-			return;
-		var vcells, hcells;
-		if (force)
-		{
-			vcells = Math.ceil(this.mapheight / this.cellheight);
-			hcells = Math.ceil(this.mapwidth / this.cellwidth);
 		}
 		else
 		{
-			vcells = this.tilecells.length;
-			hcells = Math.ceil(this.mapwidth / this.cellwidth);
-			if (curheight > this.mapheight)
-			{
-				this.mapheight = curheight;
-				vcells = Math.ceil(this.mapheight / this.cellheight);
-			}
-			if (curwidth > this.mapwidth)
-			{
-				this.mapwidth = curwidth;
-				hcells = Math.ceil(this.mapwidth / this.cellwidth);
-			}
-			this.setAllQuadMapChanged();
-			this.physics_changed = true;
-			this.runtime.redraw = true;
+			elem.addEventListener("touchstart",
+				function(info) {
+					self.onTouchStart(info);
+				},
+				false
+			);
+			elem.addEventListener("touchmove",
+				function(info) {
+					self.onTouchMove(info);
+				},
+				false
+			);
+			elem2.addEventListener("touchend",
+				function(info) {
+					self.onTouchEnd(info, false);
+				},
+				false
+			);
+			elem2.addEventListener("touchcancel",
+				function(info) {
+					self.onTouchEnd(info, true);
+				},
+				false
+			);
 		}
-		var y, x, arr;
-		for (y = 0; y < vcells; ++y)
+		if (this.isWindows8)
 		{
-			arr = this.tilecells[y];
-			if (!arr)
+			var win8accelerometerFn = function(e) {
+					var reading = e["reading"];
+					self.acc_x = reading["accelerationX"];
+					self.acc_y = reading["accelerationY"];
+					self.acc_z = reading["accelerationZ"];
+				};
+			var win8inclinometerFn = function(e) {
+					var reading = e["reading"];
+					self.orient_alpha = reading["yawDegrees"];
+					self.orient_beta = reading["pitchDegrees"];
+					self.orient_gamma = reading["rollDegrees"];
+				};
+			var accelerometer = Windows["Devices"]["Sensors"]["Accelerometer"]["getDefault"]();
+            if (accelerometer)
 			{
-				arr = [];
-				for (x = 0; x < hcells; ++x)
-					arr.push(allocTileCell(this, x, y));
-				this.tilecells[y] = arr;
+                accelerometer["reportInterval"] = Math.max(accelerometer["minimumReportInterval"], 16);
+				accelerometer.addEventListener("readingchanged", win8accelerometerFn);
+            }
+			var inclinometer = Windows["Devices"]["Sensors"]["Inclinometer"]["getDefault"]();
+			if (inclinometer)
+			{
+				inclinometer["reportInterval"] = Math.max(inclinometer["minimumReportInterval"], 16);
+				inclinometer.addEventListener("readingchanged", win8inclinometerFn);
 			}
-			else
-			{
-				for (x = arr.length; x < hcells; ++x)
-					arr.push(allocTileCell(this, x, y));
-			}
-		}
-	};
-	instanceProto.cellAt = function (tx, ty)
-	{
-		if (tx < 0 || ty < 0)
-			return null;
-		var cy = cr.floor(ty / this.cellheight);
-		if (cy >= this.tilecells.length)
-			return null;
-		var row = this.tilecells[cy];
-		var cx = cr.floor(tx / this.cellwidth);
-		if (cx >= row.length)
-			return null;
-		return row[cx];
-	};
-	instanceProto.cellAtIndex = function (cx, cy)
-	{
-		if (cx < 0 || cy < 0 || cy >= this.tilecells.length)
-			return null;
-		var row = this.tilecells[cy];
-		if (cx >= row.length)
-			return null;
-		return row[cx];
-	};
-	instanceProto.setTilesFromRLECSV = function (str)
-	{
-		var tilestream = RunLengthDecode(str);
-		var next = 0;
-		var y, x, arr, tile, cell;
-		for (y = 0; y < this.mapheight; ++y)
-		{
-			for (x = 0; x < this.mapwidth; ++x)
-			{
-				tile = tilestream[next++];
-				cell = this.cellAt(x, y);
-				if (cell)
-					cell.setTileAt(x % this.cellwidth, y % this.cellheight, tile);
-			}
-		}
-	};
-	instanceProto.getTilesAsRLECSV = function ()
-	{
-		var ret = "";
-		if (this.mapwidth <= 0 || this.mapheight <= 0)
-			return ret;
-		var run_count = 1;
-		var run_number = this.getTileAt(0, 0);
-		var y, leny, x, lenx, t;
-		var tileid, horiz_flip, vert_flip, diag_flip;
-		lenx = cr.floor(this.width / this.tilewidth);
-		leny = cr.floor(this.height / this.tileheight);
-		for (y = 0; y < leny; ++y)
-		{
-			for (x = (y === 0 ? 1 : 0) ; x < lenx; ++x)
-			{
-				t = this.getTileAt(x, y);
-				if (t === run_number)
-					++run_count;
+			document.addEventListener("visibilitychange", function(e) {
+				if (document["hidden"] || document["msHidden"])
+				{
+					if (accelerometer)
+						accelerometer.removeEventListener("readingchanged", win8accelerometerFn);
+					if (inclinometer)
+						inclinometer.removeEventListener("readingchanged", win8inclinometerFn);
+				}
 				else
 				{
-					if (run_number === -1)
-					{
-						tileid = -1;
-						horiz_flip = false;
-						vert_flip = false;
-						diag_flip = false;
-					}
-					else
-					{
-						tileid = (run_number & TILE_ID_MASK);
-						horiz_flip = (run_number & TILE_FLIPPED_HORIZONTAL) !== 0;
-						vert_flip = (run_number & TILE_FLIPPED_VERTICAL) !== 0;
-						diag_flip = (run_number & TILE_FLIPPED_DIAGONAL) !== 0;
-					}
-					if (run_count === 1)
-						ret += "" + tileid;
-					else
-						ret += "" + run_count + "x" + tileid;
-					if (horiz_flip)
-						ret += "h";
-					if (vert_flip)
-						ret += "v";
-					if (diag_flip)
-						ret += "d";
-					ret += ",";
-					run_count = 1;
-					run_number = t;
+					if (accelerometer)
+						accelerometer.addEventListener("readingchanged", win8accelerometerFn);
+					if (inclinometer)
+						inclinometer.addEventListener("readingchanged", win8inclinometerFn);
 				}
-			}
-		}
-		if (run_number === -1)
-		{
-			tileid = -1;
-			horiz_flip = false;
-			vert_flip = false;
-			diag_flip = false;
+			}, false);
 		}
 		else
 		{
-			tileid = (run_number & TILE_ID_MASK);
-			horiz_flip = (run_number & TILE_FLIPPED_HORIZONTAL) !== 0;
-			vert_flip = (run_number & TILE_FLIPPED_VERTICAL) !== 0;
-			diag_flip = (run_number & TILE_FLIPPED_DIAGONAL) !== 0;
+			window.addEventListener("deviceorientation", function (eventData) {
+				self.orient_alpha = eventData["alpha"] || 0;
+				self.orient_beta = eventData["beta"] || 0;
+				self.orient_gamma = eventData["gamma"] || 0;
+			}, false);
+			window.addEventListener("devicemotion", function (eventData) {
+				if (eventData["accelerationIncludingGravity"])
+				{
+					self.acc_g_x = eventData["accelerationIncludingGravity"]["x"] || 0;
+					self.acc_g_y = eventData["accelerationIncludingGravity"]["y"] || 0;
+					self.acc_g_z = eventData["accelerationIncludingGravity"]["z"] || 0;
+				}
+				if (eventData["acceleration"])
+				{
+					self.acc_x = eventData["acceleration"]["x"] || 0;
+					self.acc_y = eventData["acceleration"]["y"] || 0;
+					self.acc_z = eventData["acceleration"]["z"] || 0;
+				}
+			}, false);
 		}
-		if (run_count === 1)
-			ret += "" + tileid;
+		if (this.useMouseInput && !this.runtime.isDomFree)
+		{
+			jQuery(document).mousemove(
+				function(info) {
+					self.onMouseMove(info);
+				}
+			);
+			jQuery(document).mousedown(
+				function(info) {
+					self.onMouseDown(info);
+				}
+			);
+			jQuery(document).mouseup(
+				function(info) {
+					self.onMouseUp(info);
+				}
+			);
+		}
+		if (!this.runtime.isiOS && this.runtime.isCordova && navigator["accelerometer"] && navigator["accelerometer"]["watchAcceleration"])
+		{
+			navigator["accelerometer"]["watchAcceleration"](PhoneGapGetAcceleration, null, { "frequency": 40 });
+		}
+		this.runtime.tick2Me(this);
+	};
+	instanceProto.onPointerMove = function (info)
+	{
+		if (info["pointerType"] === info["MSPOINTER_TYPE_MOUSE"] || info["pointerType"] === "mouse")
+			return;
+		if (info.preventDefault)
+			info.preventDefault();
+		var i = this.findTouch(info["pointerId"]);
+		var nowtime = cr.performance_now();
+		if (i >= 0)
+		{
+			var offset = this.runtime.isDomFree ? dummyoffset : jQuery(this.runtime.canvas).offset();
+			var t = this.touches[i];
+			if (nowtime - t.time < 2)
+				return;
+			t.update(nowtime, info.pageX - offset.left, info.pageY - offset.top);
+		}
+	};
+	instanceProto.onPointerStart = function (info)
+	{
+		if (info["pointerType"] === info["MSPOINTER_TYPE_MOUSE"] || info["pointerType"] === "mouse")
+			return;
+		if (info.preventDefault && cr.isCanvasInputEvent(info))
+			info.preventDefault();
+		var offset = this.runtime.isDomFree ? dummyoffset : jQuery(this.runtime.canvas).offset();
+		var touchx = info.pageX - offset.left;
+		var touchy = info.pageY - offset.top;
+		var nowtime = cr.performance_now();
+		this.trigger_index = this.touches.length;
+		this.trigger_id = info["pointerId"];
+		this.touches.push(AllocTouchInfo(touchx, touchy, info["pointerId"], this.trigger_index));
+		this.runtime.isInUserInputEvent = true;
+		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnNthTouchStart, this);
+		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchStart, this);
+		this.curTouchX = touchx;
+		this.curTouchY = touchy;
+		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchObject, this);
+		this.runtime.isInUserInputEvent = false;
+	};
+	instanceProto.onPointerEnd = function (info, isCancel)
+	{
+		if (info["pointerType"] === info["MSPOINTER_TYPE_MOUSE"] || info["pointerType"] === "mouse")
+			return;
+		if (info.preventDefault && cr.isCanvasInputEvent(info))
+			info.preventDefault();
+		var i = this.findTouch(info["pointerId"]);
+		this.trigger_index = (i >= 0 ? this.touches[i].startindex : -1);
+		this.trigger_id = (i >= 0 ? this.touches[i]["id"] : -1);
+		this.runtime.isInUserInputEvent = true;
+		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnNthTouchEnd, this);
+		this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchEnd, this);
+		if (i >= 0)
+		{
+			if (!isCancel)
+				this.touches[i].maybeTriggerTap(this, i);
+			ReleaseTouchInfo(this.touches[i]);
+			this.touches.splice(i, 1);
+		}
+		this.runtime.isInUserInputEvent = false;
+	};
+	instanceProto.onTouchMove = function (info)
+	{
+		if (info.preventDefault)
+			info.preventDefault();
+		var nowtime = cr.performance_now();
+		var i, len, t, u;
+		for (i = 0, len = info.changedTouches.length; i < len; i++)
+		{
+			t = info.changedTouches[i];
+			var j = this.findTouch(t["identifier"]);
+			if (j >= 0)
+			{
+				var offset = this.runtime.isDomFree ? dummyoffset : jQuery(this.runtime.canvas).offset();
+				u = this.touches[j];
+				if (nowtime - u.time < 2)
+					continue;
+				u.update(nowtime, t.pageX - offset.left, t.pageY - offset.top);
+			}
+		}
+	};
+	instanceProto.onTouchStart = function (info)
+	{
+		if (info.preventDefault && cr.isCanvasInputEvent(info))
+			info.preventDefault();
+		var offset = this.runtime.isDomFree ? dummyoffset : jQuery(this.runtime.canvas).offset();
+		var nowtime = cr.performance_now();
+		this.runtime.isInUserInputEvent = true;
+		var i, len, t, j;
+		for (i = 0, len = info.changedTouches.length; i < len; i++)
+		{
+			t = info.changedTouches[i];
+			j = this.findTouch(t["identifier"]);
+			if (j !== -1)
+				continue;
+			var touchx = t.pageX - offset.left;
+			var touchy = t.pageY - offset.top;
+			this.trigger_index = this.touches.length;
+			this.trigger_id = t["identifier"];
+			this.touches.push(AllocTouchInfo(touchx, touchy, t["identifier"], this.trigger_index));
+			this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnNthTouchStart, this);
+			this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchStart, this);
+			this.curTouchX = touchx;
+			this.curTouchY = touchy;
+			this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchObject, this);
+		}
+		this.runtime.isInUserInputEvent = false;
+	};
+	instanceProto.onTouchEnd = function (info, isCancel)
+	{
+		if (info.preventDefault && cr.isCanvasInputEvent(info))
+			info.preventDefault();
+		this.runtime.isInUserInputEvent = true;
+		var i, len, t, j;
+		for (i = 0, len = info.changedTouches.length; i < len; i++)
+		{
+			t = info.changedTouches[i];
+			j = this.findTouch(t["identifier"]);
+			if (j >= 0)
+			{
+				this.trigger_index = this.touches[j].startindex;
+				this.trigger_id = this.touches[j]["id"];
+				this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnNthTouchEnd, this);
+				this.runtime.trigger(cr.plugins_.Touch.prototype.cnds.OnTouchEnd, this);
+				if (!isCancel)
+					this.touches[j].maybeTriggerTap(this, j);
+				ReleaseTouchInfo(this.touches[j]);
+				this.touches.splice(j, 1);
+			}
+		}
+		this.runtime.isInUserInputEvent = false;
+	};
+	instanceProto.getAlpha = function ()
+	{
+		if (this.runtime.isCordova && this.orient_alpha === 0 && pg_accz !== 0)
+			return pg_accz * 90;
 		else
-			ret += "" + run_count + "x" + tileid;
-		if (horiz_flip)
-			ret += "h";
-		if (vert_flip)
-			ret += "v";
-		if (diag_flip)
-			ret += "d";
-		return ret;
+			return this.orient_alpha;
 	};
-	instanceProto.getTileAt = function (x_, y_)
+	instanceProto.getBeta = function ()
 	{
-		x_ = Math.floor(x_);
-		y_ = Math.floor(y_);
-		if (x_ < 0 || y_ < 0 || x_ >= this.mapwidth || y_ >= this.mapheight)
-			return -1;
-		var cell = this.cellAt(x_, y_);
-		if (!cell)
-			return -1;
-		return cell.tiles[y_ % this.cellheight][x_ % this.cellwidth];
+		if (this.runtime.isCordova && this.orient_beta === 0 && pg_accy !== 0)
+			return pg_accy * 90;
+		else
+			return this.orient_beta;
 	};
-	instanceProto.setTileAt = function (x_, y_, t_)
+	instanceProto.getGamma = function ()
 	{
-		x_ = Math.floor(x_);
-		y_ = Math.floor(y_);
-		if (x_ < 0 || y_ < 0 || x_ >= this.mapwidth || y_ >= this.mapheight)
-			return -1;
-		var cell = this.cellAt(x_, y_);
-		if (!cell)
-			return -1;
-		cell.setTileAt(x_ % this.cellwidth, y_ % this.cellheight, t_);
+		if (this.runtime.isCordova && this.orient_gamma === 0 && pg_accx !== 0)
+			return pg_accx * 90;
+		else
+			return this.orient_gamma;
 	};
-	instanceProto.worldToCellX = function (x)
+	var noop_func = function(){};
+	instanceProto.onMouseDown = function(info)
 	{
-		return Math.floor((x - this.x) / (this.cellwidth * this.tilewidth));
+		var t = { pageX: info.pageX, pageY: info.pageY, "identifier": 0 };
+		var fakeinfo = { changedTouches: [t] };
+		this.onTouchStart(fakeinfo);
+		this.mouseDown = true;
 	};
-	instanceProto.worldToCellY = function (y)
+	instanceProto.onMouseMove = function(info)
 	{
-		return Math.floor((y - this.y) / (this.cellheight * this.tileheight));
-	};
-	instanceProto.getCollisionRectCandidates = function (bbox, candidates)
-	{
-		var firstCellX = this.worldToCellX(bbox.left);
-		var firstCellY = this.worldToCellY(bbox.top);
-		var lastCellX = this.worldToCellX(bbox.right);
-		var lastCellY = this.worldToCellY(bbox.bottom);
-		var cx, cy, cell;
-		for (cx = firstCellX; cx <= lastCellX; ++cx)
-		{
-			for (cy = firstCellY; cy <= lastCellY; ++cy)
-			{
-				cell = this.cellAtIndex(cx, cy);
-				if (!cell)
-					continue;
-				cell.maybeBuildQuadMap();
-				cr.appendArray(candidates, cell.collision_rects);
-			}
-		}
-	};
-	instanceProto.getAllCollisionRects = function (candidates)
-	{
-		var i, len, j, lenj, row, cell;
-		for (i = 0, len = this.tilecells.length; i < len; ++i)
-		{
-			row = this.tilecells[i];
-			for (j = 0, lenj = row.length; j < lenj; ++j)
-			{
-				cell = row[j];
-				cell.maybeBuildQuadMap();
-				cr.appendArray(candidates, cell.collision_rects);
-			}
-		}
-	};
-	instanceProto.onDestroy = function ()
-	{
-		var i, len, j, lenj, arr;
-		for (i = 0, len = this.tilecells.length; i < len; ++i)
-		{
-			arr = this.tilecells[i];
-			for (j = 0, lenj = arr.length; j < lenj; ++j)
-			{
-				freeTileCell(arr[j]);
-			}
-			cr.clearArray(arr);
-		}
-		cr.clearArray(this.tilecells);
-	};
-	instanceProto.saveToJSON = function ()
-	{
-		this.maybeResizeTilemap();
-		var curwidth = cr.floor(this.width / this.tilewidth);
-		var curheight = cr.floor(this.height / this.tileheight);
-		return {
-			"w": curwidth,
-			"h": curheight,
-			"d": this.getTilesAsRLECSV()
-		};
-	};
-	instanceProto.loadFromJSON = function (o)
-	{
-		this.mapwidth = o["w"];
-		this.mapheight = o["h"];
-		this.maybeResizeTilemap(true);
-		this.setTilesFromRLECSV(o["d"]);
-		this.physics_changed = true;
-		this.setAllQuadMapChanged();
-	};
-	instanceProto.draw = function(ctx)
-	{
-		if (this.tilewidth <= 0 || this.tileheight <= 0)
+		if (!this.mouseDown)
 			return;
-		this.type.maybeCutTiles(this.tilewidth, this.tileheight, this.tilexoffset, this.tileyoffset, this.tilexspacing, this.tileyspacing, this.seamless);
-		if (this.width !== this.lastwidth || this.height !== this.lastheight)
-		{
-			this.physics_changed = true;
-			this.setAllQuadMapChanged();
-			this.maybeBuildAllQuadMap();
-			this.lastwidth = this.width;
-			this.lastheight = this.height;
-		}
-		ctx.globalAlpha = this.opacity;
-		var layer = this.layer;
-		var viewLeft = layer.viewLeft;
-		var viewTop = layer.viewTop;
-		var viewRight = layer.viewRight;
-		var viewBottom = layer.viewBottom;
-		var myx = this.x;
-		var myy = this.y;
-		var seamless = this.seamless;
-		var qrc;
-		if (this.runtime.pixel_rounding)
-		{
-			myx = Math.round(myx);
-			myy = Math.round(myy);
-		}
-		var cellWidthPx = this.cellwidth * this.tilewidth;
-		var cellHeightPx = this.cellheight * this.tileheight;
-		var firstCellX = Math.floor((viewLeft - myx) / cellWidthPx);
-		var lastCellX = Math.floor((viewRight - myx) / cellWidthPx);
-		var firstCellY = Math.floor((viewTop - myy) / cellHeightPx);
-		var lastCellY = Math.floor((viewBottom - myy) / cellHeightPx);
-		var offx = myx % this.tilewidth;
-		var offy = myy % this.tileheight;
-		if (this.seamless)
-		{
-			offx = 0;
-			offy = 0;
-		}
-		if (offx !== 0 || offy !== 0)
-		{
-			ctx.save();
-			ctx.translate(offx, offy);
-			myx -= offx;
-			myy -= offy;
-			viewLeft -= offx;
-			viewTop -= offy;
-			viewRight -= offx;
-			viewBottom -= offy;
-		}
-		var cx, cy, cell, i, len, q, qleft, qtop, qright, qbottom, img;
-		for (cx = firstCellX; cx <= lastCellX; ++cx)
-		{
-			for (cy = firstCellY; cy <= lastCellY; ++cy)
-			{
-				cell = this.cellAtIndex(cx, cy);
-				if (!cell)
-					continue;
-				cell.maybeBuildQuadMap();
-				for (i = 0, len = cell.quads.length; i < len; ++i)
-				{
-					q = cell.quads[i];
-					if (q.id === -1)
-						continue;
-					qrc = q.rc;
-					qleft = qrc.left + myx;
-					qtop = qrc.top + myy;
-					qright = qrc.right + myx;
-					qbottom = qrc.bottom + myy;
-					if (qleft > viewRight || qright < viewLeft || qtop > viewBottom || qbottom < viewTop)
-						continue;
-					img = this.type.GetFlippedTileImage(q.tileid, q.horiz_flip, q.vert_flip, q.diag_flip, this.seamless);
-					if (seamless)
-					{
-						ctx.drawImage(img, qleft, qtop);
-					}
-					else
-					{
-						ctx.fillStyle = this.type.GetFlippedTileImage(q.tileid, q.horiz_flip, q.vert_flip, q.diag_flip, this.seamless);
-						ctx.fillRect(qleft, qtop, qright - qleft, qbottom - qtop);
-					}
-				}
-				/*
-				for (i = 0, len = cell.collision_rects.length; i < len; ++i)
-				{
-					qrc = cell.collision_rects[i].rc;
-					qleft = qrc.left + myx;
-					qtop = qrc.top + myy;
-					qright = qrc.right + myx;
-					qbottom = qrc.bottom + myy;
-					ctx.strokeRect(qleft, qtop, qright - qleft, qbottom - qtop);
-				}
-				*/
-			}
-		}
-		if (offx !== 0 || offy !== 0)
-			ctx.restore();
+		var t = { pageX: info.pageX, pageY: info.pageY, "identifier": 0 };
+		var fakeinfo = { changedTouches: [t] };
+		this.onTouchMove(fakeinfo);
 	};
-	var tmp_rect = new cr.rect(0, 0, 1, 1);
-	instanceProto.drawGL_earlyZPass = function(glw)
+	instanceProto.onMouseUp = function(info)
 	{
-		this.drawGL(glw);
+		if (info.preventDefault && this.runtime.had_a_click && !this.runtime.isMobile)
+			info.preventDefault();
+		this.runtime.had_a_click = true;
+		var t = { pageX: info.pageX, pageY: info.pageY, "identifier": 0 };
+		var fakeinfo = { changedTouches: [t] };
+		this.onTouchEnd(fakeinfo);
+		this.mouseDown = false;
 	};
-	instanceProto.drawGL = function (glw)
+	instanceProto.tick2 = function()
 	{
-		if (this.tilewidth <= 0 || this.tileheight <= 0)
-			return;
-		this.type.maybeCutTiles(this.tilewidth, this.tileheight, this.tilexoffset, this.tileyoffset, this.tilexspacing, this.tileyspacing, this.seamless);
-		if (this.width !== this.lastwidth || this.height !== this.lastheight)
+		var i, len, t;
+		var nowtime = cr.performance_now();
+		for (i = 0, len = this.touches.length; i < len; ++i)
 		{
-			this.physics_changed = true;
-			this.setAllQuadMapChanged();
-			this.maybeBuildAllQuadMap();
-			this.lastwidth = this.width;
-			this.lastheight = this.height;
-		}
-		glw.setOpacity(this.opacity);
-		var cut_tiles = this.type.cut_tiles;
-		var layer = this.layer;
-		var viewLeft = layer.viewLeft;
-		var viewTop = layer.viewTop;
-		var viewRight = layer.viewRight;
-		var viewBottom = layer.viewBottom;
-		var myx = this.x;
-		var myy = this.y;
-		var qrc;
-		if (this.runtime.pixel_rounding)
-		{
-			myx = Math.round(myx);
-			myy = Math.round(myy);
-		}
-		var cellWidthPx = this.cellwidth * this.tilewidth;
-		var cellHeightPx = this.cellheight * this.tileheight;
-		var firstCellX = Math.floor((viewLeft - myx) / cellWidthPx);
-		var lastCellX = Math.floor((viewRight - myx) / cellWidthPx);
-		var firstCellY = Math.floor((viewTop - myy) / cellHeightPx);
-		var lastCellY = Math.floor((viewBottom - myy) / cellHeightPx);
-		var i, len, q, qleft, qtop, qright, qbottom;
-		var qtlx, qtly, qtrx, qtry, qbrx, qbry, qblx, qbly, temp;
-		var cx, cy, cell;
-		for (cx = firstCellX; cx <= lastCellX; ++cx)
-		{
-			for (cy = firstCellY; cy <= lastCellY; ++cy)
-			{
-				cell = this.cellAtIndex(cx, cy);
-				if (!cell)
-					continue;
-				cell.maybeBuildQuadMap();
-				for (i = 0, len = cell.quads.length; i < len; ++i)
-				{
-					q = cell.quads[i];
-					if (q.id === -1)
-						continue;
-					qrc = q.rc;
-					qleft = qrc.left + myx;
-					qtop = qrc.top + myy;
-					qright = qrc.right + myx;
-					qbottom = qrc.bottom + myy;
-					if (qleft > viewRight || qright < viewLeft || qtop > viewBottom || qbottom < viewTop)
-						continue;
-					glw.setTexture(cut_tiles[q.tileid]);
-					tmp_rect.right = (qright - qleft) / this.tilewidth;
-					tmp_rect.bottom = (qbottom - qtop) / this.tileheight;
-					if (q.any_flip)
-					{
-						if (q.diag_flip)
-						{
-							temp = tmp_rect.right;
-							tmp_rect.right = tmp_rect.bottom;
-							tmp_rect.bottom = temp;
-						}
-						qtlx = 0;
-						qtly = 0;
-						qtrx = tmp_rect.right;
-						qtry = 0;
-						qbrx = tmp_rect.right;
-						qbry = tmp_rect.bottom;
-						qblx = 0;
-						qbly = tmp_rect.bottom;
-						if (q.diag_flip)
-						{
-							temp = qblx;		qblx = qtrx;		qtrx = temp;
-							temp = qbly;		qbly = qtry;		qtry = temp;
-						}
-						if (q.horiz_flip)
-						{
-							temp = qtlx;		qtlx = qtrx;		qtrx = temp;
-							temp = qtly;		qtly = qtry;		qtry = temp;
-							temp = qblx;		qblx = qbrx;		qbrx = temp;
-							temp = qbly;		qbly = qbry;		qbry = temp;
-						}
-						if (q.vert_flip)
-						{
-							temp = qtlx;		qtlx = qblx;		qblx = temp;
-							temp = qtly;		qtly = qbly;		qbly = temp;
-							temp = qtrx;		qtrx = qbrx;		qbrx = temp;
-							temp = qtry;		qtry = qbry;		qbry = temp;
-						}
-						glw.quadTexUV(qleft, qtop, qright, qtop, qright, qbottom, qleft, qbottom, qtlx, qtly, qtrx, qtry, qbrx, qbry, qblx, qbly);
-					}
-					else
-					{
-						glw.quadTex(qleft, qtop, qright, qtop, qright, qbottom, qleft, qbottom, tmp_rect);
-					}
-				}
-			}
+			t = this.touches[i];
+			if (t.time <= nowtime - 50)
+				t.lasttime = nowtime;
+			t.maybeTriggerHold(this, i);
 		}
 	};
 	function Cnds() {};
-	Cnds.prototype.CompareTileAt = function (tx, ty, cmp, t)
-	{
-		var tile = this.getTileAt(tx, ty);
-		if (tile !== -1)
-			tile = (tile & TILE_ID_MASK);
-		return cr.do_cmp(tile, cmp, t);
-	};
-	function StateComboToFlags(state)
-	{
-		switch (state) {
-		case 0:		// normal
-			return 0;
-		case 1:		// flipped horizontal
-			return TILE_FLIPPED_HORIZONTAL;
-		case 2:		// flipped vertical
-			return TILE_FLIPPED_VERTICAL;
-		case 3:		// rotated 90
-			return TILE_FLIPPED_HORIZONTAL | TILE_FLIPPED_DIAGONAL;
-		case 4:		// rotated 180
-			return TILE_FLIPPED_HORIZONTAL | TILE_FLIPPED_VERTICAL;
-		case 5:		// rotated 270
-			return TILE_FLIPPED_VERTICAL | TILE_FLIPPED_DIAGONAL;
-		case 6:		// rotated 90, flipped vertical
-			return TILE_FLIPPED_HORIZONTAL | TILE_FLIPPED_VERTICAL | TILE_FLIPPED_DIAGONAL;
-		case 7:		// rotated 270, flipped vertical
-			return TILE_FLIPPED_DIAGONAL;
-		default:
-			return 0;
-		}
-	};
-	Cnds.prototype.CompareTileStateAt = function (tx, ty, state)
-	{
-		var tile = this.getTileAt(tx, ty);
-		var flags = 0;
-		if (tile !== -1)
-			flags = (tile & TILE_FLAGS_MASK);
-		return flags === StateComboToFlags(state);
-	};
-	Cnds.prototype.OnURLLoaded = function ()
+	Cnds.prototype.OnTouchStart = function ()
 	{
 		return true;
 	};
+	Cnds.prototype.OnTouchEnd = function ()
+	{
+		return true;
+	};
+	Cnds.prototype.IsInTouch = function ()
+	{
+		return this.touches.length;
+	};
+	Cnds.prototype.OnTouchObject = function (type)
+	{
+		if (!type)
+			return false;
+		return this.runtime.testAndSelectCanvasPointOverlap(type, this.curTouchX, this.curTouchY, false);
+	};
+	var touching = [];
+	Cnds.prototype.IsTouchingObject = function (type)
+	{
+		if (!type)
+			return false;
+		var sol = type.getCurrentSol();
+		var instances = sol.getObjects();
+		var px, py;
+		var i, leni, j, lenj;
+		for (i = 0, leni = instances.length; i < leni; i++)
+		{
+			var inst = instances[i];
+			inst.update_bbox();
+			for (j = 0, lenj = this.touches.length; j < lenj; j++)
+			{
+				var touch = this.touches[j];
+				px = inst.layer.canvasToLayer(touch.x, touch.y, true);
+				py = inst.layer.canvasToLayer(touch.x, touch.y, false);
+				if (inst.contains_pt(px, py))
+				{
+					touching.push(inst);
+					break;
+				}
+			}
+		}
+		if (touching.length)
+		{
+			sol.select_all = false;
+			cr.shallowAssignArray(sol.instances, touching);
+			type.applySolToContainer();
+			cr.clearArray(touching);
+			return true;
+		}
+		else
+			return false;
+	};
+	Cnds.prototype.CompareTouchSpeed = function (index, cmp, s)
+	{
+		index = Math.floor(index);
+		if (index < 0 || index >= this.touches.length)
+			return false;
+		var t = this.touches[index];
+		var dist = cr.distanceTo(t.x, t.y, t.lastx, t.lasty);
+		var timediff = (t.time - t.lasttime) / 1000;
+		var speed = 0;
+		if (timediff > 0)
+			speed = dist / timediff;
+		return cr.do_cmp(speed, cmp, s);
+	};
+	Cnds.prototype.OrientationSupported = function ()
+	{
+		return typeof window["DeviceOrientationEvent"] !== "undefined";
+	};
+	Cnds.prototype.MotionSupported = function ()
+	{
+		return typeof window["DeviceMotionEvent"] !== "undefined";
+	};
+	Cnds.prototype.CompareOrientation = function (orientation_, cmp_, angle_)
+	{
+		var v = 0;
+		if (orientation_ === 0)
+			v = this.getAlpha();
+		else if (orientation_ === 1)
+			v = this.getBeta();
+		else
+			v = this.getGamma();
+		return cr.do_cmp(v, cmp_, angle_);
+	};
+	Cnds.prototype.CompareAcceleration = function (acceleration_, cmp_, angle_)
+	{
+		var v = 0;
+		if (acceleration_ === 0)
+			v = this.acc_g_x;
+		else if (acceleration_ === 1)
+			v = this.acc_g_y;
+		else if (acceleration_ === 2)
+			v = this.acc_g_z;
+		else if (acceleration_ === 3)
+			v = this.acc_x;
+		else if (acceleration_ === 4)
+			v = this.acc_y;
+		else if (acceleration_ === 5)
+			v = this.acc_z;
+		return cr.do_cmp(v, cmp_, angle_);
+	};
+	Cnds.prototype.OnNthTouchStart = function (touch_)
+	{
+		touch_ = Math.floor(touch_);
+		return touch_ === this.trigger_index;
+	};
+	Cnds.prototype.OnNthTouchEnd = function (touch_)
+	{
+		touch_ = Math.floor(touch_);
+		return touch_ === this.trigger_index;
+	};
+	Cnds.prototype.HasNthTouch = function (touch_)
+	{
+		touch_ = Math.floor(touch_);
+		return this.touches.length >= touch_ + 1;
+	};
+	Cnds.prototype.OnHoldGesture = function ()
+	{
+		return true;
+	};
+	Cnds.prototype.OnTapGesture = function ()
+	{
+		return true;
+	};
+	Cnds.prototype.OnDoubleTapGesture = function ()
+	{
+		return true;
+	};
+	Cnds.prototype.OnHoldGestureObject = function (type)
+	{
+		if (!type)
+			return false;
+		return this.runtime.testAndSelectCanvasPointOverlap(type, this.curTouchX, this.curTouchY, false);
+	};
+	Cnds.prototype.OnTapGestureObject = function (type)
+	{
+		if (!type)
+			return false;
+		return this.runtime.testAndSelectCanvasPointOverlap(type, this.curTouchX, this.curTouchY, false);
+	};
+	Cnds.prototype.OnDoubleTapGestureObject = function (type)
+	{
+		if (!type)
+			return false;
+		return this.runtime.testAndSelectCanvasPointOverlap(type, this.curTouchX, this.curTouchY, false);
+	};
 	pluginProto.cnds = new Cnds();
-	function Acts() {};
-	Acts.prototype.EraseTile = function (tx, ty)
+	function Exps() {};
+	Exps.prototype.TouchCount = function (ret)
 	{
-		this.maybeResizeTilemap();
-		this.setTileAt(tx, ty, -1);
+		ret.set_int(this.touches.length);
 	};
-	Acts.prototype.SetTile = function (tx, ty, t, state)
+	Exps.prototype.X = function (ret, layerparam)
 	{
-		this.maybeResizeTilemap();
-		this.setTileAt(tx, ty, (t & TILE_ID_MASK) | StateComboToFlags(state));
-	};
-	Acts.prototype.SetTileState = function (tx, ty, state)
-	{
-		var t = this.getTileAt(tx, ty);
-		if (t !== -1)
+		var index = this.getTouchIndex;
+		if (index < 0 || index >= this.touches.length)
 		{
-			this.maybeResizeTilemap();
-			this.setTileAt(tx, ty, (t & TILE_ID_MASK) | StateComboToFlags(state));
-		}
-	};
-	Acts.prototype.EraseTileRange = function (tx, ty, tw, th)
-	{
-		var fromx = Math.floor(cr.max(tx, 0));
-		var fromy = Math.floor(cr.max(ty, 0));
-		var tox = Math.floor(cr.min(tx + tw, this.mapwidth));
-		var toy = Math.floor(cr.min(ty + th, this.mapheight));
-		var x, y;
-		for (y = fromy; y < toy; ++y)
-		{
-			for (x = fromx; x < tox; ++x)
-			{
-				this.setTileAt(x, y, -1);
-			}
-		}
-	};
-	Acts.prototype.SetTileRange = function (tx, ty, tw, th, t, state)
-	{
-		this.maybeResizeTilemap();
-		var fromx = Math.floor(cr.max(tx, 0));
-		var fromy = Math.floor(cr.max(ty, 0));
-		var tox = Math.floor(cr.min(tx + tw, this.mapwidth));
-		var toy = Math.floor(cr.min(ty + th, this.mapheight));
-		var settile = (t & TILE_ID_MASK) | StateComboToFlags(state);
-		var x, y;
-		for (y = fromy; y < toy; ++y)
-		{
-			for (x = fromx; x < tox; ++x)
-			{
-				this.setTileAt(x, y, settile);
-			}
-		}
-	};
-	Acts.prototype.SetTileStateRange = function (tx, ty, tw, th, state)
-	{
-		this.maybeResizeTilemap();
-		var fromx = Math.floor(cr.max(tx, 0));
-		var fromy = Math.floor(cr.max(ty, 0));
-		var tox = Math.floor(cr.min(tx + tw, this.mapwidth));
-		var toy = Math.floor(cr.min(ty + th, this.mapheight));
-		var setstate = StateComboToFlags(state);
-		var x, y, t;
-		for (y = fromy; y < toy; ++y)
-		{
-			for (x = fromx; x < tox; ++x)
-			{
-				t = this.getTileAt(x, y);
-				if (t !== -1)
-					this.setTileAt(x, y, (t & TILE_ID_MASK) | setstate);
-			}
-		}
-	};
-	Acts.prototype.LoadFromJSON = function (str)
-	{
-		var o;
-		try {
-			o = JSON.parse(str);
-		}
-		catch (e) {
+			ret.set_float(0);
 			return;
 		}
-		if (!o["c2tilemap"])
-			return;		// not a known tilemap data format
-		this.mapwidth = o["width"];
-		this.mapheight = o["height"];
-		this.maybeResizeTilemap(true);
-		this.setTilesFromRLECSV(o["data"]);
-		this.setAllQuadMapChanged();
-		this.physics_changed = true;
-	};
-	Acts.prototype.JSONDownload = function (filename)
-	{
-		var a = document.createElement("a");
-		var o = {
-			"c2tilemap": true,
-			"width": this.mapwidth,
-			"height": this.mapheight,
-			"data": this.getTilesAsRLECSV()
-		};
-		if (typeof a.download === "undefined")
+		var layer, oldScale, oldZoomRate, oldParallaxX, oldAngle;
+		if (cr.is_undefined(layerparam))
 		{
-			var str = 'data:text/html,' + encodeURIComponent("<p><a download='data.json' href=\"data:application/json,"
-				+ encodeURIComponent(JSON.stringify(o))
-				+ "\">Download link</a></p>");
-			window.open(str);
+			layer = this.runtime.getLayerByNumber(0);
+			oldScale = layer.scale;
+			oldZoomRate = layer.zoomRate;
+			oldParallaxX = layer.parallaxX;
+			oldAngle = layer.angle;
+			layer.scale = 1;
+			layer.zoomRate = 1.0;
+			layer.parallaxX = 1.0;
+			layer.angle = 0;
+			ret.set_float(layer.canvasToLayer(this.touches[index].x, this.touches[index].y, true));
+			layer.scale = oldScale;
+			layer.zoomRate = oldZoomRate;
+			layer.parallaxX = oldParallaxX;
+			layer.angle = oldAngle;
 		}
 		else
 		{
-			var body = document.getElementsByTagName("body")[0];
-			a.textContent = filename;
-			a.href = "data:application/json," + encodeURIComponent(JSON.stringify(o));
-			a.download = filename;
-			body.appendChild(a);
-			var clickEvent = document.createEvent("MouseEvent");
-			clickEvent.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-			a.dispatchEvent(clickEvent);
-			body.removeChild(a);
+			if (cr.is_number(layerparam))
+				layer = this.runtime.getLayerByNumber(layerparam);
+			else
+				layer = this.runtime.getLayerByName(layerparam);
+			if (layer)
+				ret.set_float(layer.canvasToLayer(this.touches[index].x, this.touches[index].y, true));
+			else
+				ret.set_float(0);
 		}
 	};
-	Acts.prototype.LoadURL = function (url_)
+	Exps.prototype.XAt = function (ret, index, layerparam)
 	{
-		var img = new Image();
-		var self = this;
-		img.onload = function ()
+		index = Math.floor(index);
+		if (index < 0 || index >= this.touches.length)
 		{
-			var type = self.type;
-			type.freeCutTiles();
-			type.texture_img = img;
-			self.runtime.redraw = true;
-			self.runtime.trigger(cr.plugins_.Tilemap.prototype.cnds.OnURLLoaded, self);
-		};
-		if (url_.substr(0, 5) !== "data:")
-			img.crossOrigin = "anonymous";
-		img.src = url_;
+			ret.set_float(0);
+			return;
+		}
+		var layer, oldScale, oldZoomRate, oldParallaxX, oldAngle;
+		if (cr.is_undefined(layerparam))
+		{
+			layer = this.runtime.getLayerByNumber(0);
+			oldScale = layer.scale;
+			oldZoomRate = layer.zoomRate;
+			oldParallaxX = layer.parallaxX;
+			oldAngle = layer.angle;
+			layer.scale = 1;
+			layer.zoomRate = 1.0;
+			layer.parallaxX = 1.0;
+			layer.angle = 0;
+			ret.set_float(layer.canvasToLayer(this.touches[index].x, this.touches[index].y, true));
+			layer.scale = oldScale;
+			layer.zoomRate = oldZoomRate;
+			layer.parallaxX = oldParallaxX;
+			layer.angle = oldAngle;
+		}
+		else
+		{
+			if (cr.is_number(layerparam))
+				layer = this.runtime.getLayerByNumber(layerparam);
+			else
+				layer = this.runtime.getLayerByName(layerparam);
+			if (layer)
+				ret.set_float(layer.canvasToLayer(this.touches[index].x, this.touches[index].y, true));
+			else
+				ret.set_float(0);
+		}
 	};
-	pluginProto.acts = new Acts();
-	function Exps() {};
-	Exps.prototype.TileAt = function (ret, tx, ty)
+	Exps.prototype.XForID = function (ret, id, layerparam)
 	{
-		var tile = this.getTileAt(tx, ty);
-		ret.set_int(tile === -1 ? -1 : (tile & TILE_ID_MASK));
+		var index = this.findTouch(id);
+		if (index < 0)
+		{
+			ret.set_float(0);
+			return;
+		}
+		var touch = this.touches[index];
+		var layer, oldScale, oldZoomRate, oldParallaxX, oldAngle;
+		if (cr.is_undefined(layerparam))
+		{
+			layer = this.runtime.getLayerByNumber(0);
+			oldScale = layer.scale;
+			oldZoomRate = layer.zoomRate;
+			oldParallaxX = layer.parallaxX;
+			oldAngle = layer.angle;
+			layer.scale = 1;
+			layer.zoomRate = 1.0;
+			layer.parallaxX = 1.0;
+			layer.angle = 0;
+			ret.set_float(layer.canvasToLayer(touch.x, touch.y, true));
+			layer.scale = oldScale;
+			layer.zoomRate = oldZoomRate;
+			layer.parallaxX = oldParallaxX;
+			layer.angle = oldAngle;
+		}
+		else
+		{
+			if (cr.is_number(layerparam))
+				layer = this.runtime.getLayerByNumber(layerparam);
+			else
+				layer = this.runtime.getLayerByName(layerparam);
+			if (layer)
+				ret.set_float(layer.canvasToLayer(touch.x, touch.y, true));
+			else
+				ret.set_float(0);
+		}
 	};
-	Exps.prototype.PositionToTileX = function (ret, x_)
+	Exps.prototype.Y = function (ret, layerparam)
 	{
-		ret.set_float(Math.floor((x_ - this.x) / this.tilewidth));
+		var index = this.getTouchIndex;
+		if (index < 0 || index >= this.touches.length)
+		{
+			ret.set_float(0);
+			return;
+		}
+		var layer, oldScale, oldZoomRate, oldParallaxY, oldAngle;
+		if (cr.is_undefined(layerparam))
+		{
+			layer = this.runtime.getLayerByNumber(0);
+			oldScale = layer.scale;
+			oldZoomRate = layer.zoomRate;
+			oldParallaxY = layer.parallaxY;
+			oldAngle = layer.angle;
+			layer.scale = 1;
+			layer.zoomRate = 1.0;
+			layer.parallaxY = 1.0;
+			layer.angle = 0;
+			ret.set_float(layer.canvasToLayer(this.touches[index].x, this.touches[index].y, false));
+			layer.scale = oldScale;
+			layer.zoomRate = oldZoomRate;
+			layer.parallaxY = oldParallaxY;
+			layer.angle = oldAngle;
+		}
+		else
+		{
+			if (cr.is_number(layerparam))
+				layer = this.runtime.getLayerByNumber(layerparam);
+			else
+				layer = this.runtime.getLayerByName(layerparam);
+			if (layer)
+				ret.set_float(layer.canvasToLayer(this.touches[index].x, this.touches[index].y, false));
+			else
+				ret.set_float(0);
+		}
 	};
-	Exps.prototype.PositionToTileY = function (ret, y_)
+	Exps.prototype.YAt = function (ret, index, layerparam)
 	{
-		ret.set_float(Math.floor((y_ - this.y) / this.tileheight));
+		index = Math.floor(index);
+		if (index < 0 || index >= this.touches.length)
+		{
+			ret.set_float(0);
+			return;
+		}
+		var layer, oldScale, oldZoomRate, oldParallaxY, oldAngle;
+		if (cr.is_undefined(layerparam))
+		{
+			layer = this.runtime.getLayerByNumber(0);
+			oldScale = layer.scale;
+			oldZoomRate = layer.zoomRate;
+			oldParallaxY = layer.parallaxY;
+			oldAngle = layer.angle;
+			layer.scale = 1;
+			layer.zoomRate = 1.0;
+			layer.parallaxY = 1.0;
+			layer.angle = 0;
+			ret.set_float(layer.canvasToLayer(this.touches[index].x, this.touches[index].y, false));
+			layer.scale = oldScale;
+			layer.zoomRate = oldZoomRate;
+			layer.parallaxY = oldParallaxY;
+			layer.angle = oldAngle;
+		}
+		else
+		{
+			if (cr.is_number(layerparam))
+				layer = this.runtime.getLayerByNumber(layerparam);
+			else
+				layer = this.runtime.getLayerByName(layerparam);
+			if (layer)
+				ret.set_float(layer.canvasToLayer(this.touches[index].x, this.touches[index].y, false));
+			else
+				ret.set_float(0);
+		}
 	};
-	Exps.prototype.TileToPositionX = function (ret, x_)
+	Exps.prototype.YForID = function (ret, id, layerparam)
 	{
-		ret.set_float((x_ * this.tilewidth) + this.x + (this.tilewidth / 2));
+		var index = this.findTouch(id);
+		if (index < 0)
+		{
+			ret.set_float(0);
+			return;
+		}
+		var touch = this.touches[index];
+		var layer, oldScale, oldZoomRate, oldParallaxY, oldAngle;
+		if (cr.is_undefined(layerparam))
+		{
+			layer = this.runtime.getLayerByNumber(0);
+			oldScale = layer.scale;
+			oldZoomRate = layer.zoomRate;
+			oldParallaxY = layer.parallaxY;
+			oldAngle = layer.angle;
+			layer.scale = 1;
+			layer.zoomRate = 1.0;
+			layer.parallaxY = 1.0;
+			layer.angle = 0;
+			ret.set_float(layer.canvasToLayer(touch.x, touch.y, false));
+			layer.scale = oldScale;
+			layer.zoomRate = oldZoomRate;
+			layer.parallaxY = oldParallaxY;
+			layer.angle = oldAngle;
+		}
+		else
+		{
+			if (cr.is_number(layerparam))
+				layer = this.runtime.getLayerByNumber(layerparam);
+			else
+				layer = this.runtime.getLayerByName(layerparam);
+			if (layer)
+				ret.set_float(layer.canvasToLayer(touch.x, touch.y, false));
+			else
+				ret.set_float(0);
+		}
 	};
-	Exps.prototype.TileToPositionY = function (ret, y_)
+	Exps.prototype.AbsoluteX = function (ret)
 	{
-		ret.set_float((y_ * this.tileheight) + this.y + (this.tileheight / 2));
+		if (this.touches.length)
+			ret.set_float(this.touches[0].x);
+		else
+			ret.set_float(0);
 	};
-	Exps.prototype.SnapX = function (ret, x_)
+	Exps.prototype.AbsoluteXAt = function (ret, index)
 	{
-		ret.set_float((Math.floor((x_ - this.x) / this.tilewidth) * this.tilewidth) + this.x + (this.tilewidth / 2));
+		index = Math.floor(index);
+		if (index < 0 || index >= this.touches.length)
+		{
+			ret.set_float(0);
+			return;
+		}
+		ret.set_float(this.touches[index].x);
 	};
-	Exps.prototype.SnapY = function (ret, y_)
+	Exps.prototype.AbsoluteXForID = function (ret, id)
 	{
-		ret.set_float((Math.floor((y_ - this.y) / this.tileheight) * this.tileheight) + this.y + (this.tileheight / 2));
+		var index = this.findTouch(id);
+		if (index < 0)
+		{
+			ret.set_float(0);
+			return;
+		}
+		var touch = this.touches[index];
+		ret.set_float(touch.x);
 	};
-	Exps.prototype.TilesJSON = function (ret)
+	Exps.prototype.AbsoluteY = function (ret)
 	{
-		this.maybeResizeTilemap();
-		var curwidth = cr.floor(this.width / this.tilewidth);
-		var curheight = cr.floor(this.height / this.tileheight);
-		ret.set_string(JSON.stringify({
-			"c2tilemap": true,
-			"width": curwidth,
-			"height": curheight,
-			"data": this.getTilesAsRLECSV()
-		}));
+		if (this.touches.length)
+			ret.set_float(this.touches[0].y);
+		else
+			ret.set_float(0);
+	};
+	Exps.prototype.AbsoluteYAt = function (ret, index)
+	{
+		index = Math.floor(index);
+		if (index < 0 || index >= this.touches.length)
+		{
+			ret.set_float(0);
+			return;
+		}
+		ret.set_float(this.touches[index].y);
+	};
+	Exps.prototype.AbsoluteYForID = function (ret, id)
+	{
+		var index = this.findTouch(id);
+		if (index < 0)
+		{
+			ret.set_float(0);
+			return;
+		}
+		var touch = this.touches[index];
+		ret.set_float(touch.y);
+	};
+	Exps.prototype.SpeedAt = function (ret, index)
+	{
+		index = Math.floor(index);
+		if (index < 0 || index >= this.touches.length)
+		{
+			ret.set_float(0);
+			return;
+		}
+		var t = this.touches[index];
+		var dist = cr.distanceTo(t.x, t.y, t.lastx, t.lasty);
+		var timediff = (t.time - t.lasttime) / 1000;
+		if (timediff === 0)
+			ret.set_float(0);
+		else
+			ret.set_float(dist / timediff);
+	};
+	Exps.prototype.SpeedForID = function (ret, id)
+	{
+		var index = this.findTouch(id);
+		if (index < 0)
+		{
+			ret.set_float(0);
+			return;
+		}
+		var touch = this.touches[index];
+		var dist = cr.distanceTo(touch.x, touch.y, touch.lastx, touch.lasty);
+		var timediff = (touch.time - touch.lasttime) / 1000;
+		if (timediff === 0)
+			ret.set_float(0);
+		else
+			ret.set_float(dist / timediff);
+	};
+	Exps.prototype.AngleAt = function (ret, index)
+	{
+		index = Math.floor(index);
+		if (index < 0 || index >= this.touches.length)
+		{
+			ret.set_float(0);
+			return;
+		}
+		var t = this.touches[index];
+		ret.set_float(cr.to_degrees(cr.angleTo(t.lastx, t.lasty, t.x, t.y)));
+	};
+	Exps.prototype.AngleForID = function (ret, id)
+	{
+		var index = this.findTouch(id);
+		if (index < 0)
+		{
+			ret.set_float(0);
+			return;
+		}
+		var touch = this.touches[index];
+		ret.set_float(cr.to_degrees(cr.angleTo(touch.lastx, touch.lasty, touch.x, touch.y)));
+	};
+	Exps.prototype.Alpha = function (ret)
+	{
+		ret.set_float(this.getAlpha());
+	};
+	Exps.prototype.Beta = function (ret)
+	{
+		ret.set_float(this.getBeta());
+	};
+	Exps.prototype.Gamma = function (ret)
+	{
+		ret.set_float(this.getGamma());
+	};
+	Exps.prototype.AccelerationXWithG = function (ret)
+	{
+		ret.set_float(this.acc_g_x);
+	};
+	Exps.prototype.AccelerationYWithG = function (ret)
+	{
+		ret.set_float(this.acc_g_y);
+	};
+	Exps.prototype.AccelerationZWithG = function (ret)
+	{
+		ret.set_float(this.acc_g_z);
+	};
+	Exps.prototype.AccelerationX = function (ret)
+	{
+		ret.set_float(this.acc_x);
+	};
+	Exps.prototype.AccelerationY = function (ret)
+	{
+		ret.set_float(this.acc_y);
+	};
+	Exps.prototype.AccelerationZ = function (ret)
+	{
+		ret.set_float(this.acc_z);
+	};
+	Exps.prototype.TouchIndex = function (ret)
+	{
+		ret.set_int(this.trigger_index);
+	};
+	Exps.prototype.TouchID = function (ret)
+	{
+		ret.set_float(this.trigger_id);
 	};
 	pluginProto.exps = new Exps();
 }());
 ;
 ;
-cr.behaviors.Bullet = function(runtime)
+var stats;
+cr.plugins_.c2fpsmonitor = function(runtime)
 {
 	this.runtime = runtime;
 };
 (function ()
 {
-	var behaviorProto = cr.behaviors.Bullet.prototype;
-	behaviorProto.Type = function(behavior, objtype)
+	var pluginProto = cr.plugins_.c2fpsmonitor.prototype;
+	pluginProto.Type = function(plugin)
 	{
-		this.behavior = behavior;
-		this.objtype = objtype;
-		this.runtime = behavior.runtime;
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
 	};
-	var behtypeProto = behaviorProto.Type.prototype;
-	behtypeProto.onCreate = function()
+	var typeProto = pluginProto.Type.prototype;
+	typeProto.onCreate = function()
 	{
 	};
-	behaviorProto.Instance = function(type, inst)
+	pluginProto.Instance = function(type)
 	{
 		this.type = type;
-		this.behavior = type.behavior;
-		this.inst = inst;				// associated object instance to modify
 		this.runtime = type.runtime;
 	};
-	var behinstProto = behaviorProto.Instance.prototype;
-	behinstProto.onCreate = function()
+	var instanceProto = pluginProto.Instance.prototype;
+	var fxNames = [ "lighter",
+					"xor",
+					"copy",
+					"destination-over",
+					"source-in",
+					"destination-in",
+					"source-out",
+					"destination-out",
+					"source-atop",
+					"destination-atop"];
+	instanceProto.effectToCompositeOp = function(effect)
 	{
-		var speed = this.properties[0];
-		this.acc = this.properties[1];
-		this.g = this.properties[2];
-		this.bounceOffSolid = (this.properties[3] !== 0);
-		this.setAngle = (this.properties[4] !== 0);
-		this.dx = Math.cos(this.inst.angle) * speed;
-		this.dy = Math.sin(this.inst.angle) * speed;
-		this.lastx = this.inst.x;
-		this.lasty = this.inst.y;
-		this.lastKnownAngle = this.inst.angle;
-		this.travelled = 0;
-		this.enabled = (this.properties[5] !== 0);
+		if (effect <= 0 || effect >= 11)
+			return "source-over";
+		return fxNames[effect - 1];	// not including "none" so offset by 1
 	};
-	behinstProto.saveToJSON = function ()
+	instanceProto.updateBlend = function(effect)
+	{
+		var gl = this.runtime.gl;
+		if (!gl)
+			return;
+		this.srcBlend = gl.ONE;
+		this.destBlend = gl.ONE_MINUS_SRC_ALPHA;
+		switch (effect) {
+		case 1:		// lighter (additive)
+			this.srcBlend = gl.ONE;
+			this.destBlend = gl.ONE;
+			break;
+		case 2:		// xor
+			break;	// todo
+		case 3:		// copy
+			this.srcBlend = gl.ONE;
+			this.destBlend = gl.ZERO;
+			break;
+		case 4:		// destination-over
+			this.srcBlend = gl.ONE_MINUS_DST_ALPHA;
+			this.destBlend = gl.ONE;
+			break;
+		case 5:		// source-in
+			this.srcBlend = gl.DST_ALPHA;
+			this.destBlend = gl.ZERO;
+			break;
+		case 6:		// destination-in
+			this.srcBlend = gl.ZERO;
+			this.destBlend = gl.SRC_ALPHA;
+			break;
+		case 7:		// source-out
+			this.srcBlend = gl.ONE_MINUS_DST_ALPHA;
+			this.destBlend = gl.ZERO;
+			break;
+		case 8:		// destination-out
+			this.srcBlend = gl.ZERO;
+			this.destBlend = gl.ONE_MINUS_SRC_ALPHA;
+			break;
+		case 9:		// source-atop
+			this.srcBlend = gl.DST_ALPHA;
+			this.destBlend = gl.ONE_MINUS_SRC_ALPHA;
+			break;
+		case 10:	// destination-atop
+			this.srcBlend = gl.ONE_MINUS_DST_ALPHA;
+			this.destBlend = gl.SRC_ALPHA;
+			break;
+		}
+	};
+	instanceProto.onCreate = function()
+	{
+		this.visible = (this.properties[0] === 0);							// 0=visible, 1=invisible
+		this.compositeOp = this.effectToCompositeOp(this.properties[1]);
+		this.updateBlend(this.properties[1]);
+		this.canvas = document.createElement('canvas');
+		this.canvas.width=this.width;
+		this.canvas.height=this.height;
+		this.ctx = this.canvas.getContext('2d');
+		this.cont = document.getElementById( 'c2canvasdiv' );
+		stats = new Stats();
+				 stats.domElement.style.position = 'absolute';
+				 stats.domElement.style.top = '0px';
+				 this.cont.appendChild( stats.domElement );
+	   this.runtime.tickMe(this);
+	};
+	instanceProto.tick = function ()
+		{
+			var dt = this.runtime.getDt(this);
+			var ctx=this.ctx;
+			var w =this.canvas.width;
+			var h=this.canvas.height;
+			var dest=this.canvas;
+			stats.update();
+			 this.runtime.redraw = true;
+			 this.update_tex = true;
+		};
+	instanceProto.onDestroy = function ()
+	{
+	};
+	instanceProto.saveToJSON = function ()
 	{
 		return {
-			"acc": this.acc,
-			"g": this.g,
-			"dx": this.dx,
-			"dy": this.dy,
-			"lx": this.lastx,
-			"ly": this.lasty,
-			"lka": this.lastKnownAngle,
-			"t": this.travelled,
-			"e": this.enabled
+            "canvas_w":this.canvas.width,
+            "canvas_h":this.canvas.height,
+            "image":this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height).data
 		};
 	};
-	behinstProto.loadFromJSON = function (o)
+	instanceProto.loadFromJSON = function (o)
 	{
-		this.acc = o["acc"];
-		this.g = o["g"];
-		this.dx = o["dx"];
-		this.dy = o["dy"];
-		this.lastx = o["lx"];
-		this.lasty = o["ly"];
-		this.lastKnownAngle = o["lka"];
-		this.travelled = o["t"];
-		this.enabled = o["e"];
+        var canvasWidth = this.canvas.width = o["canvas_w"];
+        var canvasHeight = this.canvas.height = o["canvas_h"];
+        var data = this.ctx.getImageData(0,0,this.canvas.width,this.canvas.height).data;
+        for (var y = 0; y < canvasHeight; ++y) {
+            for (var x = 0; x < canvasWidth; ++x) {
+                var index = (y * canvasWidth + x)*4;
+                for (var c = 0; c < 4; ++c)
+                data[index+c] = o["image"][index+c];
+            }
+        }
 	};
-	behinstProto.tick = function ()
+	instanceProto.draw_instances = function (instances, ctx)
+    {
+        for(var x in instances)
+        {
+            if(instances[x].visible==false && this.runtime.testOverlap(this, instances[x])== false)
+                continue;
+            ctx.save();
+            ctx.scale(this.canvas.width/this.width, this.canvas.height/this.height);
+            ctx.rotate(-this.angle);
+            ctx.translate(-this.bquad.tlx, -this.bquad.tly);
+            ctx.globalCompositeOperation = instances[x].compositeOp;//rojo
+            if (instances[x].type.pattern !== undefined && instances[x].type.texture_img !== undefined) {
+                instances[x].pattern = ctx.createPattern(instances[x].type.texture_img, "repeat");
+            }
+            instances[x].draw(ctx);
+            ctx.restore();
+        }
+    };
+	instanceProto.draw = function(ctx)
 	{
-		if (!this.enabled)
-			return;
-		var dt = this.runtime.getDt(this.inst);
-		var s, a;
-		var bounceSolid, bounceAngle;
-		if (this.inst.angle !== this.lastKnownAngle)
+		ctx.save();
+		ctx.globalAlpha = this.opacity;
+		ctx.globalCompositeOperation = this.compositeOp;
+		var myx = this.x;
+		var myy = this.y;
+		if (this.runtime.pixel_rounding)
 		{
-			if (this.setAngle)
-			{
-				s = cr.distanceTo(0, 0, this.dx, this.dy);
-				this.dx = Math.cos(this.inst.angle) * s;
-				this.dy = Math.sin(this.inst.angle) * s;
-			}
-			this.lastKnownAngle = this.inst.angle;
+			myx = Math.round(myx);
+			myy = Math.round(myy);
 		}
-		if (this.acc !== 0)
+		ctx.translate(myx, myy);
+		ctx.rotate(this.angle);
+		ctx.drawImage(this.canvas,
+						  0 - (this.hotspotX * this.width),
+						  0 - (this.hotspotY * this.height),
+						  this.width,
+						  this.height);
+		ctx.restore();
+	};
+	instanceProto.drawGL = function(glw)
+	{
+		glw.setBlend(this.srcBlend, this.destBlend);
+        if (this.update_tex)
+        {
+            if (this.tex)
+                glw.deleteTexture(this.tex);
+            this.tex=glw.loadTexture(this.canvas, false, this.runtime.linearSampling);
+            this.update_tex = false;
+        }
+		glw.setTexture(this.tex);
+		glw.setOpacity(this.opacity);
+		var q = this.bquad;
+		if (this.runtime.pixel_rounding)
 		{
-			s = cr.distanceTo(0, 0, this.dx, this.dy);
-			if (this.dx === 0 && this.dy === 0)
-				a = this.inst.angle;
-			else
-				a = cr.angleTo(0, 0, this.dx, this.dy);
-			s += this.acc * dt;
-			if (s < 0)
-				s = 0;
-			this.dx = Math.cos(a) * s;
-			this.dy = Math.sin(a) * s;
-		}
-		if (this.g !== 0)
-			this.dy += this.g * dt;
-		this.lastx = this.inst.x;
-		this.lasty = this.inst.y;
-		if (this.dx !== 0 || this.dy !== 0)
-		{
-			this.inst.x += this.dx * dt;
-			this.inst.y += this.dy * dt;
-			this.travelled += cr.distanceTo(0, 0, this.dx * dt, this.dy * dt)
-			if (this.setAngle)
-			{
-				this.inst.angle = cr.angleTo(0, 0, this.dx, this.dy);
-				this.inst.set_bbox_changed();
-				this.lastKnownAngle = this.inst.angle;
-			}
-			this.inst.set_bbox_changed();
-			if (this.bounceOffSolid)
-			{
-				bounceSolid = this.runtime.testOverlapSolid(this.inst);
-				if (bounceSolid)
-				{
-					this.runtime.registerCollision(this.inst, bounceSolid);
-					s = cr.distanceTo(0, 0, this.dx, this.dy);
-					bounceAngle = this.runtime.calculateSolidBounceAngle(this.inst, this.lastx, this.lasty);
-					this.dx = Math.cos(bounceAngle) * s;
-					this.dy = Math.sin(bounceAngle) * s;
-					this.inst.x += this.dx * dt;			// move out for one tick since the object can't have spent a tick in the solid
-					this.inst.y += this.dy * dt;
-					this.inst.set_bbox_changed();
-					if (this.setAngle)
-					{
-						this.inst.angle = bounceAngle;
-						this.lastKnownAngle = bounceAngle;
-						this.inst.set_bbox_changed();
-					}
-					if (!this.runtime.pushOutSolid(this.inst, this.dx / s, this.dy / s, Math.max(s * 2.5 * dt, 30)))
-						this.runtime.pushOutSolidNearest(this.inst, 100);
-				}
-			}
-		}
-	};
-	function Cnds() {};
-	Cnds.prototype.CompareSpeed = function (cmp, s)
-	{
-		return cr.do_cmp(cr.distanceTo(0, 0, this.dx, this.dy), cmp, s);
-	};
-	Cnds.prototype.CompareTravelled = function (cmp, d)
-	{
-		return cr.do_cmp(this.travelled, cmp, d);
-	};
-	behaviorProto.cnds = new Cnds();
-	function Acts() {};
-	Acts.prototype.SetSpeed = function (s)
-	{
-		var a = cr.angleTo(0, 0, this.dx, this.dy);
-		this.dx = Math.cos(a) * s;
-		this.dy = Math.sin(a) * s;
-	};
-	Acts.prototype.SetAcceleration = function (a)
-	{
-		this.acc = a;
-	};
-	Acts.prototype.SetGravity = function (g)
-	{
-		this.g = g;
-	};
-	Acts.prototype.SetAngleOfMotion = function (a)
-	{
-		a = cr.to_radians(a);
-		var s = cr.distanceTo(0, 0, this.dx, this.dy)
-		this.dx = Math.cos(a) * s;
-		this.dy = Math.sin(a) * s;
-	};
-	Acts.prototype.Bounce = function (objtype)
-	{
-		if (!objtype)
-			return;
-		var otherinst = objtype.getFirstPicked(this.inst);
-		if (!otherinst)
-			return;
-		var dt = this.runtime.getDt(this.inst);
-		var s = cr.distanceTo(0, 0, this.dx, this.dy);
-		var bounceAngle = this.runtime.calculateSolidBounceAngle(this.inst, this.lastx, this.lasty, otherinst);
-		this.dx = Math.cos(bounceAngle) * s;
-		this.dy = Math.sin(bounceAngle) * s;
-		this.inst.x += this.dx * dt;			// move out for one tick since the object can't have spent a tick in the solid
-		this.inst.y += this.dy * dt;
-		this.inst.set_bbox_changed();
-		if (this.setAngle)
-		{
-			this.inst.angle = bounceAngle;
-			this.lastKnownAngle = bounceAngle;
-			this.inst.set_bbox_changed();
-		}
-		if (this.bounceOffSolid)
-		{
-			if (!this.runtime.pushOutSolid(this.inst, this.dx / s, this.dy / s, Math.max(s * 2.5 * dt, 30)))
-				this.runtime.pushOutSolidNearest(this.inst, 100);
+			var ox = Math.round(this.x) - this.x;
+			var oy = Math.round(this.y) - this.y;
+			glw.quad(q.tlx + ox, q.tly + oy, q.trx + ox, q.try_ + oy, q.brx + ox, q.bry + oy, q.blx + ox, q.bly + oy);
 		}
 		else
-		{
-			this.runtime.pushOut(this.inst, this.dx / s, this.dy / s, Math.max(s * 2.5 * dt, 30), otherinst)
-		}
+			glw.quad(q.tlx, q.tly, q.trx, q.try_, q.brx, q.bry, q.blx, q.bly);
 	};
-	Acts.prototype.SetDistanceTravelled = function (d)
+	pluginProto.cnds = {};
+	var cnds = pluginProto.cnds;
+	pluginProto.acts = {};
+	var acts = pluginProto.acts;
+	acts.SetEffect = function (effect)
 	{
-		this.travelled = d;
+		this.compositeOp = this.effectToCompositeOp(effect);
+		this.runtime.redraw = true;
+        this.update_tex = true;
 	};
-	Acts.prototype.SetEnabled = function (en)
-	{
-		this.enabled = (en === 1);
-	};
-	behaviorProto.acts = new Acts();
-	function Exps() {};
-	Exps.prototype.Speed = function (ret)
-	{
-		var s = cr.distanceTo(0, 0, this.dx, this.dy);
-		s = cr.round6dp(s);
-		ret.set_float(s);
-	};
-	Exps.prototype.Acceleration = function (ret)
-	{
-		ret.set_float(this.acc);
-	};
-	Exps.prototype.AngleOfMotion = function (ret)
-	{
-		ret.set_float(cr.to_degrees(cr.angleTo(0, 0, this.dx, this.dy)));
-	};
-	Exps.prototype.DistanceTravelled = function (ret)
-	{
-		ret.set_float(this.travelled);
-	};
-	behaviorProto.exps = new Exps();
+	pluginProto.exps = {};
+	var exps = pluginProto.exps;
+    exps.AsJSON = function(ret)
+    {
+        ret.set_string( JSON.stringify({
+			"c2array": true,
+			"size": [1, 1, this.canvas.width * this.canvas.height * 4],
+			"data": [[this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data]]
+		}));
+    };
 }());
+var Stats=function(){var l=Date.now(),m=l,g=0,n=Infinity,o=0,h=0,p=Infinity,q=0,r=0,s=0,f=document.createElement("div");f.id="stats";f.addEventListener("mousedown",function(b){b.preventDefault();t(++s%2)},!1);f.style.cssText="width:80px;opacity:0.9;cursor:pointer";var a=document.createElement("div");a.id="fps";a.style.cssText="padding:0 0 3px 3px;text-align:left;background-color:#002";f.appendChild(a);var i=document.createElement("div");i.id="fpsText";i.style.cssText="color:#0ff;font-family:Helvetica,Arial,sans-serif;font-size:9px;font-weight:bold;line-height:15px";
+i.innerHTML="FPS";a.appendChild(i);var c=document.createElement("div");c.id="fpsGraph";c.style.cssText="position:relative;width:74px;height:30px;background-color:#0ff";for(a.appendChild(c);74>c.children.length;){var j=document.createElement("span");j.style.cssText="width:1px;height:30px;float:left;background-color:#113";c.appendChild(j)}var d=document.createElement("div");d.id="ms";d.style.cssText="padding:0 0 3px 3px;text-align:left;background-color:#020;display:none";f.appendChild(d);var k=document.createElement("div");
+k.id="msText";k.style.cssText="color:#0f0;font-family:Helvetica,Arial,sans-serif;font-size:9px;font-weight:bold;line-height:15px";k.innerHTML="MS";d.appendChild(k);var e=document.createElement("div");e.id="msGraph";e.style.cssText="position:relative;width:74px;height:30px;background-color:#0f0";for(d.appendChild(e);74>e.children.length;)j=document.createElement("span"),j.style.cssText="width:1px;height:30px;float:left;background-color:#131",e.appendChild(j);var t=function(b){s=b;switch(s){case 0:a.style.display=
+"block";d.style.display="none";break;case 1:a.style.display="none",d.style.display="block"}};return{REVISION:11,domElement:f,setMode:t,begin:function(){l=Date.now()},end:function(){var b=Date.now();g=b-l;n=Math.min(n,g);o=Math.max(o,g);k.textContent=g+" MS ("+n+"-"+o+")";var a=Math.min(30,30-30*(g/200));e.appendChild(e.firstChild).style.height=a+"px";r++;b>m+1E3&&(h=Math.round(1E3*r/(b-m)),p=Math.min(p,h),q=Math.max(q,h),i.textContent=h+" FPS ("+p+"-"+q+")",a=Math.min(30,30-30*(h/100)),c.appendChild(c.firstChild).style.height=
+a+"px",m=b,r=0);return b},update:function(){l=this.end()}}};
 ;
 ;
 cr.behaviors.Fade = function(runtime)
@@ -22409,97 +20967,6 @@ cr.behaviors.Physics = function(runtime)
 }());
 ;
 ;
-cr.behaviors.bound = function(runtime)
-{
-	this.runtime = runtime;
-};
-(function ()
-{
-	var behaviorProto = cr.behaviors.bound.prototype;
-	behaviorProto.Type = function(behavior, objtype)
-	{
-		this.behavior = behavior;
-		this.objtype = objtype;
-		this.runtime = behavior.runtime;
-	};
-	var behtypeProto = behaviorProto.Type.prototype;
-	behtypeProto.onCreate = function()
-	{
-	};
-	behaviorProto.Instance = function(type, inst)
-	{
-		this.type = type;
-		this.behavior = type.behavior;
-		this.inst = inst;				// associated object instance to modify
-		this.runtime = type.runtime;
-		this.mode = 0;
-	};
-	var behinstProto = behaviorProto.Instance.prototype;
-	behinstProto.onCreate = function()
-	{
-		this.mode = this.properties[0];	// 0 = origin, 1 = edge
-	};
-	behinstProto.tick = function ()
-	{
-	};
-	behinstProto.tick2 = function ()
-	{
-		this.inst.update_bbox();
-		var bbox = this.inst.bbox;
-		var layout = this.inst.layer.layout;
-		var changed = false;
-		if (this.mode === 0)	// origin
-		{
-			if (this.inst.x < 0)
-			{
-				this.inst.x = 0;
-				changed = true;
-			}
-			if (this.inst.y < 0)
-			{
-				this.inst.y = 0;
-				changed = true;
-			}
-			if (this.inst.x > layout.width)
-			{
-				this.inst.x = layout.width;
-				changed = true;
-			}
-			if (this.inst.y > layout.height)
-			{
-				this.inst.y = layout.height;
-				changed = true;
-			}
-		}
-		else
-		{
-			if (bbox.left < 0)
-			{
-				this.inst.x -= bbox.left;
-				changed = true;
-			}
-			if (bbox.top < 0)
-			{
-				this.inst.y -= bbox.top;
-				changed = true;
-			}
-			if (bbox.right > layout.width)
-			{
-				this.inst.x -= (bbox.right - layout.width);
-				changed = true;
-			}
-			if (bbox.bottom > layout.height)
-			{
-				this.inst.y -= (bbox.bottom - layout.height);
-				changed = true;
-			}
-		}
-		if (changed)
-			this.inst.set_bbox_changed();
-	};
-}());
-;
-;
 cr.behaviors.destroy = function(runtime)
 {
 	this.runtime = runtime;
@@ -22537,102 +21004,49 @@ cr.behaviors.destroy = function(runtime)
 			this.runtime.DestroyInstance(this.inst);
 	};
 }());
-;
-;
-cr.behaviors.solid = function(runtime)
-{
-	this.runtime = runtime;
-};
-(function ()
-{
-	var behaviorProto = cr.behaviors.solid.prototype;
-	behaviorProto.Type = function(behavior, objtype)
-	{
-		this.behavior = behavior;
-		this.objtype = objtype;
-		this.runtime = behavior.runtime;
-	};
-	var behtypeProto = behaviorProto.Type.prototype;
-	behtypeProto.onCreate = function()
-	{
-	};
-	behaviorProto.Instance = function(type, inst)
-	{
-		this.type = type;
-		this.behavior = type.behavior;
-		this.inst = inst;				// associated object instance to modify
-		this.runtime = type.runtime;
-	};
-	var behinstProto = behaviorProto.Instance.prototype;
-	behinstProto.onCreate = function()
-	{
-		this.inst.extra["solidEnabled"] = (this.properties[0] !== 0);
-	};
-	behinstProto.tick = function ()
-	{
-	};
-	function Cnds() {};
-	Cnds.prototype.IsEnabled = function ()
-	{
-		return this.inst.extra["solidEnabled"];
-	};
-	behaviorProto.cnds = new Cnds();
-	function Acts() {};
-	Acts.prototype.SetEnabled = function (e)
-	{
-		this.inst.extra["solidEnabled"] = !!e;
-	};
-	behaviorProto.acts = new Acts();
-}());
 cr.getObjectRefTable = function () { return [
+	cr.plugins_.Button,
+	cr.plugins_.c2fpsmonitor,
+	cr.plugins_.Mouse,
 	cr.plugins_.Function,
 	cr.plugins_.Particles,
-	cr.plugins_.Mouse,
 	cr.plugins_.Sprite,
-	cr.plugins_.Text,
-	cr.plugins_.Tilemap,
-	cr.plugins_.Spritefont2,
-	cr.behaviors.solid,
+	cr.plugins_.Touch,
 	cr.behaviors.Physics,
-	cr.behaviors.Fade,
-	cr.behaviors.Bullet,
 	cr.behaviors.destroy,
-	cr.behaviors.bound,
+	cr.behaviors.Fade,
 	cr.system_object.prototype.cnds.OnLayoutStart,
 	cr.system_object.prototype.cnds.ForEach,
 	cr.plugins_.Sprite.prototype.acts.SetInstanceVar,
 	cr.plugins_.Sprite.prototype.exps.AnimationFrame,
-	cr.system_object.prototype.cnds.Every,
+	cr.plugins_.Touch.prototype.cnds.OnTouchObject,
 	cr.plugins_.Function.prototype.acts.CallFunction,
-	cr.plugins_.Function.prototype.cnds.OnFunction,
-	cr.system_object.prototype.acts.SetVar,
-	cr.system_object.prototype.exps["int"],
-	cr.system_object.prototype.exps.random,
-	cr.system_object.prototype.cnds.CompareVar,
+	cr.plugins_.Sprite.prototype.exps.UID,
 	cr.system_object.prototype.acts.CreateObject,
-	cr.system_object.prototype.exps.layoutheight,
-	cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
-	cr.system_object.prototype.cnds.Else,
-	cr.system_object.prototype.exps.layoutwidth,
-	cr.plugins_.Sprite.prototype.acts.SetMirrored,
-	cr.behaviors.Bullet.prototype.acts.SetAngleOfMotion,
-	cr.plugins_.Sprite.prototype.cnds.IsOutsideLayout,
-	cr.plugins_.Sprite.prototype.acts.Destroy,
-	cr.plugins_.Mouse.prototype.cnds.OnObjectClicked,
-	cr.plugins_.Mouse.prototype.exps.X,
-	cr.plugins_.Mouse.prototype.exps.Y,
-	cr.plugins_.Sprite.prototype.cnds.CompareInstanceVar,
-	cr.behaviors.Fade.prototype.acts.StartFade,
+	cr.plugins_.Touch.prototype.exps.X,
+	cr.plugins_.Touch.prototype.exps.Y,
 	cr.plugins_.Sprite.prototype.cnds.OnCollision,
+	cr.system_object.prototype.cnds.CompareVar,
+	cr.system_object.prototype.acts.SetVar,
+	cr.plugins_.Function.prototype.cnds.OnFunction,
+	cr.plugins_.Sprite.prototype.cnds.CompareFrame,
+	cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 	cr.system_object.prototype.acts.Wait,
 	cr.behaviors.Physics.prototype.cnds.CompareVelocity,
+	cr.system_object.prototype.cnds.Else,
+	cr.plugins_.Sprite.prototype.acts.Spawn,
+	cr.plugins_.Sprite.prototype.acts.Destroy,
+	cr.behaviors.Physics.prototype.acts.ApplyImpulseAtAngle,
+	cr.system_object.prototype.exps.distance,
+	cr.plugins_.Sprite.prototype.exps.X,
+	cr.plugins_.Sprite.prototype.exps.Y,
+	cr.system_object.prototype.exps.angle,
+	cr.plugins_.Particles.prototype.acts.SetAngle,
+	cr.system_object.prototype.cnds.Compare,
+	cr.plugins_.Sprite.prototype.cnds.PickByUID,
+	cr.plugins_.Function.prototype.exps.Param,
+	cr.plugins_.Sprite.prototype.cnds.CompareInstanceVar,
 	cr.system_object.prototype.acts.RestartLayout,
-	cr.plugins_.Sprite.prototype.cnds.OnDestroyed,
-	cr.plugins_.Mouse.prototype.cnds.IsOverObject,
-	cr.system_object.prototype.acts.GoToLayout,
-	cr.plugins_.Mouse.prototype.acts.SetCursor,
-	cr.system_object.prototype.cnds.EveryTick,
-	cr.plugins_.Sprite.prototype.acts.SetPos,
-	cr.plugins_.Mouse.prototype.cnds.OnClick,
-	cr.plugins_.Mouse.prototype.cnds.OnRelease
+	cr.plugins_.Button.prototype.cnds.OnClicked,
+	cr.system_object.prototype.acts.GoToLayout
 ];};
