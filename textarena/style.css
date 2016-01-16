@@ -1,0 +1,40 @@
+* {
+    outline: 0;
+}
+
+h1 {
+    text-align: center;
+}
+
+#horizontalBounds {
+    margin: auto;
+    position: relative;
+    width: 970px;
+}
+
+.half {
+    width: 480px;
+    float: left;
+    background-color: rgb(30,30,30);
+    border-radius: 5px;
+}
+
+#middleDivisor {
+    float: left;
+    width: 10px;
+    height: 100px;
+
+}
+
+.tab-content{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+td, th, button.level-up {
+    text-align: center;
+}
+
+button.level-up {
+    width: 100%;
+}
