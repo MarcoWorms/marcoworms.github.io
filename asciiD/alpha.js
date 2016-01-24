@@ -194,6 +194,7 @@ class Game extends Engine {
     while (this.player2.sprite === undefined) {
 
     }
+    console.log(this.player2.sprite)
   }
 
   update(deltaTime) {
