@@ -29,13 +29,30 @@ class AuxiliarFunctions {
   }
 
 
-  loadSprite(fileName) {
-    let txt = '';
+  loadSprite(gameObject, fileName) {
+
+    let loadedFileAsText = '';
     let xmlhttp = new XMLHttpRequest();
+
     xmlhttp.onreadystatechange = function(){
+
       if(xmlhttp.status == 200 && xmlhttp.readyState == 4){
-        txt = xmlhttp.responseText;
-        console.log(txt)
+
+        loadedFileAsText = xmlhttp.responseText;
+
+        let textLines = loadedFileAsText.split("\n")
+        let spriteAsArray = []
+
+        textLines.forEach(line => {
+            let spriteLineAsArray = []
+            for (let i = 0 ; i < line.length; i--) {
+                spriteLineAsArray.push(line[i])
+            };
+            spriteAsArray.push(spriteLineAsArray)
+        })
+
+        gameObject.sprite = spriteAsArray
+
       }
     };
     xmlhttp.open("GET", fileName, true);
@@ -162,7 +179,7 @@ class Game extends Engine {
                           [['|',"red"], ['X',"green"], ['|',"red"]],
                           [['\\',"red"], ['-',"red"], ['/',"red"]]];
     this.player2 = new GameObject(10, 10);
-    this.player2.sprite = this.auxiliarFunctions.loadSprite("tieshooter-sprite-test.txt")
+    this.auxiliarFunctions.loadSprite(this.player2, "tieshooter-sprite-test.txt")
   }
 
   update(deltaTime) {
@@ -173,6 +190,7 @@ class Game extends Engine {
   draw() {
     this.field = this.auxiliarFunctions.generateEmptyField();
     this.field = this.player.draw(this.field);
+    this.field = this.player2.draw(this.field);
     this.field = this.auxiliarFunctions.print(this.field, "ola", 10, 20)
   }
 }
