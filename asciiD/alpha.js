@@ -50,7 +50,7 @@ class AuxiliarFunctions {
             };
             spriteAsArray.push(spriteLineAsArray)
         })
-
+        console.log(spriteAsArray)
         callback(spriteAsArray)
       }
     };
