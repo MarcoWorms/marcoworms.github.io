@@ -54,7 +54,7 @@ class AuxiliarFunctions {
         console.log(spriteAsArray)
       }
     };
-    xmlhttp.open("GET", fileName);
+    xmlhttp.open("GET", fileName, false);
     xmlhttp.send();
 
 
