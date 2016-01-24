@@ -29,7 +29,7 @@ class AuxiliarFunctions {
   }
 
 
-  loadSprite(fileName) {
+  loadSprite(fileName, callback) {
 
     let loadedFileAsText = '';
     let xmlhttp = new XMLHttpRequest();
@@ -51,15 +51,12 @@ class AuxiliarFunctions {
             spriteAsArray.push(spriteLineAsArray)
         })
 
-        console.log(spriteAsArray)
+        callback(spriteAsArray)
       }
     };
-    xmlhttp.open("GET", fileName, false);
+    xmlhttp.open("GET", fileName);
     xmlhttp.send();
 
-
-    console.log(spriteAsArray)
-    return spriteAsArray
   }
 
 }
@@ -151,6 +148,10 @@ class GameObject {
 
   draw(field) {
 
+    if (this.sprite === undefined) {
+        return
+    }
+
     let width = this.sprite[0].length;
     let height = this.sprite.length;
     let roundX = Math.floor(this.x);
@@ -182,7 +183,10 @@ class Game extends Engine {
                           [['|',"red"], ['X',"green"], ['|',"red"]],
                           [['\\',"red"], ['-',"red"], ['/',"red"]]];
     this.player2 = new GameObject(10, 10);
-    this.player2.sprite = this.auxiliarFunctions.loadSprite("tieshooter-sprite-test.txt")
+
+    this.auxiliarFunctions.loadSprite("tieshooter-sprite-test.txt", function(spriteAsArray) {
+        this.player2.sprite = spriteAsArray
+    })
   }
 
   update(deltaTime) {
