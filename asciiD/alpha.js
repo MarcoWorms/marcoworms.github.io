@@ -29,7 +29,7 @@ class AuxiliarFunctions {
   }
 
 
-  loadSprite(gameObject, fileName) {
+  loadSprite(fileName) {
 
     let loadedFileAsText = '';
     let xmlhttp = new XMLHttpRequest();
@@ -50,8 +50,8 @@ class AuxiliarFunctions {
             };
             spriteAsArray.push(spriteLineAsArray)
         })
-
-        gameObject.sprite = spriteAsArray
+        console.log(spriteAsArray)
+        return = spriteAsArray
 
       }
     };
@@ -179,7 +179,7 @@ class Game extends Engine {
                           [['|',"red"], ['X',"green"], ['|',"red"]],
                           [['\\',"red"], ['-',"red"], ['/',"red"]]];
     this.player2 = new GameObject(10, 10);
-    this.auxiliarFunctions.loadSprite(this.player2, "tieshooter-sprite-test.txt")
+    this.player2.sprite = this.auxiliarFunctions.loadSprite("tieshooter-sprite-test.txt")
   }
 
   update(deltaTime) {
