@@ -190,7 +190,7 @@ class Game extends Engine {
 
     this.auxiliarFunctions.loadSprite("tieshooter-sprite-test.txt", function(spriteAsArray) {
         this.player2.sprite = spriteAsArray
-    })
+    }.bind(this))
     while (this.player2.sprite === undefined) {
 
     }
