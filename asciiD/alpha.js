@@ -51,7 +51,7 @@ class AuxiliarFunctions {
             spriteAsArray.push(spriteLineAsArray)
         })
         console.log(spriteAsArray)
-        return = spriteAsArray
+        return spriteAsArray
 
       }
     };
