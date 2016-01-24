@@ -177,6 +177,10 @@ class Game extends Engine {
     super(divId);
   }
 
+  load() {
+
+  }
+
   init() {
     this.player = new GameObject(3, 3);
     this.player.sprite = [[['/',"red"], ['-',"red"], ['\\',"red"]],
@@ -187,7 +191,9 @@ class Game extends Engine {
     this.auxiliarFunctions.loadSprite("tieshooter-sprite-test.txt", function(spriteAsArray) {
         this.player2.sprite = spriteAsArray
     })
-    console.log("ay")
+    while (this.player2.sprite === undefined) {
+
+    }
   }
 
   update(deltaTime) {
