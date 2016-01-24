@@ -50,13 +50,16 @@ class AuxiliarFunctions {
             };
             spriteAsArray.push(spriteLineAsArray)
         })
-        console.log(spriteAsArray)
-        return spriteAsArray
 
+        console.log(spriteAsArray)
       }
     };
-    xmlhttp.open("GET", fileName, false);
+    xmlhttp.open("GET", fileName);
     xmlhttp.send();
+
+
+    console.log(spriteAsArray)
+    return spriteAsArray
   }
 
 }
