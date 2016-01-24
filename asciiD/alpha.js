@@ -149,7 +149,7 @@ class GameObject {
   draw(field) {
 
     if (this.sprite === undefined) {
-        return
+        return field
     }
 
     let width = this.sprite[0].length;
