@@ -55,7 +55,7 @@ class AuxiliarFunctions {
 
       }
     };
-    xmlhttp.open("GET", fileName, true);
+    xmlhttp.open("GET", fileName, false);
     xmlhttp.send();
   }
 
