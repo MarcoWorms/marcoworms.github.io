@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2uistate>
+    <!--This is a UI state file - its content describes the user interface settings when the project was last open.
+It is entirely optional and the project will load without it.  If you are placing the project under source control,
+you probably do not want to add any .uistate.xml files to the repository.-->
+    <configurations>
+        <active>
+            <configuration name="HTML5" />
+        </active>
+        <display name="HTML5" />
+    </configurations>
+    <open-tabs>
+        <layout order="0">Main</layout>
+        <event-sheet active="1" order="1">Main</event-sheet>
+        <event-sheet order="2">DataSetFunctions</event-sheet>
+    </open-tabs>
+    <properties>
+        <property expanded="1" name="About" />
+        <property expanded="1" name="Project settings" />
+        <property expanded="0" name="Window Size" />
+        <property expanded="1" name="Configuration Settings" />
+    </properties>
+    <families-expanded root="1">
+        <family expanded="1" name="DataSets" />
+        <family expanded="1" name="TooltipedObject" />
+        <family expanded="1" name="aoeObjects" />
+    </families-expanded>
+    <folders-expanded>
+        <folder expanded="0" path="object-folder/" />
+        <folder expanded="1" path="object-folder/Caravan/" />
+        <folder expanded="1" path="object-folder/Camera/" />
+        <folder expanded="1" path="object-folder/Inventory/" />
+        <folder expanded="1" path="object-folder/Hero/" />
+        <folder expanded="1" path="layout-folder/" />
+        <folder expanded="1" path="event-folder/" />
+        <folder expanded="1" path="file-folder/" />
+        <folder expanded="1" path="sound-folder/" />
+        <folder expanded="1" path="music-folder/" />
+        <folder expanded="0" path="file-folder/Icons/" />
+        <folder expanded="1" path="animation-folder/Caravan/" />
+        <folder expanded="1" path="animation-folder/CaravanWheel/" />
+        <folder expanded="1" path="animation-folder/Camera/" />
+        <folder expanded="1" path="animation-folder/CameraScroll/" />
+        <folder expanded="1" path="animation-folder/CameraFov/" />
+        <folder expanded="1" path="animation-folder/ItemDisplay/" />
+        <folder expanded="1" path="animation-folder/ItemSelected/" />
+        <folder expanded="1" path="animation-folder/ItemDrop/" />
+        <folder expanded="1" path="animation-folder/HeroTortoise/" />
+        <folder expanded="1" path="animation-folder/HeroRabbit/" />
+        <folder expanded="1" path="animation-folder/HeroMantis/" />
+        <folder expanded="1" path="animation-folder/HeroMantisAoe/" />
+        <folder expanded="1" path="animation-folder/HeroArmadillo/" />
+        <folder expanded="1" path="animation-folder/HeroTortoiseAoe/" />
+        <folder expanded="1" path="animation-folder/HeroRabbitAtk/" />
+        <folder expanded="1" path="animation-folder/Sprite2/" />
+        <folder expanded="1" path="animation-folder/Sprite3/" />
+        <folder expanded="1" path="animation-folder/Enemy/" />
+        <folder expanded="1" path="animation-folder/EnemySpawner/" />
+        <folder expanded="1" path="animation-folder/EnemyKiller/" />
+        <folder expanded="1" path="animation-folder/RitualBuffPArticle/" />
+        <folder expanded="1" path="animation-folder/deathScreen/" />
+    </folders-expanded>
+</c2uistate>

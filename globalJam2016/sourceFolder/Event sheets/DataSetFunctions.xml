@@ -1,0 +1,1280 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>DataSetFunctions</name>
+    <events>
+        <event-group description="" sid="2022921087071684" title="Search Functions">
+            <sub-events>
+                <comment>Search two columns (LowerBound and UpperBound) in a DataSet for a match where a search value falls between the LowerBound and UpperBound. If a match is found then the RowIndex for the matching row is returned.</comment>
+                <comment>Params: DataSetUID, LowerBoundColumnIndex, UpperBoundColumnIndex, SearchValue</comment>
+                <comment>DataSetUID: The UID of the DataSet to search for the matching value.</comment>
+                <comment>LowerBoundColumnIndex: The index of the lower bound column to search for the matching value.</comment>
+                <comment>UpperBoundColumnIndex: The index of the upper bound column to search for the matching value.</comment>
+                <comment>SearchValue: The value to be searched for. This value must be numeric and will be compared to see if it is greater than or equal to OR lesser than or equal to the lower and upper bound values for each row.</comment>
+                <event-block sid="7421769020464474">
+                    <conditions>
+                        <condition id="0" name="On function" sid="1681104945984663" type="Function">
+                            <param id="0" name="Name">&quot;SearchBetweenFindFirst&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Set return value" sid="1904234119698641" type="Function">
+                            <param id="0" name="Value">-1</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <variable constant="0" name="paramDataSetUID" sid="635632870111767" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramLowerBoundColumnIndex" sid="1064703307066431" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramUpperBoundColumnIndex" sid="5571953898418707" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramSearchValue" sid="2244718670766818" static="0" type="text"></variable>
+                        <variable constant="0" name="paramNumericSearchValue" sid="1832010102312085" static="0" type="number">0</variable>
+                        <variable constant="0" name="SearchValueIsNumeric" sid="6287945996913572" static="0" type="number">0</variable>
+                        <event-block sid="8538262704360253">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="1642844200860044" type="System">
+                                    <param id="0" name="Variable">paramDataSetUID</param>
+                                    <param id="1" name="Value">Function.Param(0)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="5503366047677225" type="System">
+                                    <param id="0" name="Variable">paramLowerBoundColumnIndex</param>
+                                    <param id="1" name="Value">Function.Param(1)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="1039123864507763" type="System">
+                                    <param id="0" name="Variable">paramUpperBoundColumnIndex</param>
+                                    <param id="1" name="Value">Function.Param(2)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="6750792368930798" type="System">
+                                    <param id="0" name="Variable">paramSearchValue</param>
+                                    <param id="1" name="Value">Function.Param(3)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="9645537263594772" type="System">
+                                    <param id="0" name="Variable">SearchValueIsNumeric</param>
+                                    <param id="1" name="Value">Function.Call(&quot;IsNumeric&quot;, paramSearchValue)</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="2595996580316372">
+                                    <conditions>
+                                        <condition id="-8" name="Compare two values" sid="4635058962865383" type="System">
+                                            <param id="0" name="First value">SearchValueIsNumeric</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Second value">1</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="2057367770966313" type="System">
+                                            <param id="0" name="Variable">paramNumericSearchValue</param>
+                                            <param id="1" name="Value">float(paramSearchValue)</param>
+                                        </action>
+                                    </actions>
+                                    <sub-events>
+                                        <event-block sid="8456194678270303">
+                                            <conditions>
+                                                <condition id="-14" name="Pick by unique ID" sid="3689565890569295" type="DataSets">
+                                                    <param id="0" name="Unique ID">paramDataSetUID</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions />
+                                            <sub-events>
+                                                <variable constant="0" name="Found" sid="8589213139371814" static="0" type="number">0</variable>
+                                                <variable constant="0" name="RowIndex" sid="4415820257312398" static="0" type="number">0</variable>
+                                                <event-block sid="5298197901033851">
+                                                    <conditions>
+                                                        <condition id="-8" name="Is boolean instance variable set" sid="4886332425996305" type="DataSets">
+                                                            <param id="0" name="Instance variable">firstRowIsColumnNames</param>
+                                                        </condition>
+                                                    </conditions>
+                                                    <actions>
+                                                        <action id="-9" name="Set value" sid="8030608370439921" type="System">
+                                                            <param id="0" name="Variable">RowIndex</param>
+                                                            <param id="1" name="Value">1</param>
+                                                        </action>
+                                                    </actions>
+                                                </event-block>
+                                                <event-block sid="270416257778835">
+                                                    <conditions>
+                                                        <condition id="-23" name="While" sid="9344746439423191" type="System" />
+                                                        <condition id="-8" name="Compare two values" sid="8046122548589784" type="System">
+                                                            <param id="0" name="First value">DataSets.Width</param>
+                                                            <param id="1" name="Comparison">4</param>
+                                                            <param id="2" name="Second value">0</param>
+                                                        </condition>
+                                                        <condition id="-14" name="Compare variable" sid="1125352503038262" type="System">
+                                                            <param id="0" name="Variable">RowIndex</param>
+                                                            <param id="1" name="Comparison">2</param>
+                                                            <param id="2" name="Value">DataSets.Width</param>
+                                                        </condition>
+                                                    </conditions>
+                                                    <actions />
+                                                    <sub-events>
+                                                        <event-block sid="7180035930251546">
+                                                            <conditions>
+                                                                <condition id="-21" name="Is between values" sid="9798756148634661" type="System">
+                                                                    <param id="0" name="Value">paramNumericSearchValue</param>
+                                                                    <param id="1" name="Lower bound">float(DataSets.At(RowIndex, paramLowerBoundColumnIndex))</param>
+                                                                    <param id="2" name="Upper bound">float(DataSets.At(RowIndex, paramUpperBoundColumnIndex))</param>
+                                                                </condition>
+                                                            </conditions>
+                                                            <actions>
+                                                                <action id="1" name="Set return value" sid="3736073873203811" type="Function">
+                                                                    <param id="0" name="Value">RowIndex</param>
+                                                                </action>
+                                                                <action id="-24" name="Stop loop" sid="5234713640736136" type="System" />
+                                                            </actions>
+                                                        </event-block>
+                                                        <comment>No matching row found yet so just increment the index</comment>
+                                                        <event-block sid="5361184705798194">
+                                                            <conditions>
+                                                                <condition id="-22" name="Else" sid="5999414976019972" type="System" />
+                                                            </conditions>
+                                                            <actions>
+                                                                <action id="-10" name="Add to" sid="1522915475380065" type="System">
+                                                                    <param id="0" name="Variable">RowIndex</param>
+                                                                    <param id="1" name="Value">1</param>
+                                                                </action>
+                                                            </actions>
+                                                        </event-block>
+                                                    </sub-events>
+                                                </event-block>
+                                            </sub-events>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Search two columns (LowerBound and UpperBound) in a DataSet for a match where a search value falls between the LowerBound and UpperBound. If a match is found then the value of a column in that row is returned.</comment>
+                <comment>Params: DataSetUID, LowerBoundColumnIndex, UpperBoundColumnIndex, SearchValue, ReturnColumnIndex</comment>
+                <comment>DataSetUID: The UID of the DataSet to search for the matching value.</comment>
+                <comment>LowerBoundColumnIndex: The index of the lower bound column to search for the matching value.</comment>
+                <comment>UpperBoundColumnIndex: The index of the upper bound column to search for the matching value.</comment>
+                <comment>SearchValue: The value to be searched for. This value must be numeric and will be compared to see if it is greater than or equal to OR lesser than or equal to the lower and upper bound values for each row.</comment>
+                <comment>ReturnColumnIndex: The index of the column to return a value from when a match is found.</comment>
+                <event-block sid="6355786205533338">
+                    <conditions>
+                        <condition id="0" name="On function" sid="5669324657221853" type="Function">
+                            <param id="0" name="Name">&quot;SearchBetweenReturnColumn&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Set return value" sid="8470357962128034" type="Function">
+                            <param id="0" name="Value">-1</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <variable constant="0" name="paramDataSetUID" sid="5636665881784447" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramLowerBoundColumnIndex" sid="9195332511384729" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramUpperBoundColumnIndex" sid="6967200687800119" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramSearchValue" sid="1628199412694946" static="0" type="text"></variable>
+                        <variable constant="0" name="paramReturnColumnIndex" sid="1561422097890048" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramNumericSearchValue" sid="2062188875242017" static="0" type="number">0</variable>
+                        <variable constant="0" name="SearchValueIsNumeric" sid="8736477750549688" static="0" type="number">0</variable>
+                        <event-block sid="1242132829286713">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="8334087601689529" type="System">
+                                    <param id="0" name="Variable">paramDataSetUID</param>
+                                    <param id="1" name="Value">Function.Param(0)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="7229642000033109" type="System">
+                                    <param id="0" name="Variable">paramLowerBoundColumnIndex</param>
+                                    <param id="1" name="Value">Function.Param(1)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="613918761620657" type="System">
+                                    <param id="0" name="Variable">paramUpperBoundColumnIndex</param>
+                                    <param id="1" name="Value">Function.Param(2)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="1673372761901749" type="System">
+                                    <param id="0" name="Variable">paramSearchValue</param>
+                                    <param id="1" name="Value">Function.Param(3)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="9143584588569144" type="System">
+                                    <param id="0" name="Variable">paramReturnColumnIndex</param>
+                                    <param id="1" name="Value">Function.Param(4)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="4240018658481744" type="System">
+                                    <param id="0" name="Variable">SearchValueIsNumeric</param>
+                                    <param id="1" name="Value">Function.Call(&quot;IsNumeric&quot;, paramSearchValue)</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="1233719952787352">
+                                    <conditions>
+                                        <condition id="-8" name="Compare two values" sid="4869971036772453" type="System">
+                                            <param id="0" name="First value">SearchValueIsNumeric</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Second value">1</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="912958188503197" type="System">
+                                            <param id="0" name="Variable">paramNumericSearchValue</param>
+                                            <param id="1" name="Value">int(paramSearchValue)</param>
+                                        </action>
+                                    </actions>
+                                    <sub-events>
+                                        <event-block sid="2692504872523161">
+                                            <conditions>
+                                                <condition id="-14" name="Pick by unique ID" sid="8839615984804422" type="DataSets">
+                                                    <param id="0" name="Unique ID">paramDataSetUID</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions />
+                                            <sub-events>
+                                                <variable constant="0" name="Found" sid="4236647116718754" static="0" type="number">0</variable>
+                                                <variable constant="0" name="RowIndex" sid="4548394458525755" static="0" type="number">0</variable>
+                                                <event-block sid="1869142799285728">
+                                                    <conditions>
+                                                        <condition id="-8" name="Is boolean instance variable set" sid="5694561431328693" type="DataSets">
+                                                            <param id="0" name="Instance variable">firstRowIsColumnNames</param>
+                                                        </condition>
+                                                    </conditions>
+                                                    <actions>
+                                                        <action id="-9" name="Set value" sid="6814758842602464" type="System">
+                                                            <param id="0" name="Variable">RowIndex</param>
+                                                            <param id="1" name="Value">1</param>
+                                                        </action>
+                                                    </actions>
+                                                </event-block>
+                                                <event-block sid="4154851658846325">
+                                                    <conditions>
+                                                        <condition id="-23" name="While" sid="7491022574143986" type="System" />
+                                                        <condition id="-8" name="Compare two values" sid="914800172922245" type="System">
+                                                            <param id="0" name="First value">DataSets.Width</param>
+                                                            <param id="1" name="Comparison">4</param>
+                                                            <param id="2" name="Second value">0</param>
+                                                        </condition>
+                                                        <condition id="-14" name="Compare variable" sid="5655756959720895" type="System">
+                                                            <param id="0" name="Variable">RowIndex</param>
+                                                            <param id="1" name="Comparison">2</param>
+                                                            <param id="2" name="Value">DataSets.Width</param>
+                                                        </condition>
+                                                    </conditions>
+                                                    <actions />
+                                                    <sub-events>
+                                                        <event-block sid="3979249024333193">
+                                                            <conditions>
+                                                                <condition id="-21" name="Is between values" sid="7707878269240799" type="System">
+                                                                    <param id="0" name="Value">paramNumericSearchValue</param>
+                                                                    <param id="1" name="Lower bound">float(DataSets.At(RowIndex, paramLowerBoundColumnIndex))</param>
+                                                                    <param id="2" name="Upper bound">float(DataSets.At(RowIndex, paramUpperBoundColumnIndex))</param>
+                                                                </condition>
+                                                            </conditions>
+                                                            <actions>
+                                                                <action id="1" name="Set return value" sid="7102815445002869" type="Function">
+                                                                    <param id="0" name="Value">DataSets.At(RowIndex, paramReturnColumnIndex)</param>
+                                                                </action>
+                                                                <action id="-24" name="Stop loop" sid="692198362501395" type="System" />
+                                                            </actions>
+                                                        </event-block>
+                                                        <comment>No matching row found yet so just increment the index</comment>
+                                                        <event-block sid="9291795478674818">
+                                                            <conditions>
+                                                                <condition id="-22" name="Else" sid="7823935771566738" type="System" />
+                                                            </conditions>
+                                                            <actions>
+                                                                <action id="-10" name="Add to" sid="7684354959679648" type="System">
+                                                                    <param id="0" name="Variable">RowIndex</param>
+                                                                    <param id="1" name="Value">1</param>
+                                                                </action>
+                                                            </actions>
+                                                        </event-block>
+                                                    </sub-events>
+                                                </event-block>
+                                            </sub-events>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Search a column in a DataSet for a matching value. If a match is found then the value of a column in that row is returned.</comment>
+                <comment>Params: DataSetUID, ColumnIndex, SearchValue, ReturnColumnIndex</comment>
+                <comment>DataSetUID: The UID of the DataSet to search for the matching value.</comment>
+                <comment>ColumnIndex: The index of the column to search for the matching value.</comment>
+                <comment>SearchValue: The value to be searched for. This value is checked to see if it is numeric and if so then its type is converted to an Int before the comparison is made.</comment>
+                <comment>ReturnColumnIndex: The index of the column to return a value from when a match is found.</comment>
+                <event-block sid="9421940188509277">
+                    <conditions>
+                        <condition id="0" name="On function" sid="4103809716807657" type="Function">
+                            <param id="0" name="Name">&quot;SearchColumnFindFirstReturnColumn&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Set return value" sid="1008058455552149" type="Function">
+                            <param id="0" name="Value">-1</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <variable constant="0" name="paramDataSetUID" sid="7944918187051484" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramColumnIndex" sid="4588512412658285" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramSearchValue" sid="4600330765641122" static="0" type="text"></variable>
+                        <variable constant="0" name="paramReturnColumnIndex" sid="9273073859309704" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramNumericSearchValue" sid="6244251300750624" static="0" type="number">0</variable>
+                        <variable constant="0" name="SearchValueIsNumeric" sid="9230214010656187" static="0" type="number">0</variable>
+                        <event-block sid="499900709815584">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="3138443328542062" type="System">
+                                    <param id="0" name="Variable">paramDataSetUID</param>
+                                    <param id="1" name="Value">Function.Param(0)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="2802269606798925" type="System">
+                                    <param id="0" name="Variable">paramColumnIndex</param>
+                                    <param id="1" name="Value">Function.Param(1)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="968710787741954" type="System">
+                                    <param id="0" name="Variable">paramSearchValue</param>
+                                    <param id="1" name="Value">Function.Param(2)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="2196915403749124" type="System">
+                                    <param id="0" name="Variable">paramReturnColumnIndex</param>
+                                    <param id="1" name="Value">Function.Param(3)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="8496217844295436" type="System">
+                                    <param id="0" name="Variable">SearchValueIsNumeric</param>
+                                    <param id="1" name="Value">Function.Call(&quot;IsNumeric&quot;, paramSearchValue)</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="5521124693218101">
+                                    <conditions>
+                                        <condition id="-8" name="Compare two values" sid="9054507626028102" type="System">
+                                            <param id="0" name="First value">SearchValueIsNumeric</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Second value">1</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="1389966162264293" type="System">
+                                            <param id="0" name="Variable">paramNumericSearchValue</param>
+                                            <param id="1" name="Value">int(paramSearchValue)</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="8655611770489839">
+                            <conditions>
+                                <condition id="-14" name="Pick by unique ID" sid="3822439701367717" type="DataSets">
+                                    <param id="0" name="Unique ID">paramDataSetUID</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <variable constant="0" name="Found" sid="4387058614002199" static="0" type="number">0</variable>
+                                <variable constant="0" name="RowIndex" sid="8272638982160687" static="0" type="number">0</variable>
+                                <event-block sid="1318939866393999">
+                                    <conditions>
+                                        <condition id="-8" name="Is boolean instance variable set" sid="2209513680804875" type="DataSets">
+                                            <param id="0" name="Instance variable">firstRowIsColumnNames</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="3599736111891591" type="System">
+                                            <param id="0" name="Variable">RowIndex</param>
+                                            <param id="1" name="Value">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="4883643435568292">
+                                    <conditions>
+                                        <condition id="-23" name="While" sid="1468368892105508" type="System" />
+                                        <condition id="-8" name="Compare two values" sid="8384550055833388" type="System">
+                                            <param id="0" name="First value">DataSets.Width</param>
+                                            <param id="1" name="Comparison">4</param>
+                                            <param id="2" name="Second value">0</param>
+                                        </condition>
+                                        <condition id="-14" name="Compare variable" sid="7779400479009424" type="System">
+                                            <param id="0" name="Variable">RowIndex</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">DataSets.Width</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="6182682696927584">
+                                            <conditions>
+                                                <condition id="1" name="Compare at XY" sid="6977497201193626" type="DataSets">
+                                                    <param id="0" name="X">RowIndex</param>
+                                                    <param id="1" name="Y">paramColumnIndex</param>
+                                                    <param id="2" name="Comparison">0</param>
+                                                    <param id="3" name="Value">SearchValueIsNumeric = 0 ? paramSearchValue : paramNumericSearchValue</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="1" name="Set return value" sid="4157652841219094" type="Function">
+                                                    <param id="0" name="Value">DataSets.At(RowIndex, paramReturnColumnIndex)</param>
+                                                </action>
+                                                <action id="-24" name="Stop loop" sid="2807237169129358" type="System" />
+                                            </actions>
+                                        </event-block>
+                                        <comment>No matching row found yet so just increment the index</comment>
+                                        <event-block sid="8641904607007404">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="5818319783455981" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="-10" name="Add to" sid="2923761808743371" type="System">
+                                                    <param id="0" name="Variable">RowIndex</param>
+                                                    <param id="1" name="Value">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Search a column in a DataSet for one or more values that CONTAIN a piece of text. For each match found the RowIndex for the matching row is added to the ResultSet. The return value for the function is the number of matches founds.</comment>
+                <comment>Params: DataSetUID, ColumnIndex, SearchValue</comment>
+                <comment>DataSetUID: The UID of the DataSet to search for the matching value.</comment>
+                <comment>ColumnIndex: The index of the column to search for the matching value.</comment>
+                <comment>SearchValue: The value to be searched for.</comment>
+                <event-block sid="988661508374214">
+                    <conditions>
+                        <condition id="0" name="On function" sid="6974572774275052" type="Function">
+                            <param id="0" name="Name">&quot;SearchColumnFindAllLike&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Set size" sid="153927955561882" type="ResultSet">
+                            <param id="0" name="Width">0</param>
+                            <param id="1" name="Height">1</param>
+                            <param id="2" name="Depth">1</param>
+                        </action>
+                        <action id="1" name="Set return value" sid="4172598856481552" type="Function">
+                            <param id="0" name="Value">0</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <variable constant="0" name="paramDataSetUID" sid="2129622386036502" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramColumnIndex" sid="1022669844162477" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramSearchValue" sid="5746550079949514" static="0" type="text"></variable>
+                        <event-block sid="4280914338351365">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="1016515975878692" type="System">
+                                    <param id="0" name="Variable">paramDataSetUID</param>
+                                    <param id="1" name="Value">Function.Param(0)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="7211640889257522" type="System">
+                                    <param id="0" name="Variable">paramColumnIndex</param>
+                                    <param id="1" name="Value">Function.Param(1)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="3471873211208822" type="System">
+                                    <param id="0" name="Variable">paramSearchValue</param>
+                                    <param id="1" name="Value">Function.Param(2)</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="4535650978656086">
+                            <conditions>
+                                <condition id="-14" name="Pick by unique ID" sid="9017508233709341" type="DataSets">
+                                    <param id="0" name="Unique ID">paramDataSetUID</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <variable constant="0" name="RowIndex" sid="4235934217852737" static="0" type="number">0</variable>
+                                <event-block sid="8001752452965547">
+                                    <conditions>
+                                        <condition id="-8" name="Is boolean instance variable set" sid="2780958387011752" type="DataSets">
+                                            <param id="0" name="Instance variable">firstRowIsColumnNames</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="2057996257180154" type="System">
+                                            <param id="0" name="Variable">RowIndex</param>
+                                            <param id="1" name="Value">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="9152738144708816">
+                                    <conditions>
+                                        <condition id="-23" name="While" sid="8381328655872399" type="System" />
+                                        <condition id="-8" name="Compare two values" sid="7914490011859026" type="System">
+                                            <param id="0" name="First value">DataSets.Width</param>
+                                            <param id="1" name="Comparison">4</param>
+                                            <param id="2" name="Second value">0</param>
+                                        </condition>
+                                        <condition id="-14" name="Compare variable" sid="978382576152215" type="System">
+                                            <param id="0" name="Variable">RowIndex</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">DataSets.Width</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="1642251501697471">
+                                            <conditions>
+                                                <condition id="-8" name="Compare two values" sid="6441343645285141" type="System">
+                                                    <param id="0" name="First value"> find(DataSets.At(RowIndex, paramColumnIndex), paramSearchValue)</param>
+                                                    <param id="1" name="Comparison">1</param>
+                                                    <param id="2" name="Second value">-1</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="5" name="Push" sid="4042639343012268" type="ResultSet">
+                                                    <param id="0" name="Where">0</param>
+                                                    <param id="1" name="Value">RowIndex</param>
+                                                    <param id="2" name="Axis">0</param>
+                                                </action>
+                                                <action id="-10" name="Add to" sid="3510496947913574" type="System">
+                                                    <param id="0" name="Variable">RowIndex</param>
+                                                    <param id="1" name="Value">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <comment>No matching row found yet so just increment the index</comment>
+                                        <event-block sid="3711954253215321">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="6536892436423419" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="-10" name="Add to" sid="4466663696049893" type="System">
+                                                    <param id="0" name="Variable">RowIndex</param>
+                                                    <param id="1" name="Value">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <comment>Return the count of the number of matches found</comment>
+                                        <event-block sid="6692394339834392">
+                                            <conditions />
+                                            <actions>
+                                                <action id="1" name="Set return value" sid="8435703400228424" type="Function">
+                                                    <param id="0" name="Value">ResultSet.Width</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Search a column in a DataSet for one or more matching values. For each match found the RowIndex for the matching row is added to the ResultSet. The return value for the function is the number of matches founds.</comment>
+                <comment>Params: DataSetUID, ColumnIndex, SearchValue</comment>
+                <comment>DataSetUID: The UID of the DataSet to search for the matching value.</comment>
+                <comment>ColumnIndex: The index of the column to search for the matching value.</comment>
+                <comment>SearchValue: The value to be searched for. This value is checked to see if it is numeric and if so then its type is converted to an Int before the comparison is made.</comment>
+                <event-block sid="5642886835004175">
+                    <conditions>
+                        <condition id="0" name="On function" sid="2827182181670916" type="Function">
+                            <param id="0" name="Name">&quot;SearchColumnFindAll&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Set size" sid="2052597962955005" type="ResultSet">
+                            <param id="0" name="Width">0</param>
+                            <param id="1" name="Height">1</param>
+                            <param id="2" name="Depth">1</param>
+                        </action>
+                        <action id="1" name="Set return value" sid="8269216306464705" type="Function">
+                            <param id="0" name="Value">0</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <variable constant="0" name="paramDataSetUID" sid="9514587321950902" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramColumnIndex" sid="4605853146368683" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramSearchValue" sid="7955222789169099" static="0" type="text"></variable>
+                        <variable constant="0" name="paramNumericSearchValue" sid="6041148188433944" static="0" type="number">0</variable>
+                        <variable constant="0" name="SearchValueIsNumeric" sid="7562449396355744" static="0" type="number">0</variable>
+                        <event-block sid="3768410044523441">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="9986807514688939" type="System">
+                                    <param id="0" name="Variable">paramDataSetUID</param>
+                                    <param id="1" name="Value">Function.Param(0)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="9071672315731917" type="System">
+                                    <param id="0" name="Variable">paramColumnIndex</param>
+                                    <param id="1" name="Value">Function.Param(1)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="1215702665752815" type="System">
+                                    <param id="0" name="Variable">paramSearchValue</param>
+                                    <param id="1" name="Value">Function.Param(2)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="9943855420652043" type="System">
+                                    <param id="0" name="Variable">SearchValueIsNumeric</param>
+                                    <param id="1" name="Value">Function.Call(&quot;IsNumeric&quot;, paramSearchValue)</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="5859936240913621">
+                                    <conditions>
+                                        <condition id="-8" name="Compare two values" sid="478202860449856" type="System">
+                                            <param id="0" name="First value">SearchValueIsNumeric</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Second value">1</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="2181451168084251" type="System">
+                                            <param id="0" name="Variable">paramNumericSearchValue</param>
+                                            <param id="1" name="Value">int(paramSearchValue)</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="678782344424556">
+                            <conditions>
+                                <condition id="-14" name="Pick by unique ID" sid="8893193254289082" type="DataSets">
+                                    <param id="0" name="Unique ID">paramDataSetUID</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <variable constant="0" name="RowIndex" sid="5254797730185988" static="0" type="number">0</variable>
+                                <event-block sid="8456473991789227">
+                                    <conditions>
+                                        <condition id="-8" name="Is boolean instance variable set" sid="8877176813119412" type="DataSets">
+                                            <param id="0" name="Instance variable">firstRowIsColumnNames</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="1428895472247248" type="System">
+                                            <param id="0" name="Variable">RowIndex</param>
+                                            <param id="1" name="Value">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="7913588269097891">
+                                    <conditions>
+                                        <condition id="-23" name="While" sid="2960937330525209" type="System" />
+                                        <condition id="-8" name="Compare two values" sid="1065911478250151" type="System">
+                                            <param id="0" name="First value">DataSets.Width</param>
+                                            <param id="1" name="Comparison">4</param>
+                                            <param id="2" name="Second value">0</param>
+                                        </condition>
+                                        <condition id="-14" name="Compare variable" sid="5011551193805912" type="System">
+                                            <param id="0" name="Variable">RowIndex</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">DataSets.Width</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="615673545042036">
+                                            <conditions>
+                                                <condition id="1" name="Compare at XY" sid="2626676482944487" type="DataSets">
+                                                    <param id="0" name="X">RowIndex</param>
+                                                    <param id="1" name="Y">paramColumnIndex</param>
+                                                    <param id="2" name="Comparison">0</param>
+                                                    <param id="3" name="Value">SearchValueIsNumeric = 0 ? paramSearchValue : paramNumericSearchValue</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="5" name="Push" sid="3115677068734671" type="ResultSet">
+                                                    <param id="0" name="Where">0</param>
+                                                    <param id="1" name="Value">RowIndex</param>
+                                                    <param id="2" name="Axis">0</param>
+                                                </action>
+                                                <action id="-10" name="Add to" sid="6589259051871861" type="System">
+                                                    <param id="0" name="Variable">RowIndex</param>
+                                                    <param id="1" name="Value">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <comment>No matching row found yet so just increment the index</comment>
+                                        <event-block sid="208564904045616">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="2863694243558438" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="-10" name="Add to" sid="4525875874959776" type="System">
+                                                    <param id="0" name="Variable">RowIndex</param>
+                                                    <param id="1" name="Value">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <comment>Return the count of the number of matches found</comment>
+                                        <event-block sid="3230842872573038">
+                                            <conditions />
+                                            <actions>
+                                                <action id="1" name="Set return value" sid="6282960940392158" type="Function">
+                                                    <param id="0" name="Value">ResultSet.Width</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Search a column in a DataSet for a matching value. If a match is found then the RowIndex for the matching row is returned.</comment>
+                <comment>Params: DataSetUID, ColumnIndex, SearchValue</comment>
+                <comment>DataSetUID: The UID of the DataSet to search for the matching value.</comment>
+                <comment>ColumnIndex: The index of the column to search for the matching value.</comment>
+                <comment>SearchValue: The value to be searched for. This value is checked to see if it is numeric and if so then its type is converted to an Int before the comparison is made.</comment>
+                <event-block sid="9784929016488337">
+                    <conditions>
+                        <condition id="0" name="On function" sid="7271866600847477" type="Function">
+                            <param id="0" name="Name">&quot;SearchColumnFindFirst&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Set return value" sid="2005768849822909" type="Function">
+                            <param id="0" name="Value">-1</param>
+                        </action>
+                        <action id="2" name="Open a confirm dialog" sid="919684669097178" type="DialogBox">
+                            <param id="0" name="Message:">Function.Param(0)</param>
+                        </action>
+                        <action id="2" name="Open a confirm dialog" sid="5753374559594217" type="DialogBox">
+                            <param id="0" name="Message:">Function.Param(1)</param>
+                        </action>
+                        <action id="2" name="Open a confirm dialog" sid="9847410365312566" type="DialogBox">
+                            <param id="0" name="Message:">Function.Param(2)</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <comment>Search a column in a DataSet for a matching value. If a match is found then the RowIndex for the matching row is returned.</comment>
+                        <comment>Params: DataSetUID, ColumnIndex, SearchValue</comment>
+                        <comment>DataSetUID: The UID of the DataSet to search for the matching value.</comment>
+                        <comment>ColumnIndex: The index of the column to search for the matching value.</comment>
+                        <comment>SearchValue: The value to be searched for. This value is checked to see if it is numeric and if so then its type is converted to an Int before the comparison is made.</comment>
+                        <variable constant="0" name="paramDataSetUID" sid="6240154872754251" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramColumnIndex" sid="8754805652905844" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramSearchValue" sid="5098168225607135" static="0" type="text"></variable>
+                        <variable constant="0" name="paramNumericSearchValue" sid="1401079845511391" static="0" type="number">0</variable>
+                        <variable constant="0" name="SearchValueIsNumeric" sid="441071200331768" static="0" type="number">0</variable>
+                        <event-block sid="1629166134184152">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="8823512574397803" type="System">
+                                    <param id="0" name="Variable">paramDataSetUID</param>
+                                    <param id="1" name="Value">Function.Param(0)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="5693771701789897" type="System">
+                                    <param id="0" name="Variable">paramColumnIndex</param>
+                                    <param id="1" name="Value">Function.Param(1)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="9169304798237557" type="System">
+                                    <param id="0" name="Variable">paramSearchValue</param>
+                                    <param id="1" name="Value">Function.Param(2)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="3115127703518295" type="System">
+                                    <param id="0" name="Variable">SearchValueIsNumeric</param>
+                                    <param id="1" name="Value">Function.Call(&quot;IsNumeric&quot;, paramSearchValue)</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="6012204619757952">
+                                    <conditions>
+                                        <condition id="-8" name="Compare two values" sid="5760250374562085" type="System">
+                                            <param id="0" name="First value">SearchValueIsNumeric</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Second value">1</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="2880743362626839" type="System">
+                                            <param id="0" name="Variable">paramNumericSearchValue</param>
+                                            <param id="1" name="Value">int(paramSearchValue)</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="7666203364645577">
+                            <conditions>
+                                <condition id="-14" name="Pick by unique ID" sid="3477842374036483" type="DataSets">
+                                    <param id="0" name="Unique ID">paramDataSetUID</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <variable constant="0" name="Found" sid="4050553390356122" static="0" type="number">0</variable>
+                                <variable constant="0" name="RowIndex" sid="8691597477289612" static="0" type="number">0</variable>
+                                <event-block sid="8080569681059423">
+                                    <conditions>
+                                        <condition id="-8" name="Is boolean instance variable set" sid="6998035088545608" type="DataSets">
+                                            <param id="0" name="Instance variable">firstRowIsColumnNames</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="9221925846648796" type="System">
+                                            <param id="0" name="Variable">RowIndex</param>
+                                            <param id="1" name="Value">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="5503422108733541">
+                                    <conditions>
+                                        <condition id="-23" name="While" sid="3926451466339122" type="System" />
+                                        <condition id="-8" name="Compare two values" sid="7776757307614052" type="System">
+                                            <param id="0" name="First value">DataSets.Width</param>
+                                            <param id="1" name="Comparison">4</param>
+                                            <param id="2" name="Second value">0</param>
+                                        </condition>
+                                        <condition id="-14" name="Compare variable" sid="8950503667895145" type="System">
+                                            <param id="0" name="Variable">RowIndex</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">DataSets.Width</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="1186470282731906">
+                                            <conditions>
+                                                <condition id="1" name="Compare at XY" sid="6851249937076668" type="DataSets">
+                                                    <param id="0" name="X">RowIndex</param>
+                                                    <param id="1" name="Y">paramColumnIndex</param>
+                                                    <param id="2" name="Comparison">0</param>
+                                                    <param id="3" name="Value">SearchValueIsNumeric = 0 ? paramSearchValue : paramNumericSearchValue</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="1" name="Set return value" sid="2465544556610977" type="Function">
+                                                    <param id="0" name="Value">RowIndex</param>
+                                                </action>
+                                                <action id="-24" name="Stop loop" sid="1514607132470958" type="System" />
+                                            </actions>
+                                        </event-block>
+                                        <comment>No matching row found yet so just increment the index</comment>
+                                        <event-block sid="2839073813160373">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="6565060916772529" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="-10" name="Add to" sid="4093980932231705" type="System">
+                                                    <param id="0" name="Variable">RowIndex</param>
+                                                    <param id="1" name="Value">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="" sid="4824246742097829" title="Edit Functions">
+            <sub-events>
+                <comment>Create a new row at the end of the DataSet</comment>
+                <comment>Params: DataSetUID, + 1 param for each column in the DataSet</comment>
+                <comment>DataSetUID: The UID of the DataSet to add a row to</comment>
+                <event-block sid="7941155319564233">
+                    <conditions>
+                        <condition id="0" name="On function" sid="2605702330785835" type="Function">
+                            <param id="0" name="Name">&quot;CreateRow&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="852236706851538">
+                            <conditions>
+                                <condition id="-14" name="Pick by unique ID" sid="7592692727863363" type="DataSets">
+                                    <param id="0" name="Unique ID">Function.Param(0)</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="1" name="Set size" sid="4078799174675413" type="DataSets">
+                                    <param id="0" name="Width">DataSets.Width+1</param>
+                                    <param id="1" name="Height">DataSets.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="1909290455598693">
+                                    <conditions>
+                                        <condition id="-10" name="For" sid="1261995390955702" type="System">
+                                            <param id="0" name="Name">&quot;Column&quot;</param>
+                                            <param id="1" name="Start index">0</param>
+                                            <param id="2" name="End index">DataSets.Height-1</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="3" name="Set at XY" sid="9011082202868627" type="DataSets">
+                                            <param id="0" name="X">DataSets.Width-1</param>
+                                            <param id="1" name="Y">loopindex</param>
+                                            <param id="2" name="Value">Function.Call(&quot;IsNumeric&quot;, Function.Param(loopindex+1)) = 0 ? Function.Param(loopindex+1) : int(Function.Param(loopindex+1))</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Updates a column in a row for a given DataSet</comment>
+                <comment>Params: DataSetUID, RowIndex, ColumnIndex, Value</comment>
+                <comment>DataSetUID: The UID of the DataSet to update</comment>
+                <comment>RowIndex: The index of the row to update.</comment>
+                <comment>ColumnIndex: The index of the column to update.</comment>
+                <comment>Value: The new value.</comment>
+                <event-block sid="9949151496896892">
+                    <conditions>
+                        <condition id="0" name="On function" sid="4661766537466941" type="Function">
+                            <param id="0" name="Name">&quot;UpdateRow&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <variable constant="0" name="paramDataSetUID" sid="7946366093647898" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramRowIndex" sid="6468682620429" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramColumnIndex" sid="7470728150727632" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramValue" sid="6923805981460375" static="0" type="text"></variable>
+                        <event-block sid="4749613713313284">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="5195048590237108" type="System">
+                                    <param id="0" name="Variable">paramDataSetUID</param>
+                                    <param id="1" name="Value">Function.Param(0)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="5448884994903803" type="System">
+                                    <param id="0" name="Variable">paramRowIndex</param>
+                                    <param id="1" name="Value">Function.Param(1)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="3288695850697073" type="System">
+                                    <param id="0" name="Variable">paramColumnIndex</param>
+                                    <param id="1" name="Value">Function.Param(2)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="9772037401702468" type="System">
+                                    <param id="0" name="Variable">paramValue</param>
+                                    <param id="1" name="Value">Function.Param(3)</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="306819882391747">
+                            <conditions>
+                                <condition id="-14" name="Pick by unique ID" sid="2005199377830858" type="DataSets">
+                                    <param id="0" name="Unique ID">paramDataSetUID</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="3" name="Set at XY" sid="8668965025711402" type="DataSets">
+                                    <param id="0" name="X">paramRowIndex</param>
+                                    <param id="1" name="Y">paramColumnIndex</param>
+                                    <param id="2" name="Value">Function.Call(&quot;FormatValueType&quot;, paramValue)</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Delete a row from the DataSet</comment>
+                <comment>Params: DataSetUID, RowIndex</comment>
+                <comment>DataSetUID: The UID of the DataSet to delete a row from</comment>
+                <comment>RowIndex: The index of the row to delete</comment>
+                <event-block sid="3449247616129244">
+                    <conditions>
+                        <condition id="0" name="On function" sid="7087277975331624" type="Function">
+                            <param id="0" name="Name">&quot;DeleteRow&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <variable constant="0" name="paramDataSetUID" sid="6209281637955723" static="0" type="number">0</variable>
+                        <variable constant="0" name="paramRowIndex" sid="1960769695176884" static="0" type="number">0</variable>
+                        <event-block sid="5761773014279199">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="94517404880555" type="System">
+                                    <param id="0" name="Variable">paramDataSetUID</param>
+                                    <param id="1" name="Value">Function.Param(0)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="8718090259139914" type="System">
+                                    <param id="0" name="Variable">paramRowIndex</param>
+                                    <param id="1" name="Value">int(Function.Param(1))</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="3142918745665641">
+                            <conditions>
+                                <condition id="-14" name="Pick by unique ID" sid="8202857682871438" type="DataSets">
+                                    <param id="0" name="Unique ID">paramDataSetUID</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="9" name="Delete" sid="5029772587498399" type="DataSets">
+                                    <param id="0" name="Index">paramRowIndex</param>
+                                    <param id="1" name="Axis">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Clears all rows from the DataSet leaving it empty and ready to add new rows</comment>
+                <comment>Params: DataSetUID</comment>
+                <comment>DataSetUID: The UID of the DataSet to delete all rows from</comment>
+                <event-block sid="9867109863492211">
+                    <conditions>
+                        <condition id="0" name="On function" sid="9286539986652136" type="Function">
+                            <param id="0" name="Name">&quot;ClearRows&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <variable constant="0" name="paramDataSetUID" sid="8201981289355101" static="0" type="number">0</variable>
+                        <event-block sid="7962490005268933">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="464892727397337" type="System">
+                                    <param id="0" name="Variable">paramDataSetUID</param>
+                                    <param id="1" name="Value">Function.Param(0)</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="9595725514278214">
+                                    <conditions>
+                                        <condition id="-14" name="Pick by unique ID" sid="547097593903875" type="DataSets">
+                                            <param id="0" name="Unique ID">paramDataSetUID</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="1" name="Set size" sid="7349648794548649" type="DataSets">
+                                            <param id="0" name="Width">0</param>
+                                            <param id="1" name="Height">1</param>
+                                            <param id="2" name="Depth">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="" sid="3190898324890325" title="Misc Functions">
+            <sub-events>
+                <comment>Returns the number of rows in the given DataSet</comment>
+                <comment>Params: DataSetUID</comment>
+                <comment>DataSetUID: The UID of the DataSet to get the count of rows from</comment>
+                <event-block sid="7754479344985097">
+                    <conditions>
+                        <condition id="0" name="On function" sid="5618683892095778" type="Function">
+                            <param id="0" name="Name">&quot;RowsCount&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <variable constant="0" name="paramDataSetUID" sid="3086651357488256" static="0" type="number">0</variable>
+                        <event-block sid="8103440919903063">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="5966854166979942" type="System">
+                                    <param id="0" name="Variable">paramDataSetUID</param>
+                                    <param id="1" name="Value">Function.Param(0)</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="720498204694991">
+                                    <conditions>
+                                        <condition id="-14" name="Pick by unique ID" sid="3910064886333364" type="DataSets">
+                                            <param id="0" name="Unique ID">paramDataSetUID</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="1" name="Set return value" sid="5719024337379615" type="Function">
+                                            <param id="0" name="Value">DataSets.Width</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Given a value will either return that same value as a string of text, an integer number, or a float number</comment>
+                <comment>Params: Value</comment>
+                <comment>Value: The value to format into a specific type</comment>
+                <event-block sid="757964977757488">
+                    <conditions>
+                        <condition id="0" name="On function" sid="8126431249935924" type="Function">
+                            <param id="0" name="Name">&quot;FormatValueType&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <variable constant="0" name="paramValue" sid="9876088200381004" static="0" type="text"></variable>
+                        <event-block sid="5832405160110336">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="3845891014474342" type="System">
+                                    <param id="0" name="Variable">paramValue</param>
+                                    <param id="1" name="Value">&quot;&quot; &amp; Function.Param(0)</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <comment>If type is a String of text</comment>
+                                <event-block sid="4612143644352887">
+                                    <conditions>
+                                        <condition id="-8" name="Compare two values" sid="477453141638552" type="System">
+                                            <param id="0" name="First value">Function.Call(&quot;IsNumeric&quot;, paramValue)</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Second value">0</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="1" name="Set return value" sid="3112890093719712" type="Function">
+                                            <param id="0" name="Value">paramValue</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <comment>Else is either a Int or a Float number</comment>
+                                <event-block sid="9204054261223063">
+                                    <conditions>
+                                        <condition id="-22" name="Else" sid="4514017401967685" type="System" />
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <comment>Is an Int number</comment>
+                                        <event-block sid="8464892307902903">
+                                            <conditions>
+                                                <condition id="-8" name="Compare two values" sid="8751962376404964" type="System">
+                                                    <param id="0" name="First value">find(paramValue, &quot;.&quot;)</param>
+                                                    <param id="1" name="Comparison">0</param>
+                                                    <param id="2" name="Second value">-1</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="1" name="Set return value" sid="5138203511223861" type="Function">
+                                                    <param id="0" name="Value">int(paramValue)</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <event-block sid="2079846848627362">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="6229497873956911" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="1" name="Set return value" sid="2438481538060974" type="Function">
+                                                    <param id="0" name="Value">float(paramValue)</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Determines if a value can be interpreted to be a number</comment>
+                <comment>Params: Value</comment>
+                <comment>Value: The value to be evaluated</comment>
+                <event-block sid="8605966391290663">
+                    <conditions>
+                        <condition id="0" name="On function" sid="7587550274710744" type="Function">
+                            <param id="0" name="Name">&quot;IsNumeric&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <variable constant="0" name="paramValue" sid="7293854237115721" static="0" type="text"></variable>
+                        <event-block sid="5849274666173526">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="4968720314176592" type="System">
+                                    <param id="0" name="Variable">paramValue</param>
+                                    <param id="1" name="Value">Function.Param(0) &amp; &quot;&quot;</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="3032457872153929">
+                                    <conditions>
+                                        <condition id="-8" name="Compare two values" sid="1862677339339983" type="System">
+                                            <param id="0" name="First value">find(paramValue, &quot;.&quot;)</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Second value">-1</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="5984753936923856">
+                                            <conditions>
+                                                <condition id="-8" name="Compare two values" sid="439308222684068" type="System">
+                                                    <param id="0" name="First value">Function.Param(0) &amp; &quot;&quot;</param>
+                                                    <param id="1" name="Comparison">0</param>
+                                                    <param id="2" name="Second value">str(int(Function.Param(0)))</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="1" name="Set return value" sid="9797935775368508" type="Function">
+                                                    <param id="0" name="Value">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <event-block sid="6334608529213876">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="4346911281641388" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="1" name="Set return value" sid="7403592053546009" type="Function">
+                                                    <param id="0" name="Value">0</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="7785931845998987">
+                                    <conditions>
+                                        <condition id="-22" name="Else" sid="2702431404496457" type="System" />
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="7175978842177663">
+                                            <conditions>
+                                                <condition id="-8" name="Compare two values" sid="9197109880066078" type="System">
+                                                    <param id="0" name="First value">Function.Param(0) &amp; &quot;&quot;</param>
+                                                    <param id="1" name="Comparison">0</param>
+                                                    <param id="2" name="Second value">str(float(Function.Param(0)))</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="1" name="Set return value" sid="3162829011733257" type="Function">
+                                                    <param id="0" name="Value">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <event-block sid="9785175266339297">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="3195530065538342" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="1" name="Set return value" sid="8956455781238823" type="Function">
+                                                    <param id="0" name="Value">0</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Formats a number into a string of text with commas</comment>
+                <event-block sid="3930451315592402">
+                    <conditions>
+                        <condition id="0" name="On function" sid="3352681551194148" type="Function">
+                            <param id="0" name="Name">&quot;FormatNumber&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Set return value" sid="2164285891804099" type="Function">
+                            <param id="0" name="Value">RegexReplace(Function.Param(0) &amp; &quot;&quot;, &quot;(\d)(?=(\d{3})+$)&quot;, &quot;g&quot;, &quot;$&amp;,&quot;)</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>Formats a number into an American English string of text with commas, a period for cents and a dollar sign</comment>
+                <event-block sid="4874488294127251">
+                    <conditions>
+                        <condition id="0" name="On function" sid="4057501550535768" type="Function">
+                            <param id="0" name="Name">&quot;FormatCurrency&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Set return value" sid="2471478236478382" type="Function">
+                            <param id="0" name="Value">RegexReplace(Function.Param(0) &amp; &quot;&quot;, &quot;\d(?=(\d{3})+\.)&quot;, &quot;g&quot;, &quot;$&amp;,&quot;)</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-group>
+    </events>
+</c2eventsheet>

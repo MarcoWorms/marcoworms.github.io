@@ -1,0 +1,745 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>DataObjectFunctions</name>
+    <events>
+        <event-block sid="2355954505315954">
+            <conditions>
+                <condition id="0" name="On function" sid="4398734980398488" type="Function">
+                    <param id="0" name="Name">&quot;CreateInventory&quot;</param>
+                </condition>
+            </conditions>
+            <actions />
+            <sub-events>
+                <variable constant="0" name="localUID" sid="9399150836981835" static="0" type="number">0</variable>
+                <event-block sid="7487088985681575">
+                    <conditions>
+                        <condition id="-8" name="Compare two values" sid="7411062820413580" type="System">
+                            <param id="0" name="First value">Function.ParamCount</param>
+                            <param id="1" name="Comparison">4</param>
+                            <param id="2" name="Second value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-9" name="Set value" sid="6823607140068177" type="System">
+                            <param id="0" name="Variable">localUID</param>
+                            <param id="1" name="Value">Function.Param(0)</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="8316625029403753">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="7623339660606501" type="System" />
+                    </conditions>
+                    <actions>
+                        <action id="-3" name="Create object" sid="3629414421176777" type="System">
+                            <param id="0" name="Object to create">ItemsQuantity</param>
+                            <param id="1" name="Layer">0</param>
+                            <param id="2" name="X">0</param>
+                            <param id="3" name="Y">0</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="4692934445055536" type="System">
+                            <param id="0" name="Variable">localUID</param>
+                            <param id="1" name="Value">ItemsQuantity.UID</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="9366458517012298">
+                    <conditions>
+                        <condition id="-14" name="Pick by unique ID" sid="3959671027591997" type="ItemsQuantity">
+                            <param id="0" name="Unique ID">localUID</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Set return value" sid="7472102883112322" type="Function">
+                            <param id="0" name="Value">localUID</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="5115930116460941">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="8338467266126078" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Bones&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="5239737445156688">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="8929938838932750" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Fur&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="9518553559385260">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="8236779244593416" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Eyes&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="60492357309931">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="1949383169319411" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Blood&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="7784665890193824">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="374913174456140" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Wings&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="6222095535937387">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="6805762537722928" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Chitins&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="5030694182032044">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="5697183906931334" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Tongues&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="3176971648755833">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="3365056673090094" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Brains&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="8600274842221831">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="3508773850966264" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Roots&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="8269830588182348">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="9864917121428811" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Branches&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="5849243955086551">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="5068614755668860" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Shrooms&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="7923956556940847">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="6368225446368706" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Fruits&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="8016311940392966">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="905288437931977" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Flowers&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="6260673416319524">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="9769654017252885" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Barks&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="3539369256355647">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="5534381176895823" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Herbs&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="8874221373301855">
+                            <conditions />
+                            <actions>
+                                <action id="0" name="Add key" sid="2496432532177976" type="ItemsQuantity">
+                                    <param id="0" name="Key">&quot;Honey&quot;</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-block>
+        <event-block sid="4976805340794099">
+            <conditions>
+                <condition id="0" name="On function" sid="1370859462000367" type="Function">
+                    <param id="0" name="Name">&quot;CreateItems&quot;</param>
+                </condition>
+            </conditions>
+            <actions />
+            <sub-events>
+                <variable constant="0" name="localUID" sid="6761086296246203" static="0" type="number">0</variable>
+                <event-block sid="3263278803069530">
+                    <conditions>
+                        <condition id="-8" name="Compare two values" sid="4936478275022483" type="System">
+                            <param id="0" name="First value">Function.ParamCount</param>
+                            <param id="1" name="Comparison">4</param>
+                            <param id="2" name="Second value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-9" name="Set value" sid="1777725897178024" type="System">
+                            <param id="0" name="Variable">localUID</param>
+                            <param id="1" name="Value">Function.Param(0)</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="2106938543677566">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="4641753144776046" type="System" />
+                    </conditions>
+                    <actions>
+                        <action id="-3" name="Create object" sid="2590414791335713" type="System">
+                            <param id="0" name="Object to create">Items</param>
+                            <param id="1" name="Layer">0</param>
+                            <param id="2" name="X">0</param>
+                            <param id="3" name="Y">0</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="1531616788246193" type="System">
+                            <param id="0" name="Variable">localUID</param>
+                            <param id="1" name="Value">Items.UID</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="9951651326261056">
+                    <conditions>
+                        <condition id="-14" name="Pick by unique ID" sid="3461720081259017" type="Items">
+                            <param id="0" name="Unique ID">localUID</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Set return value" sid="1946207539998058" type="Function">
+                            <param id="0" name="Value">localUID</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="2511586684242541">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="4441694270773128" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="5433802237778237" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">0</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="5753541308440937" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Bones&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="2387202421881644" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Herbs&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="6015683129305724" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Roots&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="4054454440135313">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="3980771306427284" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="9431000157057959" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="8975917782370172" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Fur&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="1631992397506651" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Barks&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="1548425866386303" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Honey&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="9831530964626702">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="7265798815526465" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="6108245754206229" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">2</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="5013755004908721" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Eyes&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="7054620278027728" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Shroom&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="2565338159874487" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Barks&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="2025773308684232">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="1173078423863272" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="9206470512547962" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">3</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="6563656528238697" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Blood&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="1381267402181372" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Flower&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="6607645465464765" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Shroom&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="3733040981343838">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="1962611674562103" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="5643032150940108" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">4</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="1544048166669476" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Wings&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="987308774661655" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Honey&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="3746752173736521" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Fur&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="3331234176657299">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="31909577993512" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="2538243922909735" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">5</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="4726201248353482" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Chitins&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="5432916573960950" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Fruits&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="3455249140331867" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Branches&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="4745316317981425">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="3319929142787249" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="7122406281445199" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">6</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="8807668173013768" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Tongues&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="2010290279088453" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Branches&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="2808172030519580" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Herbs&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="5525997977075032">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="7795776570713932" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="1023203211047443" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">7</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="7232533787792558" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Brains&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="4865790736366272" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Roots&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="5341506764452496" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Flower&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="5299895726889715">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="9538033318925459" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="6704384687982788" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">8</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="3967115185799227" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Roots&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="1811762006034414" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Brains&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="95888518571475" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Bone&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="4173560665640273">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="4298269206091485" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="9483778303921349" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">9</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="1238582814396152" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Branches&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="7055336645897716" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Tongues&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="1088100120124978" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Chitins&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="8651895766499304">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="3685361794332325" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="8000208250245119" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">10</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="9697024257145142" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Shrooms&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="3819202386923618" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Eyes&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="2445354558448463" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Blood&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="5006016836942298">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="6311698845435844" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="9663647176276033" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">11</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="9575247611247324" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Fruits&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="1546552250407123" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Chitins&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="1140191490142234" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Wings&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="3760577335920690">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="8836823249654702" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="6970518430659842" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">12</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="153975033660195" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Flowers&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="5760895709376735" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Blood&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="5342162947615131" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Brains&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="1101234168204745">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="6763846602318" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="5164713293623256" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">13</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="3104064571656392" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Barks&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="7342197978739052" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Fur&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="1070378970764856" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Eye&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="4459724431629056">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="6446689955501149" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="2195555853720696" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">14</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="5190490555417421" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Herbs&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="6798001185120699" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Bones&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="6850245204090311" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Tongues&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="553606598188758">
+                            <conditions />
+                            <actions>
+                                <action id="1" name="Set size" sid="6558819126769105" type="Items">
+                                    <param id="0" name="Width">Items.Width+1</param>
+                                    <param id="1" name="Height">Items.Height</param>
+                                    <param id="2" name="Depth">1</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="4025162520033643" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">0</param>
+                                    <param id="2" name="Value">15</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="8225822864103957" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">1</param>
+                                    <param id="2" name="Value">&quot;Honey&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="7548506029570585" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">2</param>
+                                    <param id="2" name="Value">&quot;Wings&quot;</param>
+                                </action>
+                                <action id="3" name="Set at XY" sid="2377947173975222" type="Items">
+                                    <param id="0" name="X">Items.Width-1</param>
+                                    <param id="1" name="Y">3</param>
+                                    <param id="2" name="Value">&quot;Fur&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-block>
+    </events>
+</c2eventsheet>

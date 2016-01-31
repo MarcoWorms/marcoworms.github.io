@@ -1,0 +1,789 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2project>
+    <name>New project</name>
+    <description></description>
+    <version>1.0.0.0</version>
+    <author></author>
+    <author-email></author-email>
+    <author-website>http://</author-website>
+    <app-id>com.mycompany.myapp</app-id>
+    <unique-id>2m2oqhlgof90t</unique-id>
+    <saved-with-version>21600</saved-with-version>
+    <used-plugins>
+        <plugin author="Scirra" id="AJAX" version="1">AJAX</plugin>
+        <plugin author="Scirra" id="Arr" version="1">Array</plugin>
+        <plugin author="Gregory Georges" id="DialogBox" version="1">Dialog Box</plugin>
+        <plugin author="Scirra" id="Dictionary" version="1">Dictionary</plugin>
+        <plugin author="Scirra" id="Function" version="1">Function</plugin>
+        <plugin author="Scirra" id="Mouse" version="1">Mouse</plugin>
+        <plugin author="Scirra" id="Particles" version="1">Particles</plugin>
+        <plugin author="Scirra" id="Sprite" version="1">Sprite</plugin>
+        <plugin author="Scirra" id="Spritefont2" version="1">Sprite font</plugin>
+        <plugin author="Scirra" id="Text" version="1">Text</plugin>
+        <plugin author="Scirra" id="TiledBg" version="1">Tiled Background</plugin>
+    </used-plugins>
+    <used-behaviors>
+        <behavior author="Scirra" id="Bullet" version="1">Bullet</behavior>
+        <behavior author="Scirra" id="Fade" version="1">Fade</behavior>
+        <behavior author="Scirra" id="Pathfinding" version="1">Pathfinding</behavior>
+        <behavior author="Scirra" id="Pin" version="1">Pin</behavior>
+        <behavior author="Scirra" id="Rotate" version="1">Rotate</behavior>
+        <behavior author="Scirra" id="Sin" version="1">Sine</behavior>
+        <behavior author="Scirra" id="bound" version="1">Bound to layout</behavior>
+        <behavior author="Scirra" id="destroy" version="1">Destroy outside layout</behavior>
+        <behavior author="Scirra" id="scrollto" version="1">Scroll To</behavior>
+    </used-behaviors>
+    <used-effects />
+    <configurations>
+        <configuration exporter-descname="HTML5" exporter-id="html5" name="HTML5" />
+    </configurations>
+    <window-size>
+        <width>1280</width>
+        <height>720</height>
+    </window-size>
+    <pixel-rounding>0</pixel-rounding>
+    <preview-effects>1</preview-effects>
+    <use-loader-layout>0</use-loader-layout>
+    <configuration-settings>
+        <prop name="Clear background">Yes</prop>
+        <prop name="Enable WebGL">On</prop>
+        <prop name="Fullscreen in browser">Letterbox scale</prop>
+        <prop name="Fullscreen scaling">High quality</prop>
+        <prop name="Loader style">Progress bar &amp; logo</prop>
+        <prop name="Orientations">Landscape</prop>
+        <prop name="Pause on unfocus">No</prop>
+        <prop name="Physics engine">Box2D asm.js</prop>
+        <prop name="Preview browser">(default)</prop>
+        <prop name="Sampling">Point</prop>
+        <prop name="Use high-DPI display">Yes</prop>
+    </configuration-settings>
+    <object-folder>
+        <object-folder name="Caravan">
+            <object-type name="Caravan" sid="4829037470897753">
+                <plugin id="Sprite" />
+                <instance-variables>
+                    <instance-variable name="pixels_traveled" sid="3220305287066689" type="number" />
+                    <instance-variable name="speed" sid="6294264151228472" type="number" />
+                    <instance-variable name="deaceleration" sid="3628963463911618" type="number" />
+                    <instance-variable name="max_speed" sid="1682203995104156" type="number" />
+                    <instance-variable name="min_speed" sid="8229755919955502" type="number" />
+                    <instance-variable name="hp" sid="2124772773664237" type="number" />
+                    <instance-variable name="max_hp" sid="9686671385696583" type="number" />
+                    <instance-variable name="hp_regen" sid="8916663802346139" type="number" />
+                    <instance-variable name="dead" sid="5899288214788681" type="boolean" />
+                </instance-variables>
+                <animation-folder>
+                    <animation framecount="1" loop="0" name="Idle" pingpong="0" repeatcount="1" repeatto="0" sid="3727788716260687" speed="5">
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\carruagem.png">
+                            <collision-poly>
+                                <point x="0.0916667" y="0.241667" />
+                                <point x="0.525" y="0.233333" />
+                                <point x="1" y="0.358333" />
+                                <point x="1" y="0.995833" />
+                                <point x="0" y="1" />
+                                <point x="0" y="0.533333" />
+                            </collision-poly>
+                        </frame>
+                    </animation>
+                    <animation framecount="5" loop="1" name="Crafting" pingpong="0" repeatcount="1" repeatto="0" sid="8747617419195268" speed="15">
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Frame 1 - New.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Frame 2 - New.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Frame 3 - New.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Frame 4 - New.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Frame 5 - New.png" />
+                    </animation>
+                    <animation framecount="7" loop="0" name="Crafted" pingpong="0" repeatcount="1" repeatto="0" sid="8439017557852933" speed="18">
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Craft Frame 1 - New.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Craft Frame 2 - New.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Craft Frame 3 - New.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Craft Frame 4 - New.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Craft Frame 5 - New.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Craft Frame 6 - New.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\New folder\Craft Frame 7 - New.png" />
+                    </animation>
+                </animation-folder>
+            </object-type>
+            <object-type name="CaravanWheel" sid="1058459850077393">
+                <plugin id="Sprite" />
+                <instance-variables>
+                    <instance-variable name="velocimetro" sid="6484462178942517" type="boolean" />
+                    <instance-variable name="last_degree" sid="371266677297358" type="number" />
+                </instance-variables>
+                <behaviors>
+                    <behavior-type name="Rotate" sid="5590897453009091">
+                        <behavior id="Rotate" />
+                    </behavior-type>
+                </behaviors>
+                <animation-folder>
+                    <animation framecount="1" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="1282868809484922" speed="5">
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\roda.png">
+                            <collision-poly>
+                                <point x="0.133333" y="0.133333" />
+                                <point x="0.5" y="0" />
+                                <point x="0.866667" y="0.133333" />
+                                <point x="1" y="0.5" />
+                                <point x="0.866667" y="0.866667" />
+                                <point x="0.5" y="1" />
+                                <point x="0.133333" y="0.866667" />
+                                <point x="0" y="0.5" />
+                            </collision-poly>
+                        </frame>
+                    </animation>
+                </animation-folder>
+            </object-type>
+        </object-folder>
+        <object-folder name="Camera">
+            <object-type name="Camera" sid="5768056317485719">
+                <plugin id="Sprite" />
+                <behaviors>
+                    <behavior-type name="ScrollTo" sid="2102357730354703">
+                        <behavior id="scrollto" />
+                    </behavior-type>
+                </behaviors>
+                <animation-folder>
+                    <animation framecount="1" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="9613239063976986" speed="5">
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" />
+                    </animation>
+                </animation-folder>
+            </object-type>
+            <object-type name="CameraScroll" sid="5110305853627463">
+                <plugin id="Sprite" />
+                <instance-variables>
+                    <instance-variable name="offset" sid="5395526279705428" type="number" />
+                </instance-variables>
+                <animation-folder>
+                    <animation framecount="2" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="5545812155083283" speed="0">
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5">
+                            <image-point name="Imagepoint 1" x="0" y="0.5" />
+                            <collision-poly>
+                                <point x="1" y="1" />
+                                <point x="0" y="1" />
+                                <point x="0" y="0" />
+                                <point x="1" y="0" />
+                            </collision-poly>
+                        </frame>
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5">
+                            <image-point name="Imagepoint 1" x="1" y="0.5" />
+                        </frame>
+                    </animation>
+                </animation-folder>
+            </object-type>
+            <object-type name="CameraFov" sid="7636597489645031">
+                <plugin id="Sprite" />
+                <animation-folder>
+                    <animation framecount="1" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="5383734688061255" speed="5">
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                    </animation>
+                </animation-folder>
+            </object-type>
+        </object-folder>
+        <object-folder name="Inventory">
+            <object-type global="1" name="ResultSet" sid="5683428554143407">
+                <plugin id="Arr" />
+            </object-type>
+            <object-type name="ItemDisplay" sid="2947641107886047">
+                <plugin id="Sprite" />
+                <instance-variables>
+                    <instance-variable name="id" sid="3991950539175319" type="number" />
+                    <instance-variable name="name" sid="3014762210126145" type="string" />
+                    <instance-variable name="selected" sid="9229245836546606" type="boolean" />
+                </instance-variables>
+                <animation-folder>
+                    <animation framecount="16" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="1464357808376168" speed="0">
+                        <frame duration="1" hotspotX="0" hotspotY="0.03125" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Bones.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Fur.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Eye.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Blood.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Wings.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Chetin.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Tongue.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Brain.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Roots.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Branch.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Mushroom.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Fruits.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Flowers.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Bark.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Herbs.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Honey.png" />
+                    </animation>
+                </animation-folder>
+            </object-type>
+            <object-type global="1" name="ItemsQuantity" sid="4267258851386470">
+                <plugin id="Dictionary" />
+            </object-type>
+            <object-type global="1" name="Items" sid="5589288282111950">
+                <plugin id="Arr" />
+                <instance-variables>
+                    <instance-variable name="id" sid="7338902658171842" type="number" />
+                    <instance-variable name="name" sid="5819430643804675" type="number" />
+                    <instance-variable name="affinity" sid="6313190532436110" type="number" />
+                    <instance-variable name="badmix" sid="7862865426351218" type="number" />
+                    <instance-variable name="Function" sid="7444132503488692" type="number" />
+                </instance-variables>
+            </object-type>
+            <object-type name="Ammount" sid="6142698620293403">
+                <plugin id="Text" />
+            </object-type>
+            <object-type name="ItemSelected" sid="7717526585096783">
+                <plugin id="Sprite" />
+                <animation-folder>
+                    <animation framecount="16" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="3792851203880021" speed="0">
+                        <frame duration="1" hotspotX="0" hotspotY="0">
+                            <image-point name="ammount" x="1" y="0" />
+                        </frame>
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" />
+                    </animation>
+                </animation-folder>
+            </object-type>
+            <object-type name="ItemDrop" sid="3980741008583171">
+                <plugin id="Sprite" />
+                <instance-variables>
+                    <instance-variable name="name" sid="6728928966671348" type="string" />
+                </instance-variables>
+                <behaviors>
+                    <behavior-type name="DestroyOutsideLayout" sid="8856299154601677">
+                        <behavior id="destroy" />
+                    </behavior-type>
+                </behaviors>
+                <animation-folder>
+                    <animation framecount="16" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="8256298433107668" speed="0">
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Bones.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Fur.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Eye.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Blood.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Wings.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Chetin.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Tongue.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Brain.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Roots.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Branch.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Mushroom.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Fruits.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Flowers.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Bark.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Herbs.png" />
+                        <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\items\Honey.png" />
+                    </animation>
+                </animation-folder>
+            </object-type>
+        </object-folder>
+        <object-folder name="Hero">
+            <object-type name="HeroTortoise" sid="609882852361514">
+                <plugin id="Sprite" />
+                <instance-variables>
+                    <instance-variable name="damage" sid="4331617131613215" type="number" />
+                    <instance-variable name="speed" sid="5324943149327758" type="number" />
+                </instance-variables>
+                <animation-folder>
+                    <animation framecount="4" loop="1" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="6871744862197098" speed="3">
+                        <frame duration="1" hotspotX="0.504274" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tortoise 1.png">
+                            <image-point name="Imagepoint 1" x="0.478632" y="0.137931" />
+                            <image-point name="attack" x="0.692308" y="0.948276" />
+                            <image-point name="Imagepoint 3" x="0.888889" y="0.344828" />
+                        </frame>
+                        <frame duration="1" hotspotX="0.504274" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tortoise 2.png">
+                            <image-point name="Imagepoint 1" x="0.478632" y="0.12069" />
+                            <image-point name="attack" x="0.316239" y="0.362069" />
+                            <image-point name="Imagepoint 3" x="0.888889" y="0.344828" />
+                        </frame>
+                        <frame duration="1" hotspotX="0.504274" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tortoise 3.png">
+                            <image-point name="Imagepoint 1" x="0.478632" y="0.12069" />
+                            <image-point name="attack" x="0.324786" y="0.948276" />
+                            <image-point name="Imagepoint 3" x="0.888889" y="0.344828" />
+                        </frame>
+                        <frame duration="1" hotspotX="0.504274" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tortoise 4.png">
+                            <image-point name="Imagepoint 1" x="0.478632" y="0.137931" />
+                            <image-point name="attack" x="0.675214" y="0.344828" />
+                            <image-point name="Imagepoint 3" x="0.888889" y="0.344828" />
+                        </frame>
+                    </animation>
+                </animation-folder>
+            </object-type>
+            <object-type name="HeroRabbit" sid="975768600303828">
+                <plugin id="Sprite" />
+                <instance-variables>
+                    <instance-variable name="range" sid="8542591264751046" type="number" />
+                    <instance-variable name="damage" sid="6156705001084977" type="number" />
+                </instance-variables>
+                <behaviors>
+                    <behavior-type name="Pin" sid="9733393109889017">
+                        <behavior id="Pin" />
+                    </behavior-type>
+                </behaviors>
+                <animation-folder>
+                    <animation framecount="1" loop="0" name="Idle" pingpong="0" repeatcount="1" repeatto="0" sid="8602571178456175" speed="5">
+                        <frame duration="1" hotspotX="0.295455" hotspotY="0.860465" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\rabbit 1.png">
+                            <image-point name="attack" x="0.568182" y="0.325581" />
+                        </frame>
+                    </animation>
+                    <animation framecount="6" loop="0" name="Attack" pingpong="0" repeatcount="0" repeatto="0" sid="5415706784026612" speed="6">
+                        <frame duration="1" hotspotX="0.295455" hotspotY="0.860465" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\rabbit 1.png">
+                            <image-point name="attack" x="0.568182" y="0.325581" />
+                        </frame>
+                        <frame duration="1" hotspotX="0.295455" hotspotY="0.860465" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\rabbit 2.png">
+                            <image-point name="attack" x="0.568182" y="0.325581" />
+                        </frame>
+                        <frame duration="1" hotspotX="0.295455" hotspotY="0.860465" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\rabbit 3.png">
+                            <image-point name="attack" x="0.568182" y="0.325581" />
+                        </frame>
+                        <frame duration="1" hotspotX="0.295455" hotspotY="0.860465" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\rabbit 4.png">
+                            <image-point name="attack" x="0.568182" y="0.325581" />
+                        </frame>
+                        <frame duration="1" hotspotX="0.295455" hotspotY="0.860465" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\rabbit 5.png">
+                            <image-point name="attack" x="0.568182" y="0.325581" />
+                        </frame>
+                        <frame duration="1" hotspotX="0.295455" hotspotY="0.860465" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\rabbit 6.png">
+                            <image-point name="attack" x="0.568182" y="0.325581" />
+                        </frame>
+                    </animation>
+                </animation-folder>
+            </object-type>
+            <object-type name="HeroMantis" sid="6136696999381739">
+                <plugin id="Sprite" />
+                <instance-variables>
+                    <instance-variable name="in_aoe_cooldown" sid="9667948043109076" type="boolean" />
+                    <instance-variable name="damage" sid="963134886716994" type="number" />
+                    <instance-variable name="aspd" sid="4296088579453349" type="number" />
+                </instance-variables>
+                <behaviors>
+                    <behavior-type name="Pathfinding" sid="7029648863611781">
+                        <behavior id="Pathfinding" />
+                    </behavior-type>
+                </behaviors>
+                <animation-folder>
+                    <animation framecount="2" loop="1" name="Idle" pingpong="0" repeatcount="1" repeatto="0" sid="4675858091717963" speed="30">
+                        <frame duration="1" hotspotX="0.515152" hotspotY="0.514286" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\mantis 1.png" />
+                        <frame duration="1" hotspotX="0.515152" hotspotY="0.514286" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\mantis 2.png" />
+                    </animation>
+                    <animation framecount="2" loop="0" name="Attack" pingpong="0" repeatcount="1" repeatto="0" sid="3253130274372993" speed="4">
+                        <frame duration="1" hotspotX="0.515152" hotspotY="0.514286" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\mantis 3.png">
+                            <image-point name="attack" x="-0.242424" y="0.914286" />
+                        </frame>
+                        <frame duration="1" hotspotX="0.515152" hotspotY="0.514286" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\mantis 4.png">
+                            <image-point name="attack" x="0.69697" y="0.514286" />
+                        </frame>
+                    </animation>
+                </animation-folder>
+            </object-type>
+            <object-type name="HeroMantisAoe" sid="6677209567306179">
+                <plugin id="Sprite" />
+                <behaviors>
+                    <behavior-type name="Fade" sid="1632516976012598">
+                        <behavior id="Fade" />
+                    </behavior-type>
+                </behaviors>
+                <animation-folder>
+                    <animation framecount="1" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="381830600538876" speed="5">
+                        <frame duration="1" hotspotX="0.124088" hotspotY="0.506944" original-source="C:\Program Files (x86)\Steam\steamapps\common\Kenney Game Assets\Assets\Art\Space shooter assets (300 assets)\PNG\Effects\shield3.png">
+                            <collision-poly>
+                                <point x="1" y="0" />
+                                <point x="1" y="1" />
+                                <point x="0" y="1" />
+                                <point x="0" y="0" />
+                            </collision-poly>
+                        </frame>
+                    </animation>
+                </animation-folder>
+            </object-type>
+            <object-type name="HeroArmadillo" sid="5346439200261961">
+                <plugin id="Sprite" />
+                <instance-variables>
+                    <instance-variable name="speed" sid="4178128580548722" type="number" />
+                    <instance-variable name="targetUID" sid="8256551730630719" type="number" />
+                    <instance-variable name="cooldown" sid="9275100151903311" type="number" />
+                </instance-variables>
+                <animation-folder>
+                    <animation framecount="1" loop="0" name="Idle" pingpong="0" repeatcount="1" repeatto="0" sid="9819674966213072" speed="0">
+                        <frame duration="1" hotspotX="0.235294" hotspotY="0.409091" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu idle.png" />
+                    </animation>
+                    <animation framecount="10" loop="0" name="GoGrab" pingpong="0" repeatcount="1" repeatto="0" sid="5719558144215137" speed="14">
+                        <frame duration="1" hotspotX="0.772727" hotspotY="0.378788" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_entrada 1.png" />
+                        <frame duration="1" hotspotX="0.772727" hotspotY="0.378788" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_entrada 2.png" />
+                        <frame duration="1" hotspotX="0.772727" hotspotY="0.378788" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_entrada 3.png" />
+                        <frame duration="1" hotspotX="0.772727" hotspotY="0.378788" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_entrada 4.png" />
+                        <frame duration="1" hotspotX="0.772727" hotspotY="0.378788" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_entrada 5.png" />
+                        <frame duration="1" hotspotX="0.772727" hotspotY="0.378788" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_entrada 6.png" />
+                        <frame duration="1" hotspotX="0.772727" hotspotY="0.378788" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_entrada 7.png" />
+                        <frame duration="1" hotspotX="0.772727" hotspotY="0.378788" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_entrada 8.png" />
+                        <frame duration="1" hotspotX="0.772727" hotspotY="0.378788" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_entrada 9.png" />
+                        <frame duration="1" hotspotX="0.767442" hotspotY="0.369565" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_exit 1.png" />
+                    </animation>
+                    <animation framecount="7" loop="0" name="Grabbing" pingpong="0" repeatcount="1" repeatto="0" sid="8829621554258276" speed="15">
+                        <frame duration="1" hotspotX="0.533333" hotspotY="0.166667" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu pick item\tatu 1.png" />
+                        <frame duration="1" hotspotX="0.533333" hotspotY="0.166667" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu pick item\tatu 2.png" />
+                        <frame duration="1" hotspotX="0.533333" hotspotY="0.166667" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu pick item\tatu 3.png" />
+                        <frame duration="1" hotspotX="0.533333" hotspotY="0.166667" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu pick item\tatu 4.png" />
+                        <frame duration="1" hotspotX="0.533333" hotspotY="0.166667" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu pick item\tatu 5.png" />
+                        <frame duration="1" hotspotX="0.533333" hotspotY="0.166667" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu pick item\tatu 6.png" />
+                        <frame duration="1" hotspotX="0.533333" hotspotY="0.166667" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu pick item\tatu 7.png" />
+                    </animation>
+                    <animation framecount="7" loop="0" name="CommingBack" pingpong="0" repeatcount="1" repeatto="0" sid="9084081080769367" speed="12">
+                        <frame duration="1" hotspotX="0.848837" hotspotY="0.173913" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_exit 1.png" />
+                        <frame duration="1" hotspotX="0.848837" hotspotY="0.173913" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_exit 2.png" />
+                        <frame duration="1" hotspotX="0.848837" hotspotY="0.173913" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_exit 3.png" />
+                        <frame duration="1" hotspotX="0.848837" hotspotY="0.173913" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_exit 4.png" />
+                        <frame duration="1" hotspotX="0.848837" hotspotY="0.173913" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_exit 5.png" />
+                        <frame duration="1" hotspotX="0.848837" hotspotY="0.173913" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_exit 6.png" />
+                        <frame duration="1" hotspotX="0.848837" hotspotY="0.173913" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\tatu entrada_saida\tatu entrada_saida\tatu_exit 7.png" />
+                    </animation>
+                </animation-folder>
+            </object-type>
+            <object-type name="HeroTortoiseAoe" sid="2983242963527977">
+                <plugin id="Sprite" />
+                <behaviors>
+                    <behavior-type name="Fade" sid="2914208575694623">
+                        <behavior id="Fade" />
+                    </behavior-type>
+                </behaviors>
+                <animation-folder>
+                    <animation framecount="3" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="5855231979162346" speed="15">
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\stomp 1.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\stomp 2.png" />
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\stomp 3.png" />
+                    </animation>
+                </animation-folder>
+            </object-type>
+            <object-type name="HeroRabbitAtk" sid="9437928962431424">
+                <plugin id="Sprite" />
+                <behaviors>
+                    <behavior-type name="DestroyOutsideLayout" sid="1433232914381199">
+                        <behavior id="destroy" />
+                    </behavior-type>
+                    <behavior-type name="Bullet" sid="3488153837294085">
+                        <behavior id="Bullet" />
+                    </behavior-type>
+                </behaviors>
+                <animation-folder>
+                    <animation framecount="1" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="3385141111632496" speed="5">
+                        <frame duration="1" hotspotX="0.5" hotspotY="0.666667" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\flecha.png" />
+                    </animation>
+                </animation-folder>
+            </object-type>
+        </object-folder>
+        <object-type name="Sprite2" sid="6617449535738734">
+            <plugin id="Sprite" />
+            <animation-folder>
+                <animation framecount="1" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="2951347385955872" speed="5">
+                    <frame duration="1" hotspotX="0" hotspotY="0">
+                        <image-point name="tab_connection" x="1" y="0.5" />
+                    </frame>
+                </animation>
+            </animation-folder>
+        </object-type>
+        <object-type name="Sprite3" sid="7420860020755418">
+            <plugin id="Sprite" />
+            <animation-folder>
+                <animation framecount="1" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="7488594021793697" speed="5">
+                    <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\menu.png">
+                        <collision-poly>
+                            <point x="0.0220588" y="0.00852273" />
+                            <point x="0.977941" y="0.00852273" />
+                            <point x="0.992647" y="0.5" />
+                            <point x="0.977941" y="0.991477" />
+                            <point x="0.0220588" y="0.991477" />
+                            <point x="0.00735294" y="0.5" />
+                        </collision-poly>
+                    </frame>
+                </animation>
+            </animation-folder>
+        </object-type>
+        <object-type name="Text" sid="4332265001014985">
+            <plugin id="Text" />
+            <instance-variables>
+                <instance-variable name="name" sid="4840654928566767" type="string" />
+            </instance-variables>
+        </object-type>
+        <object-type name="Function" sid="8014626252248331">
+            <plugin id="Function" />
+        </object-type>
+        <object-type name="Background" sid="1500013420425693">
+            <plugin id="TiledBg" />
+            <texture original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\bg1GG.png" />
+        </object-type>
+        <object-type name="Enemy" sid="9675162308892378">
+            <plugin id="Sprite" />
+            <instance-variables>
+                <instance-variable name="hp" sid="422370210427476" type="number" />
+                <instance-variable name="attack" sid="1571481046167656" type="number" />
+                <instance-variable name="speed" sid="2421803127243529" type="number" />
+                <instance-variable name="allowed_to_take_damage" sid="7532923943825044" type="boolean" />
+                <instance-variable name="max_hp" sid="1695509808824757" type="number" />
+                <instance-variable name="moving_in_the_right_speed" sid="4127206693941884" type="boolean" />
+                <instance-variable name="spawn_timer" sid="8195013789614818" type="number" />
+                <instance-variable name="drop_chance" sid="4309949551971031" type="number" />
+            </instance-variables>
+            <behaviors>
+                <behavior-type name="Pathfinding" sid="4674305761368943">
+                    <behavior id="Pathfinding" />
+                </behavior-type>
+                <behavior-type name="Bullet" sid="6153513602728654">
+                    <behavior id="Bullet" />
+                </behavior-type>
+                <behavior-type name="DestroyOutsideLayout" sid="7067976163427586">
+                    <behavior id="destroy" />
+                </behavior-type>
+            </behaviors>
+            <animation-folder>
+                <animation framecount="2" loop="1" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="7321024833616711" speed="4">
+                    <frame duration="1" hotspotX="0.516129" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\goblin 1.png">
+                        <image-point name="Imagepoint 1" x="0.290323" y="1" />
+                        <collision-poly>
+                            <point x="0.754032" y="1" />
+                            <point x="0" y="1" />
+                            <point x="0" y="0" />
+                            <point x="0.758065" y="0" />
+                        </collision-poly>
+                    </frame>
+                    <frame duration="1" hotspotX="0.516129" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\goblin 2.png">
+                        <image-point name="Imagepoint 1" x="0.290323" y="1" />
+                        <collision-poly>
+                            <point x="0.717742" y="0.980469" />
+                            <point x="0" y="1" />
+                            <point x="0" y="0" />
+                            <point x="0.729839" y="0" />
+                        </collision-poly>
+                    </frame>
+                </animation>
+            </animation-folder>
+        </object-type>
+        <object-type name="Mouse" sid="7409750959546031">
+            <plugin id="Mouse" />
+        </object-type>
+        <object-type name="EnemySpawner" sid="2034958585715074">
+            <plugin id="Sprite" />
+            <instance-variables>
+                <instance-variable name="location" sid="2284831490677006" type="string" />
+            </instance-variables>
+            <animation-folder>
+                <animation framecount="1" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="3542756190697342" speed="5">
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5">
+                        <image-point name="Imagepoint 1" x="0.404" y="-2.652" />
+                        <image-point name="Imagepoint 2" x="0.516" y="2.356" />
+                        <image-point name="Imagepoint 3" x="0.484" y="3.54" />
+                        <image-point name="Imagepoint 4" x="0.548" y="-1.116" />
+                    </frame>
+                </animation>
+            </animation-folder>
+        </object-type>
+        <object-type name="DialogBox" sid="6225172375426306">
+            <plugin id="DialogBox" />
+        </object-type>
+        <object-type name="AJAX" sid="7341272554404608">
+            <plugin id="AJAX" />
+        </object-type>
+        <object-type name="Tooltip" sid="8636742883764569">
+            <plugin id="Spritefont2" />
+            <instance-variables>
+                <instance-variable name="fixed" sid="5983863692537809" type="boolean" />
+            </instance-variables>
+            <behaviors>
+                <behavior-type name="BoundToLayout" sid="91271841970675">
+                    <behavior id="bound" />
+                </behavior-type>
+            </behaviors>
+            <texture />
+        </object-type>
+        <object-type name="Particles" sid="7099473469248744">
+            <plugin id="Particles" />
+            <texture />
+        </object-type>
+        <object-type name="HpBarVar" sid="487732074465868">
+            <plugin id="TiledBg" />
+            <instance-variables>
+                <instance-variable name="parent" sid="1822339123547219" type="number" />
+            </instance-variables>
+            <behaviors>
+                <behavior-type name="Pin" sid="2280329637840158">
+                    <behavior id="Pin" />
+                </behavior-type>
+                <behavior-type name="Fade" sid="8178684473122532">
+                    <behavior id="Fade" />
+                </behavior-type>
+            </behaviors>
+            <texture original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\hp front.png" />
+        </object-type>
+        <object-type name="HpBarFix" sid="7078760685731197">
+            <plugin id="TiledBg" />
+            <instance-variables>
+                <instance-variable name="parent" sid="5055727176856835" type="number" />
+            </instance-variables>
+            <behaviors>
+                <behavior-type name="Pin" sid="6719897000548608">
+                    <behavior id="Pin" />
+                </behavior-type>
+                <behavior-type name="Fade" sid="1444171256701861">
+                    <behavior id="Fade" />
+                </behavior-type>
+            </behaviors>
+            <texture original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\hp back.png" />
+        </object-type>
+        <object-type name="Background2" sid="3641176407930538">
+            <plugin id="TiledBg" />
+            <texture original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\bg2pnGG.png" />
+        </object-type>
+        <object-type name="EnemyKiller" sid="8674964503555023">
+            <plugin id="Sprite" />
+            <animation-folder>
+                <animation framecount="1" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="957256994963219" speed="5">
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" />
+                </animation>
+            </animation-folder>
+        </object-type>
+        <object-type name="RitualBuffPArticle" sid="214973762455851">
+            <plugin id="Sprite" />
+            <animation-folder>
+                <animation framecount="7" loop="0" name="Yellow" pingpong="0" repeatcount="1" repeatto="0" sid="8467098265420053" speed="6">
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-amarela\sprite_1.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-amarela\sprite_2.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-amarela\sprite_3.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-amarela\sprite_4.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-amarela\sprite_5.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-amarela\sprite_6.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-amarela\sprite_7.png" />
+                </animation>
+                <animation framecount="7" loop="0" name="Red" pingpong="0" repeatcount="1" repeatto="0" sid="7698826718665496" speed="6">
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-vermelha (1)\sprite_1.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-vermelha (1)\sprite_2.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-vermelha (1)\sprite_3.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-vermelha (1)\sprite_4.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-vermelha (1)\sprite_5.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-vermelha (1)\sprite_6.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-vermelha (1)\sprite_7.png" />
+                </animation>
+                <animation framecount="7" loop="0" name="Blue" pingpong="0" repeatcount="1" repeatto="0" sid="8447576294735755" speed="6">
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-azul\sprite_1.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-azul\sprite_2.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-azul\sprite_3.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-azul\sprite_4.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-azul\sprite_5.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-azul\sprite_6.png" />
+                    <frame duration="1" hotspotX="0.5" hotspotY="0.5" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\evolve\particula-azul\sprite_7.png" />
+                </animation>
+            </animation-folder>
+        </object-type>
+        <object-type name="deathScreen" sid="7143501719136204">
+            <plugin id="Sprite" />
+            <behaviors>
+                <behavior-type name="Fade" sid="8050081406812799">
+                    <behavior id="Fade" />
+                </behavior-type>
+                <behavior-type name="DestroyOutsideLayout" sid="3362039581512301">
+                    <behavior id="destroy" />
+                </behavior-type>
+            </behaviors>
+            <animation-folder>
+                <animation framecount="3" loop="0" name="Default" pingpong="0" repeatcount="1" repeatto="0" sid="1976718034631515" speed="0">
+                    <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\Death 1.png">
+                        <image-point name="Imagepoint 1" x="0.488281" y="0.384722" />
+                    </frame>
+                    <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\Death 2.png">
+                        <image-point name="Imagepoint 1" x="0.488281" y="0.384722" />
+                    </frame>
+                    <frame duration="1" hotspotX="0" hotspotY="0" original-source="C:\Users\Marco\Desktop\dev\pelegrino\assets\Death 3.png">
+                        <image-point name="Imagepoint 1" x="0.488281" y="0.384722" />
+                    </frame>
+                </animation>
+            </animation-folder>
+        </object-type>
+        <object-type name="deathText" sid="4609480179864132">
+            <plugin id="Text" />
+            <behaviors>
+                <behavior-type name="Fade" sid="5960941054743368">
+                    <behavior id="Fade" />
+                </behavior-type>
+            </behaviors>
+        </object-type>
+        <object-type name="Text2" sid="8213744751610358">
+            <plugin id="Text" />
+            <behaviors>
+                <behavior-type name="Sine" sid="4355424538989899">
+                    <behavior id="Sin" />
+                </behavior-type>
+            </behaviors>
+        </object-type>
+    </object-folder>
+    <families>
+        <family name="DataSets" plugin-id="Arr" sid="2452631886664845">
+            <members>
+                <member>Items</member>
+                <member>ResultSet</member>
+            </members>
+            <instance-variables>
+                <instance-variable comment="If true then skip first row when working with data such as during searches" name="firstRowIsColumnNames" sid="3950191804052596" type="boolean" />
+                <instance-variable name="DataSetName" sid="3900727986163613" type="string" />
+            </instance-variables>
+        </family>
+        <family name="TooltipedObject" plugin-id="Sprite" sid="987181104632414">
+            <members>
+                <member>Caravan</member>
+                <member>Enemy</member>
+                <member>HeroArmadillo</member>
+                <member>HeroMantis</member>
+                <member>HeroRabbit</member>
+                <member>HeroTortoise</member>
+                <member>ItemDisplay</member>
+                <member>ItemDrop</member>
+                <member>ItemSelected</member>
+            </members>
+            <instance-variables>
+                <instance-variable name="tooltip" sid="1375269930572709" type="string" />
+                <instance-variable name="already_displayed" sid="7118572811912662" type="boolean" />
+            </instance-variables>
+        </family>
+        <family name="aoeObjects" plugin-id="Sprite" sid="4339907416168045">
+            <members>
+                <member>HeroMantisAoe</member>
+                <member>HeroRabbitAtk</member>
+                <member>HeroTortoiseAoe</member>
+            </members>
+            <instance-variables>
+                <instance-variable name="damage" sid="6583958329615608" type="number" />
+            </instance-variables>
+        </family>
+    </families>
+    <layout-folder>
+        <layout>Main.xml</layout>
+        <layout>InjectionLayout.xml</layout>
+    </layout-folder>
+    <event-folder>
+        <event-sheet>Main.xml</event-sheet>
+        <event-sheet>DataSetFunctions.xml</event-sheet>
+        <event-sheet>DataObjectFunctionsUNUSED.xml</event-sheet>
+        <event-sheet>DataObjectFunctions.xml</event-sheet>
+    </event-folder>
+    <global-instances>
+        <global-instance type="Function" uid="10" />
+        <global-instance type="Mouse" uid="3" />
+        <global-instance type="DialogBox" uid="17" />
+        <global-instance type="AJAX" uid="20" />
+    </global-instances>
+    <sounds-folder />
+    <music-folder />
+    <files-folder>
+        <file-folder name="Icons">
+            <file name="icon-16.png" />
+            <file name="icon-32.png" />
+            <file name="icon-114.png" />
+            <file name="icon-128.png" />
+            <file name="icon-256.png" />
+            <file name="loading-logo.png" />
+        </file-folder>
+        <file name="items.json" />
+        <file name="inv.json" />
+    </files-folder>
+</c2project>

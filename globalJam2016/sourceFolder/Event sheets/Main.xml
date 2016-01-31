@@ -1,0 +1,2399 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>Main</name>
+    <events>
+        <include>DataSetFunctions</include>
+        <event-block sid="7248642508544003">
+            <conditions>
+                <condition id="-1" name="Every tick" sid="4227270794946204" type="System" />
+            </conditions>
+            <actions>
+                <action id="0" name="Call function" sid="8049062230978954" type="Function">
+                    <param id="0" name="Name">&quot;Camera.scroll&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="9527074528610669" type="Function">
+                    <param id="0" name="Name">&quot;Caravan.add_distance&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action disabled="1" id="0" name="Call function" sid="2774147828840057" type="Function">
+                    <param id="0" name="Name">&quot;Caravan.deacelerate_wheel&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="5172169930791859" type="Function">
+                    <param id="0" name="Name">&quot;Background.scroll&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="3659682490272351" type="Function">
+                    <param id="0" name="Name">&quot;Stats.refresh&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="2910326592658066" type="Function">
+                    <param id="0" name="Name">&quot;Tooltip.refresh&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="9987218397160076" type="Function">
+                    <param id="0" name="Name">&quot;Enemy.Update&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="3126460576606961" type="Function">
+                    <param id="0" name="Name">&quot;Hero.Mantis.update&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="9863689051067812" type="Function">
+                    <param id="0" name="Name">&quot;Hero.Rabbit.try_attack&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="615784375232589" type="Function">
+                    <param id="0" name="Name">&quot;Hero.Armadillo.update&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="3965397274665836" type="Function">
+                    <param id="0" name="Name">&quot;Tooltip.update&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="1594999806268895">
+            <conditions>
+                <condition id="-2" name="On start of layout" sid="5837840242073546" type="System" />
+            </conditions>
+            <actions>
+                <action id="0" name="Call function" sid="8727263591293735" type="Function">
+                    <param id="0" name="Name">&quot;Caravan.define_wheel_speed&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="5889876133702667" type="Function">
+                    <param id="0" name="Name">&quot;Inventory.Item.create&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="112038166436465" type="Function">
+                    <param id="0" name="Name">&quot;Inventory.create&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+                <action id="0" name="Call function" sid="2487179355466853" type="Function">
+                    <param id="0" name="Name">&quot;Tooltip.update&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="6541982387469027">
+            <conditions>
+                <condition id="-6" name="Every X seconds" sid="6659623644972271" type="System">
+                    <param id="0" name="Interval (seconds)">1</param>
+                </condition>
+            </conditions>
+            <actions />
+            <sub-events>
+                <event-block sid="6962215377284908">
+                    <conditions>
+                        <condition id="-7" name="Compare instance variable" sid="2794113218338219" type="Caravan">
+                            <param id="0" name="Instance variable">hp</param>
+                            <param id="1" name="Comparison">2</param>
+                            <param id="2" name="Value">Self.max_hp</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-10" name="Set value" sid="6777771381643947" type="Caravan">
+                            <param id="0" name="Instance variable">hp</param>
+                            <param id="1" name="Value">Self.hp + Self.hp_regen</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="1015895369303526">
+                            <conditions>
+                                <condition id="-7" name="Compare instance variable" sid="546995595976754" type="Caravan">
+                                    <param id="0" name="Instance variable">hp</param>
+                                    <param id="1" name="Comparison">4</param>
+                                    <param id="2" name="Value">Self.max_hp</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-10" name="Set value" sid="7243470514694587" type="Caravan">
+                                    <param id="0" name="Instance variable">hp</param>
+                                    <param id="1" name="Value">Self.max_hp</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="2702317841307199">
+                    <conditions>
+                        <condition id="-11" name="For Each" sid="9734332261457741" type="System">
+                            <param id="0" name="Object">Enemy</param>
+                        </condition>
+                        <condition id="-8" name="Compare two values" sid="4646958591516337" type="System">
+                            <param id="0" name="First value">distance(Enemy.X, Enemy.Y, Caravan.X, Caravan.Y)</param>
+                            <param id="1" name="Comparison">2</param>
+                            <param id="2" name="Second value">150</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-10" name="Set value" sid="8320058132569857" type="Caravan">
+                            <param id="0" name="Instance variable">hp</param>
+                            <param id="1" name="Value">Self.hp - Enemy.attack</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="9221187500246713">
+                            <conditions>
+                                <condition id="-7" name="Compare instance variable" sid="414165214308486" type="Caravan">
+                                    <param id="0" name="Instance variable">hp</param>
+                                    <param id="1" name="Comparison">3</param>
+                                    <param id="2" name="Value">0</param>
+                                </condition>
+                                <condition id="-8" inverted="1" name="Is boolean instance variable set" sid="5711953779178303" type="Caravan">
+                                    <param id="0" name="Instance variable">dead</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-13" name="Set boolean" sid="7978352689674068" type="Caravan">
+                                    <param id="0" name="Instance variable">dead</param>
+                                    <param id="1" name="Value">1</param>
+                                </action>
+                                <action id="5" name="Set frame" sid="3712041353141132" type="deathScreen">
+                                    <param id="0" name="Frame number">floor(random(3))</param>
+                                </action>
+                                <action id="-3" name="Create object" sid="3433142126593652" type="System">
+                                    <param id="0" name="Object to create">deathScreen</param>
+                                    <param id="1" name="Layer">LayerIndex(&quot;death&quot;)</param>
+                                    <param id="2" name="X">0</param>
+                                    <param id="3" name="Y">0</param>
+                                </action>
+                                <action id="-3" name="Create object" sid="791100295855947" type="System">
+                                    <param id="0" name="Object to create">deathText</param>
+                                    <param id="1" name="Layer">LayerIndex(&quot;death&quot;)</param>
+                                    <param id="2" name="X">deathScreen.ImagePointX(1)</param>
+                                    <param id="3" name="Y">deathScreen.ImagePointY(1)</param>
+                                </action>
+                                <action id="0" name="Set text" sid="8087634736812209" type="deathText">
+                                    <param id="0" name="Text">&quot;You traveled: &quot; &amp; newline &amp; int(Caravan.pixels_traveled )&amp; &quot;px&quot;</param>
+                                </action>
+                                <action id="-16" name="Wait" sid="9360354801213573" type="System">
+                                    <param id="0" name="Seconds">4</param>
+                                </action>
+                                <action id="-26" name="Restart layout" sid="4852518384611496" type="System" />
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="2274107152407917">
+                    <conditions />
+                    <actions>
+                        <action id="0" name="Call function" sid="2956594912250268" type="Function">
+                            <param id="0" name="Name">&quot;Tooltip.update&quot;</param>
+                            <param id="1" name="Parameter {n}"></param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-block>
+        <event-block sid="1472511718438933">
+            <conditions>
+                <condition id="-6" name="Every X seconds" sid="1349226021593379" type="System">
+                    <param id="0" name="Interval (seconds)">Enemy.spawn_timer</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="0" name="Call function" sid="9851499970831631" type="Function">
+                    <param id="0" name="Name">&quot;Enemy.Spawn&quot;</param>
+                    <param id="1" name="Parameter {n}"></param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block disabled="1" sid="4399655518537449">
+            <conditions>
+                <condition id="1" name="On any click" sid="3233809643488643" type="Mouse" />
+            </conditions>
+            <actions />
+            <sub-events>
+                <event-block disabled="1" sid="8765231641424557">
+                    <conditions>
+                        <condition id="-7" name="Compare instance variable" sid="6684161076154455" type="Caravan">
+                            <param id="0" name="Instance variable">speed</param>
+                            <param id="1" name="Comparison">2</param>
+                            <param id="2" name="Value">self.max_speed</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block disabled="1" sid="8156481599065975">
+                            <conditions>
+                                <condition id="-11" name="For Each" sid="4104786175398906" type="System">
+                                    <param id="0" name="Object">CaravanWheel</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-10" name="Set value" sid="1693505673867011" type="Caravan">
+                                    <param id="0" name="Instance variable">speed</param>
+                                    <param id="1" name="Value">Self.speed + 10</param>
+                                </action>
+                                <action id="0" name="Call function" sid="513814060655637" type="Function">
+                                    <param id="0" name="Name">&quot;Caravan.define_wheel_speed&quot;</param>
+                                    <param id="1" name="Parameter {n}"></param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-block>
+        <event-group description="" sid="4633121152851847" title="Caravan">
+            <sub-events>
+                <event-block sid="4032619402164961">
+                    <conditions>
+                        <condition id="0" name="On function" sid="4399846489890259" type="Function">
+                            <param id="0" name="Name">&quot;Caravan.define_wheel_speed&quot;</param>
+                        </condition>
+                        <condition id="-11" name="For Each" sid="1623437798927628" type="System">
+                            <param id="0" name="Object">CaravanWheel</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-10" name="Set value" sid="977723458267916" type="Caravan">
+                            <param id="0" name="Instance variable">speed</param>
+                            <param id="1" name="Value">HeroTortoise.speed</param>
+                        </action>
+                        <action behavior="Rotate" id="0" name="Set speed" sid="9244870298282716" type="CaravanWheel">
+                            <param id="0" name="Speed">Caravan.speed</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block disabled="1" sid="4596424483962681">
+                    <conditions>
+                        <condition id="0" name="On function" sid="3944529336821358" type="Function">
+                            <param id="0" name="Name">&quot;Caravan.deacelerate_wheel&quot;</param>
+                        </condition>
+                        <condition id="-7" name="Compare instance variable" sid="7885289385835386" type="Caravan">
+                            <param id="0" name="Instance variable">speed</param>
+                            <param id="1" name="Comparison">4</param>
+                            <param id="2" name="Value">Self.min_speed</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-10" name="Set value" sid="2063284028851537" type="Caravan">
+                            <param id="0" name="Instance variable">speed</param>
+                            <param id="1" name="Value">Self.speed -Self.deaceleration*dt</param>
+                        </action>
+                        <action id="0" name="Call function" sid="1732495867702296" type="Function">
+                            <param id="0" name="Name">&quot;Caravan.define_wheel_speed&quot;</param>
+                            <param id="1" name="Parameter {n}"></param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="4324128341083441">
+                    <conditions>
+                        <condition id="0" name="On function" sid="3165442831447122" type="Function">
+                            <param id="0" name="Name">&quot;Caravan.add_distance&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-11" name="Add to" sid="2471393386345117" type="Caravan">
+                            <param id="0" name="Instance variable">pixels_traveled</param>
+                            <param id="1" name="Value">Function.Call(&quot;speed_to_distance&quot;) * dt</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="" sid="8868801385697472" title="Background">
+            <sub-events>
+                <event-block sid="3338323529068848">
+                    <conditions>
+                        <condition id="0" name="On function" sid="601048359268602" type="Function">
+                            <param id="0" name="Name">&quot;Background.scroll&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-1" name="Set X" sid="4583892600082581" type="Background">
+                            <param id="0" name="X">Self.X - Function.Call(&quot;speed_to_distance&quot;) * dt</param>
+                        </action>
+                        <action id="-1" name="Set X" sid="4663336132466917" type="Background2">
+                            <param id="0" name="X">Self.X - Function.Call(&quot;speed_to_distance&quot;) * dt* 0.65</param>
+                        </action>
+                        <action id="-1" name="Set X" sid="4005923635662821" type="ItemDrop">
+                            <param id="0" name="X">Self.X - Function.Call(&quot;speed_to_distance&quot;) * dt</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="3751023063940975">
+                            <conditions>
+                                <condition id="-1" name="Compare X" sid="2603810134186205" type="Background">
+                                    <param id="0" name="Comparison">2</param>
+                                    <param id="1" name="X co-ordinate">-720</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-1" name="Set X" sid="9866040277971454" type="Background">
+                                    <param id="0" name="X">Self.X + 1000</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="8009652495811014">
+                            <conditions>
+                                <condition id="-1" name="Compare X" sid="8293933413778523" type="Background2">
+                                    <param id="0" name="Comparison">2</param>
+                                    <param id="1" name="X co-ordinate">-720</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-1" name="Set X" sid="465226851292825" type="Background2">
+                                    <param id="0" name="X">Self.X + 1000</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="" sid="2354443280926535" title="Auxiliar Functions">
+            <sub-events>
+                <variable constant="0" name="last_mouse_x" sid="116362117659236" static="0" type="number">0</variable>
+                <variable constant="0" name="last_mouse_y" sid="7114328310306989" static="0" type="number">0</variable>
+                <event-block sid="714063867517234">
+                    <conditions>
+                        <condition id="0" name="On function" sid="6455940834210308" type="Function">
+                            <param id="0" name="Name">&quot;speed_to_distance&quot;</param>
+                        </condition>
+                        <condition id="-8" name="Is boolean instance variable set" sid="5137642680473068" type="CaravanWheel">
+                            <param id="0" name="Instance variable">velocimetro</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Set return value" sid="5532438947218681" type="Function">
+                            <param id="0" name="Value">((CaravanWheel.Width*pi*CaravanWheel.Rotate.Speed)/360)</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="" sid="7874808887350903" title="Camera">
+            <sub-events>
+                <event-block sid="5983376290226945">
+                    <conditions>
+                        <condition id="0" name="On function" sid="3552315695246265" type="Function">
+                            <param id="0" name="Name">&quot;Camera.Scroll&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="785490582994833">
+                            <conditions>
+                                <condition id="7" name="Cursor is over object" sid="8136021010703743" type="Mouse">
+                                    <param id="0" name="Object">CameraScroll</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-1" name="Set X" sid="4249094855194615" type="Camera">
+                                    <param id="0" name="X">Self.X + CameraScroll.offset * dt</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="6625990082223961">
+                                    <conditions>
+                                        <condition id="-1" name="Compare X" sid="8325014078327634" type="Camera">
+                                            <param id="0" name="Comparison">2</param>
+                                            <param id="1" name="X co-ordinate">840 + 140</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-1" name="Set X" sid="2808680464144806" type="Camera">
+                                            <param id="0" name="X">840 + 140</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="1208370830043179">
+                                    <conditions>
+                                        <condition id="-22" name="Else" sid="3620024401001464" type="System" />
+                                        <condition id="-1" name="Compare X" sid="8802949150610502" type="Camera">
+                                            <param id="0" name="Comparison">4</param>
+                                            <param id="1" name="X co-ordinate">1280 + 640 - 480 + 140</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-1" name="Set X" sid="1338315856195807" type="Camera">
+                                            <param id="0" name="X">1280 + 640 - 480 + 140</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <variable constant="0" name="enemy_max_hp" sid="8135222644169735" static="0" type="number">100</variable>
+        <variable constant="0" name="enemy_atk" sid="5781737349583663" static="0" type="number">20</variable>
+        <variable constant="0" name="enemy_spawn_timer" sid="1374817662647058" static="0" type="number">2</variable>
+        <variable constant="0" name="enemy_droprate" sid="6009242245553342" static="0" type="number">20</variable>
+        <variable constant="0" name="knockback" sid="3579607492865872" static="0" type="number">75</variable>
+        <event-group description="" sid="5569564558022003" title="Enemy">
+            <sub-events>
+                <event-block sid="5313811766310015">
+                    <conditions>
+                        <condition id="-6" name="Every X seconds" sid="7580377796619915" type="System">
+                            <param id="0" name="Interval (seconds)">10</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-10" name="Add to" sid="8252072645593225" type="System">
+                            <param id="0" name="Variable">enemy_atk</param>
+                            <param id="1" name="Value">0.1</param>
+                        </action>
+                        <action id="-10" name="Add to" sid="1264893279945006" type="System">
+                            <param id="0" name="Variable">enemy_max_hp</param>
+                            <param id="1" name="Value">1</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="2972738246671226">
+                    <conditions>
+                        <condition id="-18" name="On created" sid="3353930208784826" type="Enemy" />
+                    </conditions>
+                    <actions>
+                        <action id="-10" name="Set value" sid="6100216987211456" type="Enemy">
+                            <param id="0" name="Instance variable">max_hp</param>
+                            <param id="1" name="Value">enemy_max_hp</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="720782732817762" type="Enemy">
+                            <param id="0" name="Instance variable">hp</param>
+                            <param id="1" name="Value">Self.max_hp</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="698069350118872" type="Enemy">
+                            <param id="0" name="Instance variable">attack</param>
+                            <param id="1" name="Value">enemy_atk</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="2770403574110618" type="Enemy">
+                            <param id="0" name="Instance variable">spawn_timer</param>
+                            <param id="1" name="Value">enemy_spawn_timer</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="5878308955599152" type="Enemy">
+                            <param id="0" name="Instance variable">drop_chance</param>
+                            <param id="1" name="Value">enemy_droprate</param>
+                        </action>
+                        <action behavior="Bullet" id="0" name="Set speed" sid="3119703140592094" type="Enemy">
+                            <param id="0" name="Speed">knockback</param>
+                        </action>
+                        <action behavior="Pathfinding" id="0" name="Find path" sid="1454441577293996" type="Enemy">
+                            <param id="0" name="X">Caravan.X</param>
+                            <param id="1" name="Y">Caravan.Y</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="777108576539785" type="Enemy">
+                            <param id="0" name="Instance variable">tooltip</param>
+                            <param id="1" name="Value">&quot;Filthy Enemy: &quot; &amp; newline &amp; &quot;Hp: &quot; &amp; Self.hp &amp; &quot;/&quot; &amp; Self.max_hp &amp; newline &amp; &quot;Attack: &quot; &amp; Self.attack &amp; &quot;/s&quot; &amp; newline &amp; &quot;Item drop chance :&quot; &amp; Self.drop_chance &amp; &quot;\%&quot;  &amp; newline &amp; &quot;Spawn-Timer Speed: &quot; &amp; Self.spawn_timer</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="2645282912684998">
+                    <conditions>
+                        <condition behavior="Pathfinding" id="0" name="On path found" sid="8774384359457648" type="Enemy" />
+                    </conditions>
+                    <actions>
+                        <action behavior="Pathfinding" id="1" name="Move along path" sid="6759764386566123" type="Enemy" />
+                    </actions>
+                </event-block>
+                <event-block sid="4928120450299815">
+                    <conditions>
+                        <condition id="0" name="On function" sid="5748614003467093" type="Function">
+                            <param id="0" name="Name">&quot;Enemy.Spawn&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="9698186348160741">
+                            <conditions>
+                                <condition id="-11" name="For Each" sid="8499271712445259" type="System">
+                                    <param id="0" name="Object">EnemySpawner</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <event-block sid="4278261543702974">
+                                    <conditions>
+                                        <condition id="-8" name="Compare two values" sid="5786429701431002" type="System">
+                                            <param id="0" name="First value">floor(random(2))</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Second value">0</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="0" name="Spawn another object" sid="1153020876724395" type="EnemySpawner">
+                                            <param id="0" name="Object">Enemy</param>
+                                            <param id="1" name="Layer">1</param>
+                                            <param id="2" name="Image point">floor(random(0,5))</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="2645854399771823">
+                    <conditions>
+                        <condition id="0" name="On collision with another object" sid="5362861707239437" type="Enemy">
+                            <param id="0" name="Object">aoeObjects</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-12" name="Subtract from" sid="8435687242252338" type="Enemy">
+                            <param id="0" name="Instance variable">hp</param>
+                            <param id="1" name="Value">aoeObjects.damage</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="1483326160768482" type="Enemy">
+                            <param id="0" name="Instance variable">tooltip</param>
+                            <param id="1" name="Value">&quot;Filthy Enemy: &quot; &amp; newline &amp; &quot;Hp: &quot; &amp; Self.hp &amp; &quot;/&quot; &amp; Self.max_hp &amp; newline &amp; &quot;Attack: &quot; &amp; Self.attack &amp; &quot;/s&quot; &amp; newline &amp; &quot;Item drop chance :&quot; &amp; Self.drop_chance &amp; &quot;\%&quot;  &amp; newline &amp; &quot;Spawn-Timer Speed: &quot; &amp; Self.spawn_timer</param>
+                        </action>
+                        <action id="-3" name="Create object" sid="4360365388423695" type="System">
+                            <param id="0" name="Object to create">Particles</param>
+                            <param id="1" name="Layer">1</param>
+                            <param id="2" name="X">Enemy.X</param>
+                            <param id="3" name="Y">Enemy.Y</param>
+                        </action>
+                        <action id="-8" name="Set angle" sid="8354623837732719" type="Particles">
+                            <param id="0" name="Angle">HeroMantisAoe.Angle</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="3347693839690889">
+                            <conditions>
+                                <condition id="-7" name="Compare instance variable" sid="9707729030539629" type="Enemy">
+                                    <param id="0" name="Instance variable">hp</param>
+                                    <param id="1" name="Comparison">3</param>
+                                    <param id="2" name="Value">0</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Call function" sid="6998511123566223" type="Function">
+                                    <param id="0" name="Name">&quot;Enemy.Kill&quot;</param>
+                                    <param id="1" name="Parameter {n}">Enemy.UID</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="8958645874670074">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="6798973833114148" type="System" />
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <event-block sid="4163937773349498">
+                                    <conditions>
+                                        <condition id="-7" name="Compare instance variable" sid="4835426465454565" type="HpBarFix">
+                                            <param id="0" name="Instance variable">parent</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Value">Enemy.UID</param>
+                                        </condition>
+                                        <condition id="-7" name="Compare instance variable" sid="4213380048761425" type="HpBarVar">
+                                            <param id="0" name="Instance variable">parent</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Value">Enemy.UID</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Destroy" sid="7831899710777629" type="HpBarFix" />
+                                        <action id="-9" name="Destroy" sid="866819737341055" type="HpBarVar" />
+                                    </actions>
+                                </event-block>
+                                <event-block sid="5178983381290225">
+                                    <conditions />
+                                    <actions>
+                                        <action id="-3" name="Create object" sid="9849665323029929" type="System">
+                                            <param id="0" name="Object to create">HpBarFix</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="X">Enemy.ImagePointX(0) - HpBarFix.Width/2</param>
+                                            <param id="3" name="Y">Enemy.ImagePointY(0) - 60</param>
+                                        </action>
+                                        <action id="-3" name="Create object" sid="2191635396100758" type="System">
+                                            <param id="0" name="Object to create">HpBarVar</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="X">Enemy.ImagePointX(0) - HpBarVar.Width/2</param>
+                                            <param id="3" name="Y">Enemy.ImagePointY(0) -60</param>
+                                        </action>
+                                        <action id="-10" name="Set value" sid="4841958101461024" type="HpBarFix">
+                                            <param id="0" name="Instance variable">parent</param>
+                                            <param id="1" name="Value">Enemy.UID</param>
+                                        </action>
+                                        <action id="-10" name="Set value" sid="7513738326373374" type="HpBarVar">
+                                            <param id="0" name="Instance variable">parent</param>
+                                            <param id="1" name="Value">Enemy.UID</param>
+                                        </action>
+                                        <action behavior="Pin" id="0" name="Pin to object" sid="9659937304426192" type="HpBarFix">
+                                            <param id="0" name="Pin to">Enemy</param>
+                                            <param id="1" name="Mode">1</param>
+                                        </action>
+                                        <action behavior="Pin" id="0" name="Pin to object" sid="2861922710104544" type="HpBarVar">
+                                            <param id="0" name="Pin to">Enemy</param>
+                                            <param id="1" name="Mode">1</param>
+                                        </action>
+                                        <action id="-5" name="Set width" sid="937993974106721" type="HpBarVar">
+                                            <param id="0" name="Width">HpBarFix.Width*(Enemy.hp/Enemy.max_hp)</param>
+                                        </action>
+                                        <action behavior="Fade" id="1" name="Start fade" sid="3373360586152408" type="HpBarFix" />
+                                        <action behavior="Fade" id="1" name="Start fade" sid="1531719288547081" type="HpBarVar" />
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="6585720404927794">
+                            <conditions>
+                                <condition id="-8" name="Compare two values" sid="1617134109828661" type="System">
+                                    <param id="0" name="First value">HeroRabbitAtk.UID</param>
+                                    <param id="1" name="Comparison">0</param>
+                                    <param id="2" name="Second value">aoeObjects.UID</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-9" name="Destroy" sid="282384361870194" type="HeroRabbitAtk" />
+                            </actions>
+                        </event-block>
+                        <event-block sid="5585146142172786">
+                            <conditions />
+                            <actions>
+                                <action behavior="Pathfinding" id="2" name="Stop" sid="3530846494112086" type="Enemy" />
+                                <action behavior="Pathfinding" id="3" name="Set enabled" sid="7488667372791556" type="Enemy">
+                                    <param id="0" name="Set">0</param>
+                                </action>
+                                <action behavior="Bullet" id="5" name="Set enabled" sid="8442365046780631" type="Enemy">
+                                    <param id="0" name="State">1</param>
+                                </action>
+                                <action behavior="Bullet" id="3" name="Set angle of motion" sid="7414089141206631" type="Enemy">
+                                    <param id="0" name="Angle">angle(aoeObjects.X, aoeObjects.Y, Enemy.X, Enemy.Y)</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="1129999828419577">
+                                    <conditions />
+                                    <actions>
+                                        <action id="-16" name="Wait" sid="4459935269488207" type="System">
+                                            <param id="0" name="Seconds">0.3</param>
+                                        </action>
+                                        <action behavior="Bullet" id="5" name="Set enabled" sid="3194531371131963" type="Enemy">
+                                            <param id="0" name="State">0</param>
+                                        </action>
+                                        <action behavior="Pathfinding" id="3" name="Set enabled" sid="3237470345303626" type="Enemy">
+                                            <param id="0" name="Set">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="8303089732148249">
+                    <conditions>
+                        <condition id="0" name="On function" sid="6984553807001171" type="Function">
+                            <param id="0" name="Name">&quot;Enemy.update&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="8105251331327202">
+                            <conditions>
+                                <condition id="-11" name="For Each" sid="5919275348530587" type="System">
+                                    <param id="0" name="Object">Enemy</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                        </event-block>
+                        <event-block sid="6088022262591501">
+                            <conditions>
+                                <condition behavior="Pathfinding" id="4" name="Is moving along path" sid="9362790360798167" type="Enemy" />
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <event-block sid="8638931164614872">
+                                    <conditions>
+                                        <condition id="-13" name="Is between angles" sid="5491557033074565" type="Enemy">
+                                            <param id="0" name="First angle">90</param>
+                                            <param id="1" name="Second angle">270</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="8" name="Set flipped" sid="2267603186133406" type="Enemy">
+                                            <param id="0" name="State">0</param>
+                                        </action>
+                                    </actions>
+                                    <sub-events>
+                                        <event-block sid="2317111788099127">
+                                            <conditions>
+                                                <condition id="-8" inverted="1" name="Is boolean instance variable set" sid="6275995122799874" type="Enemy">
+                                                    <param id="0" name="Instance variable">moving_in_the_right_speed</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action behavior="Pathfinding" id="7" name="Set max speed" sid="1338564454109641" type="Enemy">
+                                                    <param id="0" name="Speed">Self.Pathfinding.MaxSpeed + Function.Call(&quot;speed_to_distance&quot;)</param>
+                                                </action>
+                                                <action id="-13" name="Set boolean" sid="218733426310933" type="Enemy">
+                                                    <param id="0" name="Instance variable">moving_in_the_right_speed</param>
+                                                    <param id="1" name="Value">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="9735834225947271">
+                                    <conditions>
+                                        <condition id="-22" name="Else" sid="8583834864696627" type="System" />
+                                    </conditions>
+                                    <actions>
+                                        <action id="8" name="Set flipped" sid="8343366823015822" type="Enemy">
+                                            <param id="0" name="State">1</param>
+                                        </action>
+                                    </actions>
+                                    <sub-events>
+                                        <event-block sid="2829818578065692">
+                                            <conditions>
+                                                <condition id="-8" inverted="1" name="Is boolean instance variable set" sid="3601394502873241" type="Enemy">
+                                                    <param id="0" name="Instance variable">moving_in_the_right_speed</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action behavior="Pathfinding" id="7" name="Set max speed" sid="8621889618360136" type="Enemy">
+                                                    <param id="0" name="Speed">Self.Pathfinding.MaxSpeed - Function.Call(&quot;speed_to_distance&quot;)</param>
+                                                </action>
+                                                <action id="-13" name="Set boolean" sid="5226093829035478" type="Enemy">
+                                                    <param id="0" name="Instance variable">moving_in_the_right_speed</param>
+                                                    <param id="1" name="Value">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="2829556795397688">
+                            <conditions>
+                                <condition behavior="Pathfinding" id="3" inverted="1" name="Is calculating path" sid="8886107189996848" type="Enemy" />
+                                <condition behavior="Pathfinding" id="4" inverted="1" name="Is moving along path" sid="6742077375200052" type="Enemy" />
+                            </conditions>
+                            <actions>
+                                <action behavior="Pathfinding" id="0" name="Find path" sid="5433413317538508" type="Enemy">
+                                    <param id="0" name="X">Caravan.X</param>
+                                    <param id="1" name="Y">Caravan.Y</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="3467556145622901">
+                    <conditions>
+                        <condition id="0" name="On collision with another object" sid="9542350104845281" type="Enemy">
+                            <param id="0" name="Object">EnemyKiller</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="0" name="Call function" sid="28064574987807" type="Function">
+                            <param id="0" name="Name">&quot;Enemy.Kill&quot;</param>
+                            <param id="1" name="Parameter {n}">Enemy.UID</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="4297088304474828">
+                    <conditions>
+                        <condition id="0" name="On function" sid="7731558897665732" type="Function">
+                            <param id="0" name="Name">&quot;Enemy.kill&quot;</param>
+                        </condition>
+                        <condition id="-14" name="Pick by unique ID" sid="8162401430744172" type="Enemy">
+                            <param id="0" name="Unique ID">Function.Param(0)</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="5745860877271432">
+                            <conditions>
+                                <condition id="-7" name="Compare instance variable" sid="2310596498142488" type="HpBarFix">
+                                    <param id="0" name="Instance variable">parent</param>
+                                    <param id="1" name="Comparison">0</param>
+                                    <param id="2" name="Value">Enemy.UID</param>
+                                </condition>
+                                <condition id="-7" name="Compare instance variable" sid="6653533918816832" type="HpBarVar">
+                                    <param id="0" name="Instance variable">parent</param>
+                                    <param id="1" name="Comparison">0</param>
+                                    <param id="2" name="Value">Enemy.UID</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-9" name="Destroy" sid="1730132960158567" type="HpBarFix" />
+                                <action id="-9" name="Destroy" sid="3586529835114043" type="HpBarVar" />
+                            </actions>
+                        </event-block>
+                        <event-block sid="9477678586109772">
+                            <conditions>
+                                <condition id="-8" name="Compare two values" sid="8610316814517308" type="System">
+                                    <param id="0" name="First value">floor(random(100))</param>
+                                    <param id="1" name="Comparison">2</param>
+                                    <param id="2" name="Second value">Enemy.drop_chance</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-3" name="Create object" sid="5219803080637372" type="System">
+                                    <param id="0" name="Object to create">ItemDrop</param>
+                                    <param id="1" name="Layer">0</param>
+                                    <param id="2" name="X">Enemy.X</param>
+                                    <param id="3" name="Y">Enemy.Y + Enemy.Height/2</param>
+                                </action>
+                                <action id="-10" name="Set value" sid="3273852121446502" type="ItemDrop">
+                                    <param id="0" name="Instance variable">name</param>
+                                    <param id="1" name="Value">Function.Call(&quot;SearchColumnFindFirstReturnColumn&quot;, Items.UID, Items.id, floor(random(16)), Items.name)</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="8870662084659333">
+                                    <conditions>
+                                        <condition id="-7" name="Compare instance variable" sid="791821154170323" type="ItemDisplay">
+                                            <param id="0" name="Instance variable">name</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Value">ItemDrop.name</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="5" name="Set frame" sid="3512789949528675" type="ItemDrop">
+                                            <param id="0" name="Frame number">ItemDisplay.AnimationFrame</param>
+                                        </action>
+                                        <action id="-10" name="Set value" sid="5305531497266098" type="ItemDrop">
+                                            <param id="0" name="Instance variable">tooltip</param>
+                                            <param id="1" name="Value">ItemDisplay.name</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="1914692060095788">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Destroy" sid="6230986629322048" type="Enemy" />
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="" sid="3316254246782986" title="Stats">
+            <sub-events>
+                <event-block sid="3505110997930475">
+                    <conditions>
+                        <condition id="0" name="On function" sid="6515556286261942" type="Function">
+                            <param id="0" name="Name">&quot;Stats.refresh&quot;</param>
+                        </condition>
+                        <condition id="-11" name="For Each" sid="3905480118878611" type="System">
+                            <param id="0" name="Object">Text</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="1452412069227793">
+                            <conditions>
+                                <condition id="-7" name="Compare instance variable" sid="4262301153007591" type="Text">
+                                    <param id="0" name="Instance variable">name</param>
+                                    <param id="1" name="Comparison">0</param>
+                                    <param id="2" name="Value">&quot;km&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Set text" sid="8287214486971408" type="Text">
+                                    <param id="0" name="Text">&quot;Total pixels traveled: &quot; &amp; newline &amp; floor(Caravan.pixels_traveled)</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="9432844798133527">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="8103821137760772" type="System" />
+                                <condition id="-7" name="Compare instance variable" sid="173523433541369" type="Text">
+                                    <param id="0" name="Instance variable">name</param>
+                                    <param id="1" name="Comparison">0</param>
+                                    <param id="2" name="Value">&quot;pxs&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Set text" sid="5103506920271223" type="Text">
+                                    <param id="0" name="Text">&quot;Px/s: &quot; &amp;newline&amp; round(Function.Call(&quot;speed_to_distance&quot;))</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="" sid="2617290113190161" title="Inventory">
+            <sub-events>
+                <event-group description="" sid="6982958822155168" title="Crafting">
+                    <sub-events>
+                        <event-group description="" sid="6999902495153121" title="Effects">
+                            <sub-events>
+                                <event-block sid="5880710546977064">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="2710732912605428" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Barks.Hero.Armadillo.decrease_cooldown&quot;</param>
+                                        </condition>
+                                        <condition id="-7" name="Compare instance variable" sid="2652497841002929" type="HeroArmadillo">
+                                            <param id="0" name="Instance variable">cooldown</param>
+                                            <param id="1" name="Comparison">4</param>
+                                            <param id="2" name="Value">0.5</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-12" name="Subtract from" sid="6425131118927842" type="HeroArmadillo">
+                                            <param id="0" name="Instance variable">cooldown</param>
+                                            <param id="1" name="Value">0.02 * Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Spawn another object" sid="7560061209848466" type="HeroArmadillo">
+                                            <param id="0" name="Object">RitualBuffPArticle</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="Image point">0</param>
+                                        </action>
+                                        <action id="4" name="Set animation" sid="2448034887120757" type="RitualBuffPArticle">
+                                            <param id="0" name="Animation">&quot;Yellow&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="7404878058104451">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="3587584664087359" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Shrooms.Hero.Armadillo.increase_speed&quot;</param>
+                                        </condition>
+                                        <condition id="-7" name="Compare instance variable" sid="7550253232010822" type="HeroArmadillo">
+                                            <param id="0" name="Instance variable">speed</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">40</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Add to" sid="2756149729581338" type="HeroArmadillo">
+                                            <param id="0" name="Instance variable">speed</param>
+                                            <param id="1" name="Value">0.05 * Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Spawn another object" sid="8349115326148699" type="HeroArmadillo">
+                                            <param id="0" name="Object">RitualBuffPArticle</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="Image point">0</param>
+                                        </action>
+                                        <action id="4" name="Set animation" sid="9898058461839857" type="RitualBuffPArticle">
+                                            <param id="0" name="Animation">&quot;Yellow&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="7176146385637154">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="5535337027789914" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Brains.Hero.Tortoise.increase_spd&quot;</param>
+                                        </condition>
+                                        <condition id="-7" name="Compare instance variable" sid="8235028313855059" type="HeroTortoise">
+                                            <param id="0" name="Instance variable">speed</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">300</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Add to" sid="7274539961454325" type="HeroTortoise">
+                                            <param id="0" name="Instance variable">speed</param>
+                                            <param id="1" name="Value">0.5 * Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Spawn another object" sid="6081058398246504" type="HeroTortoise">
+                                            <param id="0" name="Object">RitualBuffPArticle</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="Image point">3</param>
+                                        </action>
+                                        <action id="4" name="Set animation" sid="2586272426153094" type="RitualBuffPArticle">
+                                            <param id="0" name="Animation">&quot;Yellow&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="5195982442816893">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="7472632527504897" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Fruits.Hero.Tortoise.increase_attack&quot;</param>
+                                        </condition>
+                                        <condition id="-7" name="Compare instance variable" sid="1751878707432815" type="HeroTortoise">
+                                            <param id="0" name="Instance variable">damage</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">100</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Add to" sid="6046405550778328" type="HeroTortoise">
+                                            <param id="0" name="Instance variable">speed</param>
+                                            <param id="1" name="Value">1 * Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Spawn another object" sid="5788572038763226" type="HeroTortoise">
+                                            <param id="0" name="Object">RitualBuffPArticle</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="Image point">3</param>
+                                        </action>
+                                        <action id="4" name="Set animation" sid="7154313409998073" type="RitualBuffPArticle">
+                                            <param id="0" name="Animation">&quot;Yellow&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="7413375011343067">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="5776284268769369" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Herbs.Hero.Rabbit.increase_attack&quot;</param>
+                                        </condition>
+                                        <condition id="-7" name="Compare instance variable" sid="2459799497131339" type="HeroRabbit">
+                                            <param id="0" name="Instance variable">damage</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">150</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Add to" sid="2935007769941582" type="HeroRabbit">
+                                            <param id="0" name="Instance variable">damage</param>
+                                            <param id="1" name="Value">1 * Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Spawn another object" sid="9087894516158174" type="HeroRabbit">
+                                            <param id="0" name="Object">RitualBuffPArticle</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="Image point">0</param>
+                                        </action>
+                                        <action id="4" name="Set animation" sid="4891409697321725" type="RitualBuffPArticle">
+                                            <param id="0" name="Animation">&quot;Yellow&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="6435393626799898">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="4226276747473134" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Roots.Hero.Rabbit.increase_range&quot;</param>
+                                        </condition>
+                                        <condition id="-7" name="Compare instance variable" sid="507012118017363" type="HeroRabbit">
+                                            <param id="0" name="Instance variable">range</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">600</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Add to" sid="8199886502360459" type="HeroRabbit">
+                                            <param id="0" name="Instance variable">range</param>
+                                            <param id="1" name="Value">2 * Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Spawn another object" sid="1572871524321917" type="HeroRabbit">
+                                            <param id="0" name="Object">RitualBuffPArticle</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="Image point">0</param>
+                                        </action>
+                                        <action id="4" name="Set animation" sid="6331161679871841" type="RitualBuffPArticle">
+                                            <param id="0" name="Animation">&quot;Yellow&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="168563583760392">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="8575554233529815" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Chitins.Hero.Mantis.increase_attack&quot;</param>
+                                        </condition>
+                                        <condition id="-7" name="Compare instance variable" sid="9765303173227981" type="HeroMantis">
+                                            <param id="0" name="Instance variable">damage</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">120</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Add to" sid="783857094043389" type="HeroMantis">
+                                            <param id="0" name="Instance variable">damage</param>
+                                            <param id="1" name="Value">1 * Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Spawn another object" sid="2688134739902008" type="HeroMantis">
+                                            <param id="0" name="Object">RitualBuffPArticle</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="Image point">0</param>
+                                        </action>
+                                        <action id="4" name="Set animation" sid="4131536140137267" type="RitualBuffPArticle">
+                                            <param id="0" name="Animation">&quot;Yellow&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="3132447451717205">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="999204129346003" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Wings.Hero.Mantis.increase_aspd&quot;&#x0D;&#x0A;</param>
+                                        </condition>
+                                        <condition id="-7" name="Compare instance variable" sid="2589530150655121" type="HeroMantis">
+                                            <param id="0" name="Instance variable">aspd</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">10</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Add to" sid="6253744689157155" type="HeroMantis">
+                                            <param id="0" name="Instance variable">aspd</param>
+                                            <param id="1" name="Value">0.1 * Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Spawn another object" sid="8770125499412605" type="HeroMantis">
+                                            <param id="0" name="Object">RitualBuffPArticle</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="Image point">0</param>
+                                        </action>
+                                        <action id="4" name="Set animation" sid="2986841572818983" type="RitualBuffPArticle">
+                                            <param id="0" name="Animation">&quot;Yellow&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="7934477798298832">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="5577221311408627" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Blood.Enemy.increase_spawntime&quot;</param>
+                                        </condition>
+                                        <condition id="-14" name="Compare variable" sid="7456463378963048" type="System">
+                                            <param id="0" name="Variable">enemy_spawn_timer</param>
+                                            <param id="1" name="Comparison">4</param>
+                                            <param id="2" name="Value">1</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Subtract from" sid="6439148663570985" type="System">
+                                            <param id="0" name="Variable">enemy_spawn_timer</param>
+                                            <param id="1" name="Value">0.1 * Function.Param(0)</param>
+                                        </action>
+                                    </actions>
+                                    <sub-events>
+                                        <event-block sid="7334480900135305">
+                                            <conditions>
+                                                <condition id="-11" name="For Each" sid="1536871576869588" type="System">
+                                                    <param id="0" name="Object">Enemy</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="0" name="Spawn another object" sid="2564605541831997" type="Enemy">
+                                                    <param id="0" name="Object">RitualBuffPArticle</param>
+                                                    <param id="1" name="Layer">2</param>
+                                                    <param id="2" name="Image point">0</param>
+                                                </action>
+                                                <action id="4" name="Set animation" sid="1908851664222" type="RitualBuffPArticle">
+                                                    <param id="0" name="Animation">&quot;Red&quot;</param>
+                                                    <param id="1" name="From">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="9545210033287784">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="3296987749198724" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Bones.Enemy.decrease_attack&quot;</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Subtract from" sid="6276292516433009" type="System">
+                                            <param id="0" name="Variable">enemy_atk</param>
+                                            <param id="1" name="Value">0.3 * Function.Param(0)</param>
+                                        </action>
+                                    </actions>
+                                    <sub-events>
+                                        <event-block sid="9432625571514131">
+                                            <conditions>
+                                                <condition id="-11" name="For Each" sid="403001378881172" type="System">
+                                                    <param id="0" name="Object">Enemy</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="0" name="Spawn another object" sid="7039367026047014" type="Enemy">
+                                                    <param id="0" name="Object">RitualBuffPArticle</param>
+                                                    <param id="1" name="Layer">2</param>
+                                                    <param id="2" name="Image point">0</param>
+                                                </action>
+                                                <action id="4" name="Set animation" sid="4414415753832422" type="RitualBuffPArticle">
+                                                    <param id="0" name="Animation">&quot;Red&quot;</param>
+                                                    <param id="1" name="From">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="1367972137299928">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="6511267179819" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Eyes.Enemy.decrease_hp&quot;</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Subtract from" sid="3124130304295397" type="System">
+                                            <param id="0" name="Variable">enemy_max_hp</param>
+                                            <param id="1" name="Value">5 * Function.Param(0)</param>
+                                        </action>
+                                    </actions>
+                                    <sub-events>
+                                        <event-block sid="2821760197947422">
+                                            <conditions>
+                                                <condition id="-11" name="For Each" sid="8216406838756485" type="System">
+                                                    <param id="0" name="Object">Enemy</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="0" name="Spawn another object" sid="928374441631633" type="Enemy">
+                                                    <param id="0" name="Object">RitualBuffPArticle</param>
+                                                    <param id="1" name="Layer">2</param>
+                                                    <param id="2" name="Image point">0</param>
+                                                </action>
+                                                <action id="4" name="Set animation" sid="7162576703897572" type="RitualBuffPArticle">
+                                                    <param id="0" name="Animation">&quot;Red&quot;</param>
+                                                    <param id="1" name="From">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="6237402972125934">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="1753311167191489" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Tongues.Enemy.increase_droprate&quot;</param>
+                                        </condition>
+                                        <condition id="-14" name="Compare variable" sid="1316395840427559" type="System">
+                                            <param id="0" name="Variable">enemy_droprate</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">80</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-10" name="Add to" sid="8866940876155757" type="System">
+                                            <param id="0" name="Variable">enemy_droprate</param>
+                                            <param id="1" name="Value">0.05 * Function.Param(0)</param>
+                                        </action>
+                                    </actions>
+                                    <sub-events>
+                                        <event-block sid="6132747461485046">
+                                            <conditions>
+                                                <condition id="-11" name="For Each" sid="4544244865828481" type="System">
+                                                    <param id="0" name="Object">Enemy</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="0" name="Spawn another object" sid="9196785316620074" type="Enemy">
+                                                    <param id="0" name="Object">RitualBuffPArticle</param>
+                                                    <param id="1" name="Layer">2</param>
+                                                    <param id="2" name="Image point">0</param>
+                                                </action>
+                                                <action id="4" name="Set animation" sid="8754523863344112" type="RitualBuffPArticle">
+                                                    <param id="0" name="Animation">&quot;Red&quot;</param>
+                                                    <param id="1" name="From">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="9542187609386631">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="3954407102274717" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Branches.Caravan.increase_hp&quot;&#x0D;&#x0A;</param>
+                                        </condition>
+                                        <condition id="-7" name="Compare instance variable" sid="2970671172201743" type="Caravan">
+                                            <param id="0" name="Instance variable">max_hp</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">500</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Add to" sid="4577774562873742" type="Caravan">
+                                            <param id="0" name="Instance variable">max_hp</param>
+                                            <param id="1" name="Value">2 * Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Spawn another object" sid="6020334168075456" type="Caravan">
+                                            <param id="0" name="Object">RitualBuffPArticle</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="Image point">0</param>
+                                        </action>
+                                        <action id="4" name="Set animation" sid="328295423279862" type="RitualBuffPArticle">
+                                            <param id="0" name="Animation">&quot;Blue&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="6676600421454791">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="6449703162159516" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Fur.Caravan.increase_hpregen&quot;</param>
+                                        </condition>
+                                        <condition id="-7" name="Compare instance variable" sid="7116561466624641" type="Caravan">
+                                            <param id="0" name="Instance variable">hp_regen</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">30</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Add to" sid="3369043130485647" type="Caravan">
+                                            <param id="0" name="Instance variable">hp_regen</param>
+                                            <param id="1" name="Value">0.25 * Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Spawn another object" sid="5325998609098445" type="Caravan">
+                                            <param id="0" name="Object">RitualBuffPArticle</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="Image point">0</param>
+                                        </action>
+                                        <action id="4" name="Set animation" sid="7399236013635426" type="RitualBuffPArticle">
+                                            <param id="0" name="Animation">&quot;Blue&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="8966109391899859">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="9679208748911441" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Honey.All.increase_attack&quot;</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="0" name="Call function" sid="9653371427016639" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Fruits.Hero.Tortoise.increase_attack&quot;</param>
+                                            <param id="1" name="Parameter {n}">Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Call function" sid="5593898956840903" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Herbs.Hero.Rabbit.increase_attack&quot;</param>
+                                            <param id="1" name="Parameter {n}">Function.Param(0)</param>
+                                        </action>
+                                        <action id="0" name="Call function" sid="6483708681541708" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Chitins.Hero.Mantis.increase_attack&quot;</param>
+                                            <param id="1" name="Parameter {n}">Function.Param(0)</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="2685051864161452">
+                                    <conditions>
+                                        <condition id="0" name="On function" sid="7463043195945164" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.Crafting.Flowers.All.increase_knockback&quot;</param>
+                                        </condition>
+                                        <condition id="-14" name="Compare variable" sid="5974866040021536" type="System">
+                                            <param id="0" name="Variable">knockback</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Value">200</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-11" name="Subtract from" sid="2123277232103479" type="System">
+                                            <param id="0" name="Variable">knockback</param>
+                                            <param id="1" name="Value">1 * Function.Param(0)</param>
+                                        </action>
+                                    </actions>
+                                    <sub-events>
+                                        <event-block sid="3038667692331219">
+                                            <conditions>
+                                                <condition id="-11" name="For Each" sid="3489896332342024" type="System">
+                                                    <param id="0" name="Object">Enemy</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="0" name="Spawn another object" sid="3945074905622699" type="Enemy">
+                                                    <param id="0" name="Object">RitualBuffPArticle</param>
+                                                    <param id="1" name="Layer">2</param>
+                                                    <param id="2" name="Image point">0</param>
+                                                </action>
+                                                <action id="4" name="Set animation" sid="6781713722019004" type="RitualBuffPArticle">
+                                                    <param id="0" name="Animation">&quot;Red&quot;</param>
+                                                    <param id="1" name="From">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="6009980709133212">
+                                    <conditions>
+                                        <condition id="5" name="On any finished" sid="1552493350451488" type="RitualBuffPArticle" />
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Destroy" sid="978764227271852" type="RitualBuffPArticle" />
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-group>
+                        <event-block sid="4977026823300157">
+                            <conditions>
+                                <condition id="0" name="On function" sid="149385588683467" type="Function">
+                                    <param id="0" name="Name">&quot;Inventory.Crafting.craft&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <variable constant="0" name="multiplier" sid="9055587115531773" static="0" type="number">1</variable>
+                                <event-block sid="2084017461104469">
+                                    <conditions>
+                                        <condition id="-8" name="Compare two values" sid="3848581070211446" type="System">
+                                            <param id="0" name="First value">Function.Call(&quot;SearchColumnFindFirstReturnColumn&quot;, Items.UID, Items.name, Function.Param(0), Items.affinity)</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Second value">Function.Param(1)</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="9089453532606473" type="System">
+                                            <param id="0" name="Variable">multiplier</param>
+                                            <param id="1" name="Value">2</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="4977114183883891">
+                                    <conditions>
+                                        <condition id="-8" name="Compare two values" sid="3191427703148771" type="System">
+                                            <param id="0" name="First value">Function.Call(&quot;SearchColumnFindFirstReturnColumn&quot;, Items.UID, Items.name, Function.Param(0), Items.badmix)</param>
+                                            <param id="1" name="Comparison">0</param>
+                                            <param id="2" name="Second value">Function.Param(1)</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-9" name="Set value" sid="6719727338677862" type="System">
+                                            <param id="0" name="Variable">multiplier</param>
+                                            <param id="1" name="Value">0.5</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="7649798396675461">
+                                    <conditions />
+                                    <actions>
+                                        <action id="1" name="Set key" sid="6370397777258468" type="ItemsQuantity">
+                                            <param id="0" name="Key">Function.Param(0)</param>
+                                            <param id="1" name="Value">int(ItemsQuantity.Get(Function.Param(0))) - 1</param>
+                                        </action>
+                                        <action id="1" name="Set key" sid="2533183431440006" type="ItemsQuantity">
+                                            <param id="0" name="Key">Function.Param(1)</param>
+                                            <param id="1" name="Value">int(ItemsQuantity.Get(Function.Param(1))) - 1</param>
+                                        </action>
+                                        <action id="0" name="Call function" sid="8314645819317374" type="Function">
+                                            <param id="0" name="Name">Function.Call(&quot;SearchColumnFindFirstReturnColumn&quot;, Items.UID, Items.name, Function.Param(0), Items.Function)</param>
+                                            <param id="1" name="Parameter {n}">multiplier</param>
+                                        </action>
+                                        <action id="0" name="Call function" sid="2204662754878503" type="Function">
+                                            <param id="0" name="Name">Function.Call(&quot;SearchColumnFindFirstReturnColumn&quot;, Items.UID, Items.name, Function.Param(1), Items.Function)</param>
+                                            <param id="1" name="Parameter {n}">multiplier</param>
+                                        </action>
+                                        <action id="0" name="Call function" sid="5159802367341236" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.refresh_display&quot;</param>
+                                            <param id="1" name="Parameter {n}"></param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-group>
+                <event-block sid="3210793912424968">
+                    <conditions>
+                        <condition id="0" name="On function" sid="4827058630978989" type="Function">
+                            <param id="0" name="Name">&quot;Inventory.create&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="1" name="Request project file" sid="8476755156439004" type="AJAX">
+                            <param id="0" name="Tag">&quot;Inv&quot;</param>
+                            <param id="1" name="File">inv.json</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="7644070343077277">
+                    <conditions>
+                        <condition id="0" name="On completed" sid="8743635861710952" type="AJAX">
+                            <param id="0" name="Tag">&quot;Inv&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="4" name="Load" sid="6604699505667271" type="ItemsQuantity">
+                            <param id="0" name="JSON">AJAX.LastData</param>
+                        </action>
+                        <action id="0" name="Call function" sid="5366282310992568" type="Function">
+                            <param id="0" name="Name">&quot;Inventory.refresh_display&quot;</param>
+                            <param id="1" name="Parameter {n}"></param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="5127869808371948">
+                    <conditions>
+                        <condition id="0" name="On function" sid="2069576234088428" type="Function">
+                            <param id="0" name="Name">&quot;Inventory.refresh_display&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-9" name="Destroy" sid="9770010913739383" type="Ammount" />
+                    </actions>
+                    <sub-events>
+                        <event-block sid="7877329816951633">
+                            <conditions>
+                                <condition id="-11" name="For Each" sid="9118327120453127" type="System">
+                                    <param id="0" name="Object">ItemDisplay</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-3" name="Create object" sid="4590970656857379" type="System">
+                                    <param id="0" name="Object to create">Ammount</param>
+                                    <param id="1" name="Layer">LayerIndex(&quot;tab_inv&quot;)</param>
+                                    <param id="2" name="X">ItemDisplay.X</param>
+                                    <param id="3" name="Y">ItemDisplay.Y</param>
+                                </action>
+                                <action id="0" name="Set text" sid="9948071518324781" type="Ammount">
+                                    <param id="0" name="Text">ItemsQuantity.Get(ItemDisplay.name)</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="2813825707183149">
+                    <conditions>
+                        <condition id="6" name="On object clicked" sid="8601093924630676" type="Mouse">
+                            <param id="0" name="Mouse button">0</param>
+                            <param id="1" name="Click type">0</param>
+                            <param id="2" name="Object clicked">ItemDisplay</param>
+                        </condition>
+                        <condition id="0" name="Compare value" sid="5113187304984396" type="ItemsQuantity">
+                            <param id="0" name="Key">ItemDisplay.name</param>
+                            <param id="1" name="Comparison">4</param>
+                            <param id="2" name="Value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-4" name="Set position to another object" sid="2519685222701711" type="ItemSelected">
+                            <param id="0" name="Object">ItemDisplay</param>
+                            <param id="1" name="Image point (optional)">0</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <variable constant="0" name="clicked_name" sid="9860113315185938" static="0" type="text"></variable>
+                        <variable constant="0" name="clicked_uid" sid="7814157189965664" static="0" type="text"></variable>
+                        <event-block sid="4642246510471201">
+                            <conditions />
+                            <actions>
+                                <action id="-9" name="Set value" sid="5784573183442976" type="System">
+                                    <param id="0" name="Variable">clicked_name</param>
+                                    <param id="1" name="Value">ItemDisplay.name</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="3329903774970515" type="System">
+                                    <param id="0" name="Variable">clicked_uid</param>
+                                    <param id="1" name="Value">ItemDisplay.UID</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="6194414038854404">
+                            <conditions>
+                                <condition id="2" name="Is playing" sid="7408330864088833" type="Caravan">
+                                    <param id="0" name="Animation">&quot;Idle&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="4" name="Set animation" sid="3707946745224309" type="Caravan">
+                                    <param id="0" name="Animation">&quot;Crafting&quot;</param>
+                                    <param id="1" name="From">1</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="8807145189243783">
+                            <conditions>
+                                <condition id="-19" name="Pick all" sid="5131037589329028" type="System">
+                                    <param id="0" name="Object">ItemDisplay</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <event-block sid="797249413026975">
+                                    <conditions>
+                                        <condition id="-8" name="Is boolean instance variable set" sid="5186049817634932" type="ItemDisplay">
+                                            <param id="0" name="Instance variable">selected</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="8761653745008594">
+                                            <conditions>
+                                                <condition id="-8" name="Compare two values" sid="5449860405718016" type="System">
+                                                    <param id="0" name="First value">clicked_name</param>
+                                                    <param id="1" name="Comparison">1</param>
+                                                    <param id="2" name="Second value">ItemDisplay.name</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="0" name="Call function" sid="6489324144985296" type="Function">
+                                                    <param id="0" name="Name">&quot;Inventory.Crafting.craft&quot;</param>
+                                                    <param id="1" name="Parameter {n}">clicked_name{###}ItemDisplay.name</param>
+                                                </action>
+                                                <action id="4" name="Set animation" sid="3186717559337572" type="Caravan">
+                                                    <param id="0" name="Animation">&quot;Crafted&quot;</param>
+                                                    <param id="1" name="From">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <event-block sid="8118543503586952">
+                                            <conditions>
+                                                <condition id="-19" name="Pick all" sid="6604027055583704" type="System">
+                                                    <param id="0" name="Object">ItemDisplay</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="-13" name="Set boolean" sid="4652436229419676" type="ItemDisplay">
+                                                    <param id="0" name="Instance variable">selected</param>
+                                                    <param id="1" name="Value">0</param>
+                                                </action>
+                                                <action id="-3" name="Set position" sid="4617486775399328" type="ItemSelected">
+                                                    <param id="0" name="X">-100</param>
+                                                    <param id="1" name="Y">-100</param>
+                                                </action>
+                                            </actions>
+                                            <sub-events>
+                                                <event-block sid="8448212523837067">
+                                                    <conditions>
+                                                        <condition id="2" name="Is playing" sid="9521091537625866" type="Caravan">
+                                                            <param id="0" name="Animation">&quot;Crafting&quot;</param>
+                                                        </condition>
+                                                    </conditions>
+                                                    <actions>
+                                                        <action id="4" name="Set animation" sid="5959741373710099" type="Caravan">
+                                                            <param id="0" name="Animation">&quot;Idle&quot;</param>
+                                                            <param id="1" name="From">1</param>
+                                                        </action>
+                                                    </actions>
+                                                </event-block>
+                                            </sub-events>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="7202184137583269">
+                                    <conditions>
+                                        <condition id="-22" name="Else" sid="5277721389591797" type="System" />
+                                        <condition id="-14" name="Pick by unique ID" sid="6683527648271991" type="ItemDisplay">
+                                            <param id="0" name="Unique ID">clicked_uid</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-13" name="Set boolean" sid="369549524570025" type="ItemDisplay">
+                                            <param id="0" name="Instance variable">selected</param>
+                                            <param id="1" name="Value">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="9422312756590667">
+                    <conditions>
+                        <condition id="4" name="On finished" sid="7576638621032974" type="Caravan">
+                            <param id="0" name="Animation">&quot;Crafted&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="4" name="Set animation" sid="6540098991174123" type="Caravan">
+                            <param id="0" name="Animation">&quot;Idle&quot;</param>
+                            <param id="1" name="From">1</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-group description="" sid="1466266181870681" title="Item">
+                    <sub-events>
+                        <event-block sid="2669273779806199">
+                            <conditions>
+                                <condition id="0" name="On function" sid="7485963407650098" type="Function">
+                                    <param id="0" name="Name">&quot;Inventory.Item.create&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="1" name="Request project file" sid="4678373708361104" type="AJAX">
+                                    <param id="0" name="Tag">&quot;Items&quot;</param>
+                                    <param id="1" name="File">items.json</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="2716118291663805">
+                            <conditions>
+                                <condition id="0" name="On completed" sid="7646567386471108" type="AJAX">
+                                    <param id="0" name="Tag">&quot;Items&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="11" name="Load" sid="844539470038679" type="Items">
+                                    <param id="0" name="JSON">AJAX.LastData</param>
+                                </action>
+                                <action id="0" name="Call function" sid="3183883843555651" type="Function">
+                                    <param id="0" name="Name">&quot;Inventory.Item.display&quot;</param>
+                                    <param id="1" name="Parameter {n}"></param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="1101108175215388">
+                            <conditions>
+                                <condition id="0" name="On function" sid="2415130643297867" type="Function">
+                                    <param id="0" name="Name">&quot;Inventory.Item.display&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <event-block sid="313225483469152">
+                                    <conditions>
+                                        <condition id="-11" name="For Each" sid="231917606577166" type="System">
+                                            <param id="0" name="Object">ItemDisplay</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-10" name="Set value" sid="3810072576910216" type="ItemDisplay">
+                                            <param id="0" name="Instance variable">name</param>
+                                            <param id="1" name="Value">Function.Call(&quot;SearchColumnFindFirstReturnColumn&quot;, Items.UID, Items.id, ItemDisplay.id, Items.name)</param>
+                                        </action>
+                                        <action id="-10" name="Set value" sid="2070039653489448" type="ItemDisplay">
+                                            <param id="0" name="Instance variable">tooltip</param>
+                                            <param id="1" name="Value">&quot;Crafting Item:&quot; &amp; newline &amp; Self.name</param>
+                                        </action>
+                                        <action id="5" name="Set frame" sid="6229135232422365" type="ItemDisplay">
+                                            <param id="0" name="Frame number">ItemDisplay.id</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-group>
+            </sub-events>
+        </event-group>
+        <event-group description="" sid="3050251021645104" title="Tooltip">
+            <sub-events>
+                <event-block sid="1112736900775064">
+                    <conditions>
+                        <condition id="0" name="On function" sid="596755878447001" type="Function">
+                            <param id="0" name="Name">&quot;Tooltip.update&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-10" name="Set value" sid="7094350578878236" type="HeroRabbit">
+                            <param id="0" name="Instance variable">tooltip</param>
+                            <param id="1" name="Value">&quot;Oswald the Ranger Rabbit:&quot; &amp; newline &amp; &quot;Damage: &quot; &amp; HeroRabbit.damage &amp; newline &amp; &quot;Range: &quot; &amp; HeroRabbit.range &amp; &quot; pixels&quot;</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="8619287568998405" type="HeroMantis">
+                            <param id="0" name="Instance variable">tooltip</param>
+                            <param id="1" name="Value">&quot;Jay the Mighty Mantis:&quot; &amp; newline &amp; &quot;Damage: &quot; &amp; HeroMantis.damage &amp; newline &amp; &quot;Attack Speed: &quot; &amp; HeroMantis.aspd &amp; &quot; attacks/s&quot;</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="5531013934903795" type="HeroTortoise">
+                            <param id="0" name="Instance variable">tooltip</param>
+                            <param id="1" name="Value">&quot;Memphis the Tortoise:&quot; &amp; newline &amp; &quot;Damage: &quot; &amp; HeroTortoise.damage &amp; newline &amp; &quot;Speed: &quot; &amp; HeroTortoise.speed</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="3406876190189685" type="Caravan">
+                            <param id="0" name="Instance variable">tooltip</param>
+                            <param id="1" name="Value">&quot;Necromancer&apos;s Caravan:&quot; &amp; newline &amp; &quot;Hp: &quot; &amp; Caravan.hp &amp; &quot;/&quot; &amp; Caravan.max_hp</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="9334502290002423" type="HeroArmadillo">
+                            <param id="0" name="Instance variable">tooltip</param>
+                            <param id="1" name="Value">&quot;Lilo the Armadillo: &quot; &amp; newline &amp; &quot;Speed: &quot; &amp; HeroArmadillo.speed &amp; newline &amp; &quot;Dig Time: &quot; &amp; HeroArmadillo.cooldown &amp; &quot;s&quot;</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="531534546213701">
+                            <conditions />
+                            <actions>
+                                <action id="-6" name="Set height" sid="2604916116176467" type="Tooltip">
+                                    <param id="0" name="Height">16 + tokencount(Tooltip.Text, newline) * 16</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="3566796546205561">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="9798747901675777" type="System" />
+                            </conditions>
+                            <actions />
+                        </event-block>
+                        <event-block sid="8239268202361257">
+                            <conditions>
+                                <condition id="2" name="Mouse button is down" sid="2085709057366372" type="Mouse">
+                                    <param id="0" name="Mouse button">0</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-13" name="Set boolean" sid="2288251589213656" type="Tooltip">
+                                    <param id="0" name="Instance variable">fixed</param>
+                                    <param id="1" name="Value">1</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="4835796594495592">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="4174601980069927" type="System" />
+                            </conditions>
+                            <actions>
+                                <action id="-13" name="Set boolean" sid="5455976724222426" type="Tooltip">
+                                    <param id="0" name="Instance variable">fixed</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="7649627807804324">
+                    <conditions>
+                        <condition id="0" name="On function" sid="8379921543452274" type="Function">
+                            <param id="0" name="Name">&quot;Tooltip.refresh&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="7879117752902938">
+                            <conditions>
+                                <condition id="-8" name="Is boolean instance variable set" sid="4039681554892137" type="Tooltip">
+                                    <param id="0" name="Instance variable">fixed</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-3" name="Set position" sid="176754900631759" type="Tooltip">
+                                    <param id="0" name="X">Mouse.X</param>
+                                    <param id="1" name="Y">Mouse.Y</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="8446435892047612">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="4663054808002365" type="System" />
+                                <condition id="7" name="Cursor is over object" sid="1733025375031805" type="Mouse">
+                                    <param id="0" name="Object">TooltipedObject</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Call function" sid="862006058657067" type="Function">
+                                    <param id="0" name="Name">&quot;Tooltip.set_text&quot;</param>
+                                    <param id="1" name="Parameter {n}">TooltipedObject.tooltip</param>
+                                </action>
+                                <action id="-3" name="Set position" sid="6544568463502853" type="Tooltip">
+                                    <param id="0" name="X">Mouse.X</param>
+                                    <param id="1" name="Y">Mouse.Y</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="1908142262572923">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="2848185459648799" type="System" />
+                                <condition id="-1" name="Compare X" sid="5198642128072075" type="Tooltip">
+                                    <param id="0" name="Comparison">1</param>
+                                    <param id="1" name="X co-ordinate">-1000</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-3" name="Set position" sid="4183851318346002" type="Tooltip">
+                                    <param id="0" name="X">-1000</param>
+                                    <param id="1" name="Y">-500</param>
+                                </action>
+                                <action id="-13" name="Set boolean" sid="8594002425870615" type="TooltipedObject">
+                                    <param id="0" name="Instance variable">already_displayed</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="6054049188915072">
+                    <conditions>
+                        <condition id="0" name="On function" sid="9134121829528137" type="Function">
+                            <param id="0" name="Name">&quot;Tooltip.set_text&quot;</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="0" name="Set text" sid="8341557010210217" type="Tooltip">
+                            <param id="0" name="Text">Function.Param(0)</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="9175486107899559">
+                            <conditions />
+                            <actions>
+                                <action id="-6" name="Set height" sid="6986740681140827" type="Tooltip">
+                                    <param id="0" name="Height">16 + tokencount(Tooltip.Text, newline) * 16</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="" sid="1833635329058303" title="Hero">
+            <sub-events>
+                <event-group description="" sid="6176582236157027" title="Armadillo">
+                    <sub-events>
+                        <event-block sid="7783369128991978">
+                            <conditions>
+                                <condition id="0" name="On function" sid="1887230158366513" type="Function">
+                                    <param id="0" name="Name">&quot;Hero.Armadillo.update&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="6" name="Set speed" sid="8162413285222236" type="HeroArmadillo">
+                                    <param id="0" name="Speed">HeroArmadillo.speed</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="1752902410255428">
+                                    <conditions>
+                                        <condition id="2" name="Is playing" sid="5537452429689815" type="HeroArmadillo">
+                                            <param id="0" name="Animation">&quot;Idle&quot;</param>
+                                        </condition>
+                                        <condition id="1" name="Is overlapping another object" sid="3417954359795821" type="ItemDrop">
+                                            <param id="0" name="Object">CameraFov</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="4" name="Set animation" sid="8823572651249985" type="HeroArmadillo">
+                                            <param id="0" name="Animation">&quot;GoGrab&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                        <action id="-10" name="Set value" sid="7184389735328899" type="HeroArmadillo">
+                                            <param id="0" name="Instance variable">targetUID</param>
+                                            <param id="1" name="Value">ItemDrop.UID</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="95117049757244">
+                            <conditions>
+                                <condition id="4" name="On finished" sid="1845910655481305" type="HeroArmadillo">
+                                    <param id="0" name="Animation">&quot;GoGrab&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-15" name="Set visible" sid="2190369923324084" type="HeroArmadillo">
+                                    <param id="0" name="Visibility">0</param>
+                                </action>
+                                <action id="-16" name="Wait" sid="5926261938958913" type="System">
+                                    <param id="0" name="Seconds">HeroArmadillo.cooldown</param>
+                                </action>
+                                <action id="-15" name="Set visible" sid="3335586180511852" type="HeroArmadillo">
+                                    <param id="0" name="Visibility">1</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="478778933211392">
+                                    <conditions>
+                                        <condition id="-14" name="Pick by unique ID" sid="2868119385584951" type="ItemDrop">
+                                            <param id="0" name="Unique ID">HeroArmadillo.targetUID</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="4" name="Set animation" sid="6947995954857222" type="HeroArmadillo">
+                                            <param id="0" name="Animation">&quot;Grabbing&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                        <action id="-3" name="Set position" sid="874667310280035" type="HeroArmadillo">
+                                            <param id="0" name="X">ItemDrop.X</param>
+                                            <param id="1" name="Y">ItemDrop.Y</param>
+                                        </action>
+                                        <action id="1" name="Set key" sid="968003295600653" type="ItemsQuantity">
+                                            <param id="0" name="Key">ItemDrop.name</param>
+                                            <param id="1" name="Value">int(ItemsQuantity.Get(ItemDrop.name)) + 1</param>
+                                        </action>
+                                        <action id="0" name="Call function" sid="2024078456364904" type="Function">
+                                            <param id="0" name="Name">&quot;Inventory.refresh_display&quot;</param>
+                                            <param id="1" name="Parameter {n}"></param>
+                                        </action>
+                                        <action id="-9" name="Destroy" sid="6476661165048449" type="ItemDrop" />
+                                    </actions>
+                                </event-block>
+                                <event-block sid="1929573657744319">
+                                    <conditions>
+                                        <condition id="-22" name="Else" sid="6563252765952617" type="System" />
+                                    </conditions>
+                                    <actions>
+                                        <action id="-3" name="Set position" sid="7365835287282188" type="HeroArmadillo">
+                                            <param id="0" name="X">1235</param>
+                                            <param id="1" name="Y">479</param>
+                                        </action>
+                                        <action id="4" name="Set animation" sid="9413959977016031" type="HeroArmadillo">
+                                            <param id="0" name="Animation">&quot;CommingBack&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="481642907612665">
+                            <conditions>
+                                <condition id="4" name="On finished" sid="651134987641868" type="HeroArmadillo">
+                                    <param id="0" name="Animation">&quot;Grabbing&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-3" name="Set position" sid="2311372569661981" type="HeroArmadillo">
+                                    <param id="0" name="X">1235</param>
+                                    <param id="1" name="Y">479</param>
+                                </action>
+                                <action id="4" name="Set animation" sid="4488476685366794" type="HeroArmadillo">
+                                    <param id="0" name="Animation">&quot;CommingBack&quot;</param>
+                                    <param id="1" name="From">1</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="6889106157895012">
+                            <conditions>
+                                <condition id="4" name="On finished" sid="7432883634877002" type="HeroArmadillo">
+                                    <param id="0" name="Animation">&quot;CommingBack&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="4" name="Set animation" sid="1417123790468284" type="HeroArmadillo">
+                                    <param id="0" name="Animation">&quot;Idle&quot;</param>
+                                    <param id="1" name="From">1</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-group>
+                <event-group description="" sid="3296142620143921" title="Rabbit">
+                    <sub-events>
+                        <event-block sid="5806524061920069">
+                            <conditions>
+                                <condition id="4" name="On finished" sid="3243628700096617" type="HeroRabbit">
+                                    <param id="0" name="Animation">&quot;Attack&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                            <sub-events>
+                                <event-block sid="690888392774327">
+                                    <conditions>
+                                        <condition id="-15" name="Pick nearest/furthest" sid="4797346329011919" type="Enemy">
+                                            <param id="0" name="Which">0</param>
+                                            <param id="1" name="X">HeroRabbit.X</param>
+                                            <param id="2" name="Y">HeroRabbit.Y</param>
+                                        </condition>
+                                        <condition id="-8" name="Compare two values" sid="6505443717772365" type="System">
+                                            <param id="0" name="First value">distance(HeroRabbit.X, HeroRabbit.Y, Enemy.X, Enemy.Y)</param>
+                                            <param id="1" name="Comparison">2</param>
+                                            <param id="2" name="Second value">HeroRabbit.range</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="-3" name="Create object" sid="2938951190292318" type="System">
+                                            <param id="0" name="Object to create">HeroRabbitAtk</param>
+                                            <param id="1" name="Layer">2</param>
+                                            <param id="2" name="X">HeroRabbit.ImagePointX(&quot;attack&quot;)</param>
+                                            <param id="3" name="Y">HeroRabbit.ImagePointY(&quot;attack&quot;)</param>
+                                        </action>
+                                        <action id="-8" name="Set angle" sid="8947826455114081" type="HeroRabbitAtk">
+                                            <param id="0" name="Angle">angle(HeroRabbit.ImagePointX(&quot;attack&quot;), HeroRabbit.ImagePointY(&quot;attack&quot;),Enemy.X,Enemy.Y)</param>
+                                        </action>
+                                        <action id="-10" name="Set value" sid="1052518776610391" type="HeroRabbitAtk">
+                                            <param id="0" name="Instance variable">damage</param>
+                                            <param id="1" name="Value">HeroRabbit.damage</param>
+                                        </action>
+                                    </actions>
+                                    <sub-events>
+                                        <event-block sid="8496206808007802">
+                                            <conditions>
+                                                <condition id="-1" name="Compare X" sid="9296033110508671" type="HeroRabbit">
+                                                    <param id="0" name="Comparison">2</param>
+                                                    <param id="1" name="X co-ordinate">Enemy.X</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="7" name="Set mirrored" sid="8323544871405669" type="HeroRabbit">
+                                                    <param id="0" name="State">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <event-block sid="2014063389626923">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="5999260689932974" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="7" name="Set mirrored" sid="9950698045772787" type="HeroRabbit">
+                                                    <param id="0" name="State">0</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="2695448556397049">
+                                    <conditions />
+                                    <actions>
+                                        <action id="4" name="Set animation" sid="6244729858550345" type="HeroRabbit">
+                                            <param id="0" name="Animation">&quot;Idle&quot;</param>
+                                            <param id="1" name="From">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="8658707740918049">
+                            <conditions>
+                                <condition id="0" name="On function" sid="8259377204353658" type="Function">
+                                    <param id="0" name="Name">&quot;Hero.Rabbit.try_attack&quot;</param>
+                                </condition>
+                                <condition id="2" name="Is playing" sid="8928563843266645" type="HeroRabbit">
+                                    <param id="0" name="Animation">&quot;Idle&quot;</param>
+                                </condition>
+                                <condition id="-15" name="Pick nearest/furthest" sid="7126426657900438" type="Enemy">
+                                    <param id="0" name="Which">0</param>
+                                    <param id="1" name="X">HeroRabbit.X</param>
+                                    <param id="2" name="Y">HeroRabbit.Y</param>
+                                </condition>
+                                <condition id="-8" name="Compare two values" sid="9769079647235372" type="System">
+                                    <param id="0" name="First value">distance(HeroRabbit.X, HeroRabbit.Y, Enemy.X, Enemy.Y)</param>
+                                    <param id="1" name="Comparison">2</param>
+                                    <param id="2" name="Second value">HeroRabbit.range</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="4" name="Set animation" sid="870475697347946" type="HeroRabbit">
+                                    <param id="0" name="Animation">&quot;Attack&quot;</param>
+                                    <param id="1" name="From">1</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="9422924707304885">
+                                    <conditions>
+                                        <condition id="-1" name="Compare X" sid="1158535620632993" type="HeroRabbit">
+                                            <param id="0" name="Comparison">2</param>
+                                            <param id="1" name="X co-ordinate">Enemy.X</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions>
+                                        <action id="7" name="Set mirrored" sid="5078270811513087" type="HeroRabbit">
+                                            <param id="0" name="State">1</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                                <event-block sid="5323258619241962">
+                                    <conditions>
+                                        <condition id="-22" name="Else" sid="5840922376626325" type="System" />
+                                    </conditions>
+                                    <actions>
+                                        <action id="7" name="Set mirrored" sid="9130712483308112" type="HeroRabbit">
+                                            <param id="0" name="State">0</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-group>
+                <event-group description="" sid="8873477801471734" title="Tortoise">
+                    <sub-events>
+                        <event-block sid="7029786380234665">
+                            <conditions>
+                                <condition id="6" name="On frame changed" sid="9067013014610704" type="HeroTortoise" />
+                            </conditions>
+                            <actions>
+                                <action disabled="1" id="-4" name="Set position to another object" sid="4291400859417369" type="HeroRabbit">
+                                    <param id="0" name="Object">HeroTortoise</param>
+                                    <param id="1" name="Image point (optional)">1</param>
+                                </action>
+                                <action id="-3" name="Create object" sid="5939435424211889" type="System">
+                                    <param id="0" name="Object to create">HeroTortoiseAoe</param>
+                                    <param id="1" name="Layer">0</param>
+                                    <param id="2" name="X">HeroTortoise.ImagePointX(&quot;attack&quot;)</param>
+                                    <param id="3" name="Y">HeroTortoise.ImagePointY(&quot;attack&quot;)</param>
+                                </action>
+                                <action id="-10" name="Set value" sid="2031721356451803" type="HeroTortoiseAoe">
+                                    <param id="0" name="Instance variable">damage</param>
+                                    <param id="1" name="Value">HeroTortoise.damage</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <event-block sid="6373852348406164">
+                            <conditions>
+                                <condition id="0" name="On function" sid="7801725641309434" type="Function">
+                                    <param id="0" name="Name">&quot;Hero.Tortoise.update&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions />
+                        </event-block>
+                    </sub-events>
+                </event-group>
+                <event-group description="" sid="7611556860714793" title="Mantis">
+                    <sub-events>
+                        <event-block sid="3810290350762357">
+                            <conditions>
+                                <condition id="0" name="On function" sid="6776759472881607" type="Function">
+                                    <param id="0" name="Name">&quot;Hero.Mantis.update&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="6" name="Set speed" sid="8309969424862122" type="HeroMantis">
+                                    <param id="0" name="Speed">Self.aspd * 2</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <event-block sid="9046619853304077">
+                                    <conditions>
+                                        <condition id="1" name="Is overlapping another object" sid="5650355046642657" type="Enemy">
+                                            <param id="0" name="Object">CameraFov</param>
+                                        </condition>
+                                        <condition id="-15" name="Pick nearest/furthest" sid="7811943085389342" type="Enemy">
+                                            <param id="0" name="Which">0</param>
+                                            <param id="1" name="X">Caravan.X</param>
+                                            <param id="2" name="Y">Caravan.Y</param>
+                                        </condition>
+                                        <condition disabled="1" id="-15" name="Pick nearest/furthest" sid="3755023878314834" type="Enemy">
+                                            <param id="0" name="Which">0</param>
+                                            <param id="1" name="X">Caravan.X</param>
+                                            <param id="2" name="Y">Caravan.Y</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="4631994218724245">
+                                            <conditions>
+                                                <condition id="2" name="Is playing" sid="3553259987194396" type="HeroMantis">
+                                                    <param id="0" name="Animation">&quot;Idle&quot;</param>
+                                                </condition>
+                                                <condition behavior="Pathfinding" id="4" inverted="1" name="Is moving along path" sid="340213164841234" type="HeroMantis" />
+                                                <condition behavior="Pathfinding" id="3" inverted="1" name="Is calculating path" sid="8772585242458284" type="HeroMantis" />
+                                            </conditions>
+                                            <actions>
+                                                <action behavior="Pathfinding" id="0" name="Find path" sid="8016436845417847" type="HeroMantis">
+                                                    <param id="0" name="X">Enemy.X</param>
+                                                    <param id="1" name="Y">Enemy.Y</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <event-block sid="2640082515517412">
+                                            <conditions>
+                                                <condition id="-8" name="Compare two values" sid="3123231516799329" type="System">
+                                                    <param id="0" name="First value">distance(HeroMantis.X, HeroMantis.Y, Enemy.X, Enemy.Y)</param>
+                                                    <param id="1" name="Comparison">3</param>
+                                                    <param id="2" name="Second value">150</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions />
+                                            <sub-events>
+                                                <event-block sid="9911788839725374">
+                                                    <conditions>
+                                                        <condition id="2" name="Is playing" sid="9721655741997604" type="HeroMantis">
+                                                            <param id="0" name="Animation">&quot;Idle&quot;</param>
+                                                        </condition>
+                                                    </conditions>
+                                                    <actions>
+                                                        <action id="4" name="Set animation" sid="42804174310047" type="HeroMantis">
+                                                            <param id="0" name="Animation">&quot;Attack&quot;</param>
+                                                            <param id="1" name="From">1</param>
+                                                        </action>
+                                                    </actions>
+                                                </event-block>
+                                            </sub-events>
+                                        </event-block>
+                                        <event-block sid="1770523376034196">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="5361940016908465" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="4" name="Set animation" sid="1945339772672274" type="HeroMantis">
+                                                    <param id="0" name="Animation">&quot;Idle&quot;</param>
+                                                    <param id="1" name="From">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="3395891286453038">
+                                    <conditions>
+                                        <condition behavior="Pathfinding" id="4" name="Is moving along path" sid="6357387107710337" type="HeroMantis" />
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="3601016148155774">
+                                            <conditions>
+                                                <condition id="-13" name="Is between angles" sid="9042208271754492" type="HeroMantis">
+                                                    <param id="0" name="First angle">90</param>
+                                                    <param id="1" name="Second angle">270</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions>
+                                                <action id="8" name="Set flipped" sid="9983938729061075" type="HeroMantis">
+                                                    <param id="0" name="State">0</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                        <event-block sid="1713594817877856">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="3168933317547304" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="8" name="Set flipped" sid="4008344033687547" type="HeroMantis">
+                                                    <param id="0" name="State">1</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="8072776517456597">
+                                    <conditions>
+                                        <condition id="2" name="Is playing" sid="3446697812313709" type="HeroMantis">
+                                            <param id="0" name="Animation">&quot;Attack&quot;</param>
+                                        </condition>
+                                    </conditions>
+                                    <actions />
+                                    <sub-events>
+                                        <event-block sid="6698344675843497">
+                                            <conditions>
+                                                <condition id="-8" name="Compare two values" sid="5102909203323022" type="System">
+                                                    <param id="0" name="First value">HeroMantis.AnimationFrame</param>
+                                                    <param id="1" name="Comparison">0</param>
+                                                    <param id="2" name="Second value">1</param>
+                                                </condition>
+                                            </conditions>
+                                            <actions />
+                                            <sub-events>
+                                                <event-block sid="2891128103296637">
+                                                    <conditions>
+                                                        <condition id="-8" inverted="1" name="Is boolean instance variable set" sid="3628563671365228" type="HeroMantis">
+                                                            <param id="0" name="Instance variable">in_aoe_cooldown</param>
+                                                        </condition>
+                                                    </conditions>
+                                                    <actions>
+                                                        <action id="-3" name="Create object" sid="1685493639895602" type="System">
+                                                            <param id="0" name="Object to create">HeroMantisAoe</param>
+                                                            <param id="1" name="Layer">0</param>
+                                                            <param id="2" name="X">HeroMantis.ImagePointX(&quot;attack&quot;)</param>
+                                                            <param id="3" name="Y">HeroMantis.ImagePointY(&quot;attack&quot;)</param>
+                                                        </action>
+                                                        <action id="-8" name="Set angle" sid="593690921636564" type="HeroMantisAoe">
+                                                            <param id="0" name="Angle">HeroMantis.Angle</param>
+                                                        </action>
+                                                        <action id="-10" name="Set value" sid="7610761568218949" type="HeroMantisAoe">
+                                                            <param id="0" name="Instance variable">damage</param>
+                                                            <param id="1" name="Value">HeroMantis.damage</param>
+                                                        </action>
+                                                        <action id="-13" name="Set boolean" sid="7921362801559909" type="HeroMantis">
+                                                            <param id="0" name="Instance variable">in_aoe_cooldown</param>
+                                                            <param id="1" name="Value">1</param>
+                                                        </action>
+                                                    </actions>
+                                                </event-block>
+                                            </sub-events>
+                                        </event-block>
+                                        <event-block sid="1787937382611918">
+                                            <conditions>
+                                                <condition id="-22" name="Else" sid="3645182357690059" type="System" />
+                                            </conditions>
+                                            <actions>
+                                                <action id="-13" name="Set boolean" sid="9551549468217453" type="HeroMantis">
+                                                    <param id="0" name="Instance variable">in_aoe_cooldown</param>
+                                                    <param id="1" name="Value">0</param>
+                                                </action>
+                                            </actions>
+                                        </event-block>
+                                    </sub-events>
+                                </event-block>
+                                <event-block sid="8639165489552299">
+                                    <conditions />
+                                    <actions />
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="4367201668269194">
+                            <conditions>
+                                <condition behavior="Pathfinding" id="0" name="On path found" sid="2409062487778933" type="HeroMantis" />
+                            </conditions>
+                            <actions>
+                                <action behavior="Pathfinding" id="1" name="Move along path" sid="2737139812940182" type="HeroMantis" />
+                            </actions>
+                        </event-block>
+                        <event-block sid="313930074066701">
+                            <conditions>
+                                <condition id="4" name="On finished" sid="8673462335745405" type="HeroMantis">
+                                    <param id="0" name="Animation">&quot;Attack&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="4" name="Set animation" sid="6414863886597546" type="HeroMantis">
+                                    <param id="0" name="Animation">&quot;Idle&quot;</param>
+                                    <param id="1" name="From">1</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-group>
+            </sub-events>
+        </event-group>
+    </events>
+</c2eventsheet>

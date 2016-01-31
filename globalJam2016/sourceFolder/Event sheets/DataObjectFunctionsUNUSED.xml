@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>DataObjectFunctionsUNUSED</name>
+    <events>
+        <event-block sid="6948069547008110">
+            <conditions>
+                <condition id="0" name="On function" sid="4179593340328719" type="Function">
+                    <param id="0" name="Name">&quot;Item.create_all&quot;</param>
+                </condition>
+            </conditions>
+            <actions />
+            <sub-events>
+                <variable constant="0" name="localUID" sid="542073042321382" static="0" type="number">0</variable>
+                <event-block sid="7675162661393677">
+                    <conditions>
+                        <condition id="-8" name="Compare two values" sid="6003780676426010" type="System">
+                            <param id="0" name="First value">Function.ParamCount</param>
+                            <param id="1" name="Comparison">4</param>
+                            <param id="2" name="Second value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-9" name="Set value" sid="2051058427583478" type="System">
+                            <param id="0" name="Variable">localUID</param>
+                            <param id="1" name="Value">Function.Param(0)</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="4650345860841905">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="9272167125002132" type="System" />
+                    </conditions>
+                    <actions />
+                </event-block>
+                <event-block sid="7554010959630748">
+                    <conditions />
+                    <actions>
+                        <action id="1" name="Set return value" sid="2021882509578372" type="Function">
+                            <param id="0" name="Value">localUID</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-block>
+    </events>
+</c2eventsheet>

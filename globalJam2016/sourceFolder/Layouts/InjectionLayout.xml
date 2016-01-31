@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2layout>
+    <name>InjectionLayout</name>
+    <sid>9566470401552245</sid>
+    <event-sheet></event-sheet>
+    <size>
+        <width>1708</width>
+        <height>960</height>
+    </size>
+    <margins>
+        <horizontal>500</horizontal>
+        <vertical>500</vertical>
+    </margins>
+    <unbounded-scrolling>0</unbounded-scrolling>
+    <layers>
+        <layer name="Layer 0" sid="2021910488349686">
+            <initially-visible>1</initially-visible>
+            <background-color>255,255,255</background-color>
+            <transparent>0</transparent>
+            <parallax>
+                <x>1</x>
+                <y>1</y>
+            </parallax>
+            <zoom-rate>1</zoom-rate>
+            <opacity>1</opacity>
+            <force-own-texture>0</force-own-texture>
+            <global>0</global>
+            <use-render-cells>0</use-render-cells>
+            <blend-mode>0</blend-mode>
+            <effect-fallback>0</effect-fallback>
+            <instances />
+            <effects />
+        </layer>
+    </layers>
+    <nonworld-instances>
+        <instance type="ResultSet" uid="23">
+            <properties>
+                <width>10</width>
+                <height>1</height>
+                <depth>1</depth>
+            </properties>
+            <instance-variables>
+                <firstRowIsColumnNames>false</firstRowIsColumnNames>
+                <DataSetName></DataSetName>
+            </instance-variables>
+        </instance>
+        <instance type="ItemsQuantity" uid="40" />
+        <instance type="Items" uid="41">
+            <properties>
+                <width>0</width>
+                <height>0</height>
+                <depth>0</depth>
+            </properties>
+            <instance-variables>
+                <firstRowIsColumnNames>false</firstRowIsColumnNames>
+                <DataSetName></DataSetName>
+                <id>0</id>
+                <name>1</name>
+                <affinity>2</affinity>
+                <badmix>3</badmix>
+                <Function>4</Function>
+            </instance-variables>
+        </instance>
+    </nonworld-instances>
+    <effects />
+</c2layout>
