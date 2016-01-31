@@ -25,7 +25,7 @@ Todos os arquivos dessa pasta estão sob a licença Creative Commons 3, você po
 ### Programação:
 - Marco Worms
 
-### Auxiliares de devÇ
+### Auxiliares de dev:
 - Rodrigo Naufal
 - [Ana Luiza Bastos](https://github.com/anabastos)
 
