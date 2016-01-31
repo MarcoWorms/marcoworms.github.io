@@ -1,5 +1,7 @@
 # Pelegrino
 
+# [http://worms.io/globalJam2016/](Play)
+
 ### Unnoficial 2016 Global Jam submission
 
 Faça rituais com os ingredientes que caem de inimigos e melhore seus aliados.
