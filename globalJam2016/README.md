@@ -19,7 +19,7 @@ Todos os arquivos dessa pasta estão sob a licença Creative Commons 3, você po
 ## Contribuidores:
 
 ### Arte:
-- Filipe Ogg
+- Fillipe Ogg
 - Lucas Bizarro
 
 ### Programação:
