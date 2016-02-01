@@ -2,7 +2,7 @@
 
 # [Play](http://worms.io/globalJam2016/)
   
-### Unnoficial 2016 Global Jam submission (Kinda broken but i'll fix it tomorrow, I'm really tired atm)
+### Unnoficial 2016 Global Jam submission
   
   Faça rituais com os ingredientes que caem de inimigos e melhore seus aliados.
   
