@@ -1,8 +1,8 @@
 # Pelegrino
+
+# [Play](http://worms.io/globalJam2016/)
   
-  # [Play](http://worms.io/globalJam2016/)
-  
-  ### Unnoficial 2016 Global Jam submission
+### Unnoficial 2016 Global Jam submission
   
   Faça rituais com os ingredientes que caem de inimigos e melhore seus aliados.
   
@@ -16,16 +16,16 @@
   
   Todos os arquivos dessa pasta estão sob a licença Creative Commons 3, você pode usar qualquer coisa desse projeto desde que referencie o link para esta pasta.
   
-  ## Contribuidores:
+## Contribuidores:
   
-  ### Arte:
+### Arte:
   - Fillipe Ogg
   - Lucas Bizarro
   
-  ### Programação:
+### Programação:
   - Marco Worms
   
-  ### Auxiliares de dev:
+### Auxiliares de dev:
   - Rodrigo Naufal
   - [Ana Luiza Bastos](https://github.com/anabastos)
   
