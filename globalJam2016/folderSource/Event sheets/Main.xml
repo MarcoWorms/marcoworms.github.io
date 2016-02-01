@@ -143,15 +143,8 @@
                                     <param id="1" name="Comparison">3</param>
                                     <param id="2" name="Value">0</param>
                                 </condition>
-                                <condition id="-8" inverted="1" name="Is boolean instance variable set" sid="5711953779178303" type="Caravan">
-                                    <param id="0" name="Instance variable">dead</param>
-                                </condition>
                             </conditions>
                             <actions>
-                                <action id="-13" name="Set boolean" sid="7978352689674068" type="Caravan">
-                                    <param id="0" name="Instance variable">dead</param>
-                                    <param id="1" name="Value">1</param>
-                                </action>
                                 <action id="5" name="Set frame" sid="3712041353141132" type="deathScreen">
                                     <param id="0" name="Frame number">floor(random(3))</param>
                                 </action>
@@ -168,7 +161,7 @@
                                     <param id="3" name="Y">deathScreen.ImagePointY(1)</param>
                                 </action>
                                 <action id="0" name="Set text" sid="8087634736812209" type="deathText">
-                                    <param id="0" name="Text">&quot;You traveled: &quot; &amp; newline &amp; int(Caravan.pixels_traveled )&amp; &quot;px&quot;</param>
+                                    <param id="0" name="Text">&quot;You traveled: &quot; &amp; newline &amp; Caravan.pixels_traveled &amp; &quot;px&quot;</param>
                                 </action>
                                 <action id="-16" name="Wait" sid="9360354801213573" type="System">
                                     <param id="0" name="Seconds">4</param>
@@ -310,7 +303,7 @@
                             <param id="0" name="X">Self.X - Function.Call(&quot;speed_to_distance&quot;) * dt</param>
                         </action>
                         <action id="-1" name="Set X" sid="4663336132466917" type="Background2">
-                            <param id="0" name="X">Self.X - Function.Call(&quot;speed_to_distance&quot;) * dt* 0.65</param>
+                            <param id="0" name="X">Self.X - Function.Call(&quot;speed_to_distance&quot;) * dt* 0.8</param>
                         </action>
                         <action id="-1" name="Set X" sid="4005923635662821" type="ItemDrop">
                             <param id="0" name="X">Self.X - Function.Call(&quot;speed_to_distance&quot;) * dt</param>
@@ -423,8 +416,8 @@
                 </event-block>
             </sub-events>
         </event-group>
-        <variable constant="0" name="enemy_max_hp" sid="8135222644169735" static="0" type="number">100</variable>
-        <variable constant="0" name="enemy_atk" sid="5781737349583663" static="0" type="number">20</variable>
+        <variable constant="0" name="enemy_max_hp" sid="8135222644169735" static="0" type="number">30</variable>
+        <variable constant="0" name="enemy_atk" sid="5781737349583663" static="0" type="number">2</variable>
         <variable constant="0" name="enemy_spawn_timer" sid="1374817662647058" static="0" type="number">2</variable>
         <variable constant="0" name="enemy_droprate" sid="6009242245553342" static="0" type="number">20</variable>
         <variable constant="0" name="knockback" sid="3579607492865872" static="0" type="number">75</variable>
@@ -479,9 +472,9 @@
                             <param id="0" name="X">Caravan.X</param>
                             <param id="1" name="Y">Caravan.Y</param>
                         </action>
-                        <action id="-10" name="Set value" sid="777108576539785" type="Enemy">
+                        <action id="-10" name="Set value" sid="647742602229158" type="Enemy">
                             <param id="0" name="Instance variable">tooltip</param>
-                            <param id="1" name="Value">&quot;Filthy Enemy: &quot; &amp; newline &amp; &quot;Hp: &quot; &amp; Self.hp &amp; &quot;/&quot; &amp; Self.max_hp &amp; newline &amp; &quot;Attack: &quot; &amp; Self.attack &amp; &quot;/s&quot; &amp; newline &amp; &quot;Item drop chance :&quot; &amp; Self.drop_chance &amp; &quot;\%&quot;  &amp; newline &amp; &quot;Spawn-Timer Speed: &quot; &amp; Self.spawn_timer</param>
+                            <param id="1" name="Value">&quot;Filthy Enemy: &quot; &amp; newline &amp; &quot;Hp: &quot; &amp; Self.hp &amp; &quot;/&quot; &amp; Self.max_hp &amp; newline &amp; &quot;Attack: &quot; &amp; Self.attack &amp; &quot;/s&quot; &amp; newline &amp; &quot;Item drop chance :&quot; &amp; Self.drop_chance &amp; &quot;%&quot; </param>
                         </action>
                     </actions>
                 </event-block>
@@ -600,8 +593,8 @@
                                         <action id="-3" name="Create object" sid="9849665323029929" type="System">
                                             <param id="0" name="Object to create">HpBarFix</param>
                                             <param id="1" name="Layer">2</param>
-                                            <param id="2" name="X">Enemy.ImagePointX(0) - HpBarFix.Width/2</param>
-                                            <param id="3" name="Y">Enemy.ImagePointY(0) - 60</param>
+                                            <param id="2" name="X">Enemy.ImagePointX(0) - HpBarFix.Width/2 </param>
+                                            <param id="3" name="Y">Enemy.ImagePointY(0) -60</param>
                                         </action>
                                         <action id="-3" name="Create object" sid="2191635396100758" type="System">
                                             <param id="0" name="Object to create">HpBarVar</param>

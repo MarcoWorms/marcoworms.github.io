@@ -28,7 +28,6 @@
         <behavior author="Scirra" id="Pathfinding" version="1">Pathfinding</behavior>
         <behavior author="Scirra" id="Pin" version="1">Pin</behavior>
         <behavior author="Scirra" id="Rotate" version="1">Rotate</behavior>
-        <behavior author="Scirra" id="Sin" version="1">Sine</behavior>
         <behavior author="Scirra" id="bound" version="1">Bound to layout</behavior>
         <behavior author="Scirra" id="destroy" version="1">Destroy outside layout</behavior>
         <behavior author="Scirra" id="scrollto" version="1">Scroll To</behavior>
@@ -70,7 +69,6 @@
                     <instance-variable name="hp" sid="2124772773664237" type="number" />
                     <instance-variable name="max_hp" sid="9686671385696583" type="number" />
                     <instance-variable name="hp_regen" sid="8916663802346139" type="number" />
-                    <instance-variable name="dead" sid="5899288214788681" type="boolean" />
                 </instance-variables>
                 <animation-folder>
                     <animation framecount="1" loop="0" name="Idle" pingpong="0" repeatcount="1" repeatto="0" sid="3727788716260687" speed="5">
@@ -705,14 +703,6 @@
             <behaviors>
                 <behavior-type name="Fade" sid="5960941054743368">
                     <behavior id="Fade" />
-                </behavior-type>
-            </behaviors>
-        </object-type>
-        <object-type name="Text2" sid="8213744751610358">
-            <plugin id="Text" />
-            <behaviors>
-                <behavior-type name="Sine" sid="4355424538989899">
-                    <behavior id="Sin" />
                 </behavior-type>
             </behaviors>
         </object-type>
