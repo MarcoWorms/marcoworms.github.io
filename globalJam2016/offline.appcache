@@ -1,5 +1,5 @@
 ﻿CACHE MANIFEST
-#1454285855
+#1454286666
 data.js
 c2runtime.js
 jquery-2.1.1.min.js
@@ -39,6 +39,12 @@ images/ritualbuffparticle-sheet0.png
 images/ritualbuffparticle-sheet1.png
 images/deathscreen-sheet0.png
 images/deathscreen-sheet1.png
+icon-16.png
+icon-32.png
+icon-114.png
+icon-128.png
+icon-256.png
+loading-logo.png
 items.json
 inv.json
 pathfind.js
