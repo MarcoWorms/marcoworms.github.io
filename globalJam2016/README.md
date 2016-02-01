@@ -1,6 +1,8 @@
 # Pelegrino
 
 # [Play](http://worms.io/globalJam2016/)
+
+A progressão está desbalanceada mas as mecânicas estão funcionando muito bem. Tivemos pouco tempo para testar o jogo completo, talvez atualizaremos ele arredondando o que faltou ficar pronto.
   
 ### Unnoficial 2016 Global Jam submission
   
