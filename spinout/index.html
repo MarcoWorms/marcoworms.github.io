@@ -6,7 +6,7 @@
 	<title>New project</title>
 	
 	<!-- Standardised web app manifest -->
-	<link rel="manifest" href="app.manifest" />
+	<link rel="manifest" href="appmanifest.json" />
 	
 	<!-- Allow fullscreen mode on iOS devices. (These are Apple specific meta tags.) -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
@@ -78,7 +78,7 @@
 	<!-- Pages load faster with scripts at the bottom -->
 	
 	<!-- Construct 2 exported games require jQuery. -->
-	<script src="jquery-2.0.0.min.js"></script>
+	<script src="jquery-2.1.1.min.js"></script>
 
 
 	
@@ -112,6 +112,11 @@
 		document.addEventListener("webkitvisibilitychange", onVisibilityChanged, false);
 		document.addEventListener("msvisibilitychange", onVisibilityChanged, false);
 		
+		if (navigator.serviceWorker && navigator.serviceWorker.register)
+		{
+			// Register an empty service worker to trigger web app install banners.
+			navigator.serviceWorker.register("sw.js", { scope: "./" });
+		}
     </script>
 </body> 
 </html> 
