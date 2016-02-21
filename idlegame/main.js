@@ -249,7 +249,7 @@ idleFight.player = ( function () {
             return false
         },
         isDead: () => {
-            stats.hp.value <= 0 ? true : false
+            return stats.hp.value <= 0 ? true : false
         },
         draw: () => {
             gui.player.draw.stats(stats)
