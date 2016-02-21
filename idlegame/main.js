@@ -21,7 +21,7 @@ idleFight.monsters = {
             stats: {
                 hp: 3,
                 max_hp: 3,
-                attack: 1,
+                attack: 2,
                 defense: 1,
                 speed: 1,
                 exp: 1,
@@ -178,8 +178,8 @@ idleFight.player = ( function () {
         },
         hp: {
             name: "HP",
-            value: 20,
-            max: 20,
+            value: 10,
+            max: 10,
             display: "combat"
         },
         mana: {
@@ -190,7 +190,7 @@ idleFight.player = ( function () {
         },
         attack: {
             name: "Attack",
-            value: 3,
+            value: 2,
             display: "combat"
         },
         defense: {
@@ -200,7 +200,7 @@ idleFight.player = ( function () {
         },
         speed: {
             name: "Speed",
-            value: 1,
+            value: 2,
             display: "combat"
         },
         luck: {
@@ -250,6 +250,10 @@ idleFight.player = ( function () {
         },
         isDead: () => {
             return stats.hp.value <= 0 ? true : false
+        },
+        die: () => {
+            stats.hp.value = JSON.parse(JSON.stringify(stats.hp.max))
+            stats.charge.value = 0
         },
         draw: () => {
             gui.player.draw.stats(stats)
@@ -323,7 +327,7 @@ idleFight.combat = ( function () {
                 let player_attack = window.setInterval(function() {
                     if (idleFight.player.charge()) {
                         spawned_monster.stats.hp -= (monster_dmg_taken > 0) ? monster_dmg_taken : 0
-                        if (spawned_monster.stats.hp < 0) {
+                        if (spawned_monster.stats.hp <= 0) {
                             spawned_monster.stats.hp = 0;
                             spawned_monster.stats.charge = 0;
                             window.clearInterval(monster_attack)
@@ -331,6 +335,7 @@ idleFight.combat = ( function () {
                             changeStatus("Waiting")
                             idleFight.player.gainExp(spawned_monster.stats.exp)
                             idleFight.player.draw()
+                            idleFight.combat.fight()
                         }
                     }
                     idleFight.combat.draw()
@@ -344,9 +349,11 @@ idleFight.combat = ( function () {
                             window.clearInterval(monster_attack)
                             window.clearInterval(player_attack)
                             changeStatus("Waiting")
+                            idleFight.player.die()
+                            idleFight.player.draw()
                         }
                     }
-                }, Math.ceil(150 /(spawned_monster.stats.speed)))
+                }, Math.ceil(300 /(spawned_monster.stats.speed)))
             }
         },
         draw: function () {
