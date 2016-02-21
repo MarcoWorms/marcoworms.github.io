@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Idle</title>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+	<!-- Bootstrap v3.3.6 -->
+	<!-- Latest compiled and minified CSS -->
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<!-- Optional theme -->
+	<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous"> -->
+	<!-- <link rel="stylesheet" href="https://bootswatch.com/cyborg/bootstrap.css" crossorigin="anonymous"> -->
+	<link rel="stylesheet" href="https://bootswatch.com/simplex/bootstrap.css" crossorigin="anonymous">
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<!-- /Bootstrap -->
+
+	<link rel="stylesheet" href="style.css">
+
+	<script src="main.js"></script>
+
+</head>
+<body>
+
+	<div class="content">
+
+		<h1>Idle Game</h1>
+
+		<ul id="main-pills" class="nav nav-pills" data-tabs="tabs">
+			<li class="active"><a href="#battle" data-toggle="tab">Battle</a></li>
+			<li><a href="#quest" data-toggle="tab">Quest</a></li>
+		</ul>
+
+
+		<div class="col-md-6">
+			<div id="my-tab-content" class="tab-content">
+
+				<div class="tab-pane active" id="battle">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							Battle
+						</div>
+						<div class="panel-body">
+							<div class="col-md-12">
+								<div class="panel panel-default">
+									<div class="panel-body">
+										<!-- Single button -->
+										<div class="btn-group">
+											<button id="raid-picker" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+												<span id="raid-name-display">Pick a raid</span> <span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu" id="raid-picker-dropdown">
+												<li><a href="#training_grounds">Training Grounds</a></li>
+												<li><a href="#cursed_mansion">Cursed Mansion</a></li>
+												<!-- <li role="separator" class="divider"></li> -->
+											</ul>
+										</div>
+										<button id="fight_button" type="button" class="btn btn-default">Fight</button>
+										<h3>Fighting Status: <span id="fighting_status">Waiting</span></h3>
+									</div>
+								</div>
+							</div>
+
+							<div class="col-md-6">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										You
+									</div>
+									<div class="panel-body">
+										<h5>Turn:</h5>
+										<div class="progress">
+											<div id="player_charge" class="progress-bar progress-bar-danger progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+
+											</div>
+										</div>
+										<h5>HP:</h5>
+										<div class="progress">
+											<div id="player_hp" class="progress-bar progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+
+											</div>
+										</div>
+										<h5>Mana:</h5>
+										<div class="progress">
+											<div id="player_mana" class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+
+											</div>
+										</div>
+										<div class="panel panel-default">
+											<div class="panel-body">
+												<div id="player_combat_stats"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="panel panel-default">
+									<div class="panel-heading">
+										<span id="monster_name">Monster</span>
+									</div>
+									<div class="panel-body">
+
+
+										<h5>Turn:</h5>
+										<div class="progress">
+											<div id="monster_charge" class="progress-bar progress-bar-danger progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+
+											</div>
+										</div>
+										<h5>HP:</h5>
+										<div class="progress">
+											<div id="monster_hp" class="progress-bar progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+
+											</div>
+										</div>
+
+										<div class="panel panel-default">
+											<div class="panel-body">
+												<div id="monster_stats">
+
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+
+						</div>
+
+					</div>
+				</div>
+
+				<div class="tab-pane" id="quest">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							Quest
+						</div>
+						<div class="panel-body">
+							<div class="col-md-12">
+								<p id="quest-info">You have no quest.</p>
+								<button id="quest_button" type="button" class="btn btn-default">Give Quest</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+
+		<div class="col-md-6">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					Character
+				</div>
+				<div class="panel-body">
+					<div class="col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								Stats
+							</div>
+							<div class="panel-body">
+								<div id="stats"></div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								Inventory
+							</div>
+							<div class="panel-body">
+								<div id="inventory"></div>
+							</div>
+						</div>
+					</div>
+					<br>
+					<div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								Equips
+							</div>
+							<div class="panel-body">
+								<div id="equips">
+									<h6>Head:</h6>
+									<h6>Body:</h6>
+									<h6>Legs:</h6>
+									<h6>Right-hand:</h6>
+									<h6>Left-hand:</h5>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div> <!-- container -->
+
+</body>
+</html>

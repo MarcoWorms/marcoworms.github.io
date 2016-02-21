@@ -1,0 +1,32 @@
+.content {
+    margin: 10px 50px 0px 50px;
+}
+
+body {
+    background-color: #FFE1E1
+}
+
+h1 {
+     margin: 0px 0px 10px 15px;
+}
+
+#main-pills {
+    margin: 0px 0px 20px 15px;
+}
+
+#raid-picker {
+    clear: both;
+}
+
+.progress-bar {
+    -webkit-transition-duration: 0.14s;
+    -moz-transition-duration: 0.14s;
+    -ms-transition-duration: 0.14s;s
+    -o-transition-duration: 0.14s;
+    transition-duration: 0.14s;
+}​
+
+#player_combat_stats p {
+    -webkit-margin-before: 5px;
+    -webkit-margin-after: 5px;
+}
