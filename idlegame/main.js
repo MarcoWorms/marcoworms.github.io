@@ -211,7 +211,7 @@ idleFight.player = ( function () {
         charge: {
             name: "Charge",
             value: 0,
-            display: "combat"
+            display: ""
         },
     }
     const quest = {
