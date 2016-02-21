@@ -36,7 +36,7 @@ idleFight.monsters = {
                 hp: 6,
                 max_hp: 6,
                 attack: 2,
-                defense: 2,
+                defense: 1,
                 speed: 1,
                 exp: 2,
                 gold: 1,
