@@ -15,7 +15,7 @@ idleFight.items = {
 }
 
 idleFight.level_table = {
-    exp_table: [0, 10, 21, 35, 50, 70, 100]
+    exp_table: [0, 7, 15, 25, 40, 60, 100]
 }
 
 idleFight.monsters = {
@@ -23,16 +23,16 @@ idleFight.monsters = {
         "training_dummy": {
             name: "Training Dummy",
             stats: {
-                hp: 2,
+                hp: 3,
                 max_hp: 2,
                 attack: 2,
                 defense: 1,
-                speed: 1,
+                speed: 1.5,
                 exp: 1,
                 gold: 1,
                 charge: 0
             },
-            spawn_influence: 10
+            spawn_influence: 40
         },
         "mecha_training_dummy": {
             name: "Mecha Training Dummy",
@@ -41,9 +41,23 @@ idleFight.monsters = {
                 max_hp: 6,
                 attack: 2,
                 defense: 1,
-                speed: 1,
-                exp: 2,
-                gold: 1,
+                speed: 2,
+                exp: 4,
+                gold: 5,
+                charge: 0
+            },
+            spawn_influence: 9
+        },
+        "elite_training_dummy": {
+            name: "Elite Training Dummy",
+            stats: {
+                hp: 15,
+                max_hp: 15,
+                attack: 6,
+                defense: 4,
+                speed: 2,
+                exp: 15,
+                gold: 20,
                 charge: 0
             },
             spawn_influence: 1
@@ -94,13 +108,23 @@ idleFight._gui = () => {
             draw: {
                 stats: (player_stats) => {
                     let dom = document.getElementById('player_stats')
+                    let dom2 = document.getElementById('player_combat_stats')
+                    let dom3 = document.getElementById('player_fragments')
                     dom.innerHTML = ''
+                    dom2.innerHTML = ''
                     Object.keys(player_stats).forEach( key => {
                         let stat = player_stats[key]
                         if (stat.display === "header") {
                             dom.innerHTML += '<p>'+stat.name+': '+stat.value+(stat.max ? (' / ' + stat.max) : "")+'</p>'
+                        } else if (stat.display === "combat") {
+                            dom2.innerHTML += '<p>'+stat.name+': '+stat.value+(stat.max ? (' / ' + stat.max) : "")+'</p>'
+                        } else if (stat.display === "fragments") {
+                            dom3.innerHTML = stat.value
                         }
                     })
+                    drawBar('player_hp', player_stats.hp.max, player_stats.hp.value)
+                    drawBar('player_mana', player_stats.mana.max, player_stats.mana.value)
+                    drawBar('player_charge', 100, player_stats.charge.value)
                 },
                 inventory: (player_inventory) => {
                     let dom = document.getElementById('player_inventory')
@@ -123,22 +147,6 @@ idleFight._gui = () => {
                     } else if (combat_status === 'Fighting') {
                         dom2.setAttribute('class', 'btn btn-success')
                     }
-                },
-                player : (player_stats) => {
-
-                    drawBar('player_hp', player_stats.hp.max, player_stats.hp.value)
-                    drawBar('player_mana', player_stats.mana.max, player_stats.mana.value)
-                    drawBar('player_charge', 100, player_stats.charge.value)
-
-                    let dom = document.getElementById('player_combat_stats')
-                    dom.innerHTML = ''
-                    Object.keys(player_stats).forEach( key => {
-                        let stat = player_stats[key]
-                        if (stat.display === "combat") {
-                            dom.innerHTML += '<p>'+stat.name+': '+stat.value+(stat.max ? (' / ' + stat.max) : "")+'</p>'
-                        }
-
-                    })
                 },
                 monster: (monster) => {
                     if (monster) {
@@ -180,47 +188,53 @@ idleFight.player = ( function () {
             value: 0,
             display: "header"
         },
-        fragment: {
+        fragments: {
             name: "Ancient Fragments",
             value: 0,
-            display: "header"
+            display: "fragments"
         },
         hp: {
             name: "HP",
             value: 10,
             max: 10,
-            display: "combat"
+            display: "combat",
+            lvl_up_increase: 1
         },
         mana: {
             name: "Mana",
             value: 3,
             max: 3,
-            display: "combat"
+            display: "combat",
+            lvl_up_increase: 1
         },
         attack: {
             name: "Attack",
             value: 2,
-            display: "combat"
+            display: "combat",
+            lvl_up_increase: 1
         },
         defense: {
             name: "Defense",
             value: 1,
-            display: "combat"
+            display: "combat",
+            lvl_up_increase: 1
         },
         speed: {
             name: "Speed",
             value: 2,
-            display: "combat"
+            display: "combat",
+            lvl_up_increase: 0.1
         },
         luck: {
             name: "Luck",
             value: 1,
-            display: "combat"
+            display: "combat",
+            lvl_up_increase: 1
         },
         charge: {
             name: "Charge",
             value: 0,
-            display: ""
+            display: "",
         },
     }
     const quest = {
@@ -246,17 +260,30 @@ idleFight.player = ( function () {
             let damage_taken = monster_attack - stats.defense.value
             stats.hp.value -= (damage_taken > 0) ? damage_taken : 0
         },
-        gainExp: (exp) => {
+        kill: (monster) => {
+            stats.exp.value += monster.stats.exp
+            stats.gold.value += monster.stats.gold
+
             let exp_to_next_level = idleFight.level_table.exp_table[stats.level.value + 1]
-            stats.exp.value += exp
-            if (stats.exp.value >= exp_to_next_level) {
-                idleFight.player.levelUp();
-            } 
+            if (exp_to_next_level) {
+                if (stats.exp.value >= exp_to_next_level) {
+                    idleFight.player.levelUp();
+                } 
+            }        
             
         },
         levelUp: () => {
             stats.level.value += 1
-            stats.fragment.value += stats.level.value
+            stats.fragments.value += stats.level.value
+            Object.keys(stats).forEach( key => {
+                let stat = stats[key]
+                if (stat.lvl_up_increase) {
+                    if (stat.max) {
+                        stat.max += stat.lvl_up_increase
+                    }
+                    stat.value += stat.lvl_up_increase
+                }
+            })
         },
         charge: () => {
             stats.charge.value += 2
@@ -351,7 +378,7 @@ idleFight.combat = ( function () {
                             window.clearInterval(monster_attack)
                             window.clearInterval(player_attack)
                             changeStatus("Waiting")
-                            idleFight.player.gainExp(spawned_monster.stats.exp)
+                            idleFight.player.kill(spawned_monster)
                             idleFight.player.draw()
                             idleFight.combat.fight()
                         }
@@ -376,7 +403,7 @@ idleFight.combat = ( function () {
         },
         draw: function () {
             gui.combat.draw.status(status)
-            gui.combat.draw.player(idleFight.player.getStats())
+            idleFight.player.draw()
             gui.combat.draw.monster(spawned_monster)
         }
     }
