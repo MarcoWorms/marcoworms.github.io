@@ -14,13 +14,17 @@ idleFight.items = {
     }
 }
 
+idleFight.level_table = {
+    exp_table: [0, 10, 21, 35, 50, 70, 100]
+}
+
 idleFight.monsters = {
     training_grounds: {
         "training_dummy": {
             name: "Training Dummy",
             stats: {
-                hp: 3,
-                max_hp: 3,
+                hp: 2,
+                max_hp: 2,
                 attack: 2,
                 defense: 1,
                 speed: 1,
@@ -89,7 +93,7 @@ idleFight._gui = () => {
         player: {
             draw: {
                 stats: (player_stats) => {
-                    let dom = document.getElementById('stats')
+                    let dom = document.getElementById('player_stats')
                     dom.innerHTML = ''
                     Object.keys(player_stats).forEach( key => {
                         let stat = player_stats[key]
@@ -99,7 +103,7 @@ idleFight._gui = () => {
                     })
                 },
                 inventory: (player_inventory) => {
-                    let dom = document.getElementById('inventory')
+                    let dom = document.getElementById('player_inventory')
                     dom.innerHTML = ''
                     player_inventory.forEach( (key) => {
                         let item = idleFight.items[key]
@@ -163,7 +167,7 @@ idleFight.player = ( function () {
     const stats = {
         level: {
             name: "Level",
-            value: 1,
+            value: 0,
             display: "header"
         },
         exp: {
@@ -173,6 +177,11 @@ idleFight.player = ( function () {
         },
         gold: {
             name: "Gold",
+            value: 0,
+            display: "header"
+        },
+        fragment: {
+            name: "Ancient Fragments",
             value: 0,
             display: "header"
         },
@@ -238,7 +247,16 @@ idleFight.player = ( function () {
             stats.hp.value -= (damage_taken > 0) ? damage_taken : 0
         },
         gainExp: (exp) => {
+            let exp_to_next_level = idleFight.level_table.exp_table[stats.level.value + 1]
             stats.exp.value += exp
+            if (stats.exp.value >= exp_to_next_level) {
+                idleFight.player.levelUp();
+            } 
+            
+        },
+        levelUp: () => {
+            stats.level.value += 1
+            stats.fragment.value += stats.level.value
         },
         charge: () => {
             stats.charge.value += 2
