@@ -26,3 +26,8 @@ h1 {
     -webkit-margin-before: 5px;
     -webkit-margin-after: 5px;
 }
+
+#player_inventory {
+    overflow-y: scroll;
+    height: 150px;
+}

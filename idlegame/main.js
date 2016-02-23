@@ -4,18 +4,139 @@ Array.prototype.random = function () {
   return this[Math.floor((Math.random()*this.length))];
 }
 
-const idleFight = {}
-
-idleFight.items = {
-    "hp_potion": {
-        name: "HP Potion",
-        effect: "heal",
-        power: 1
+const RNGEESUS = function(percentage) {
+    if (Math.random() * 100 < percentage) {
+        return true
+    } else {
+        return false
     }
 }
 
+function randomIntFromInterval (min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+const idleFight = {}
+
+idleFight.items = (function(){
+
+    let crates = (function(){
+        function rngeesusGo (crate_id) {
+
+            let crate_content = all_crates[crate_id]
+
+            let open_crate_content = {
+                stats: [],
+                items: []
+            }
+
+            Object.keys(crate_content.stats).forEach(_stat => {
+                let stat = crate_content.stats[_stat]
+                if (RNGEESUS(stat.chance)) {
+                    let ammount = randomIntFromInterval(stat.min, stat.max)
+                    for (let i = 0; i < ammount; i += 1) {
+                        open_crate_content.stats.push(_stat)
+                    }
+                }
+            })
+
+            Object.keys(crate_content.items).forEach(_item => {
+                let item = crate_content.items[_item]
+                if (RNGEESUS(item.chance)) {
+                    let ammount = randomIntFromInterval(item.min, item.max)
+                    for (let i = 0; i < ammount; i += 1) {
+                        open_crate_content.items.push(_item)
+                    }
+                }
+            })
+
+            return open_crate_content
+
+        }
+        let all_crates = {
+            0: {
+                name: "Novice Crate",
+                stats: {
+                    hp: {
+                        chance: 70,
+                        min: 1,
+                        max: 3
+                    },
+                    attack: {
+                        chance: 60,
+                        min: 1,
+                        max: 2
+                    },
+                    defense: {
+                        chance: 60,
+                        min: 1,
+                        max: 2
+                    }
+                },
+                items: {
+                    hp_potion: {
+                        chance: 40,
+                        min: 1,
+                        max: 2
+                    },
+                    mp_potion: {
+                        chance: 40,
+                        min: 1,
+                        max: 2
+                    },
+                }
+            }
+        }
+        return {
+            openCrate: (id) => {
+                return rngeesusGo(id)
+            }
+        }
+    }()) 
+    
+    let items_effects = {
+        heal: function (power) {
+            idleFight.player.heal(power)
+        },
+        crate: function (power) {
+            idleFight.player.parseCrate(crates.openCrate(power))
+        }
+    }
+
+    let all_items = {
+        "hp_potion": {
+            name: "Health Potion",
+            effect: items_effects.heal,
+            power: 5
+        },
+        crate_1: {
+            name: "Novice Crate",
+            effect: items_effects.crate,
+            power: 0
+        },
+        mp_potion: {
+            name: "Mana Potion",
+            effect: items_effects.crate,
+            power: 5
+        }
+    }
+
+    return {
+        useItem: (id) => {
+            let item = all_items[id]
+            item.effect(item.power)
+        },
+        allItems: () => {
+            return all_items
+        },
+    }
+
+}())
+
+
+
 idleFight.level_table = {
-    exp_table: [0, 7, 15, 25, 40, 60, 100]
+    exp_table: [0, 7, 20, 50, 100, 200, 450, 1000, 1600, 2400, 4000]
 }
 
 idleFight.monsters = {
@@ -130,7 +251,7 @@ idleFight._gui = () => {
                     let dom = document.getElementById('player_inventory')
                     dom.innerHTML = ''
                     player_inventory.forEach( (key) => {
-                        let item = idleFight.items[key]
+                        let item = idleFight.items.allItems()[key]
                         dom.innerHTML += '<p>'+item.name+'</p>'
                     })
                 }
@@ -235,7 +356,7 @@ idleFight.player = ( function () {
             name: "Charge",
             value: 0,
             display: "",
-        },
+        }
     }
     const quest = {
         active: false,
@@ -259,6 +380,9 @@ idleFight.player = ( function () {
         takeDamage: (monster_attack) => {
             let damage_taken = monster_attack - stats.defense.value
             stats.hp.value -= (damage_taken > 0) ? damage_taken : 0
+        },
+        heal: (ammount) => {
+            stats.hp.value += ammount
         },
         kill: (monster) => {
             stats.exp.value += monster.stats.exp
@@ -299,6 +423,23 @@ idleFight.player = ( function () {
         die: () => {
             stats.hp.value = JSON.parse(JSON.stringify(stats.hp.max))
             stats.charge.value = 0
+        },
+        parseCrate: (crate_content) => {
+            $(opened_crate_content).html($(opened_crate_content).html() + '<br>' + JSON.stringify(crate_content))
+            crate_content.stats.forEach(stat => {
+                stats[stat].value += 1
+            })
+            crate_content.items.forEach(item => {
+                inventory.push(item)
+            })
+        },
+        spendFragments: (ammount) => {
+            if (stats.fragments.value >= ammount) {
+                stats.fragments.value -= ammount
+                return true
+            } else {
+                return false
+            }
         },
         draw: () => {
             gui.player.draw.stats(stats)
@@ -409,6 +550,16 @@ idleFight.combat = ( function () {
     }
 }())
 
+idleFight.shop = {
+    buyCrate: (id) => {
+        if (idleFight.player.spendFragments(1)) {
+            idleFight.items.useItem(id)
+            idleFight.player.draw()
+        }
+        
+    }
+}
+
 idleFight.start_game = function () {
 
     $('#tabs').tab();
@@ -429,6 +580,10 @@ idleFight.start_game = function () {
 
     $(document).on('click', '#fight_button', function() {
         idleFight.combat.fight()
+    });
+
+    $(document).on('click', '#crate_1', function() {
+        idleFight.shop.buyCrate("crate_1")
     });
 
     idleFight.player.draw()
