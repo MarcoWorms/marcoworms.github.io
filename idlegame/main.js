@@ -403,9 +403,9 @@ idleFight.player = ( function () {
                 let stat = stats[key]
                 if (stat.lvl_up_increase) {
                     if (stat.max) {
-                        stat.max += stat.lvl_up_increase
+                        stat.max += Math.floor(stat.lvl_up_increase*100)/100
                     }
-                    stat.value += stat.lvl_up_increase
+                    stat.value += Math.floor(stat.lvl_up_increase*100)/100
                 }
             })
         },
@@ -428,6 +428,9 @@ idleFight.player = ( function () {
             $(opened_crate_content).html($(opened_crate_content).html() + '<br>' + JSON.stringify(crate_content))
             crate_content.stats.forEach(stat => {
                 stats[stat].value += 1
+                if (stats[stat].max) {
+                    stats[stat].max += 1;
+                }
             })
             crate_content.items.forEach(item => {
                 inventory.push(item)
