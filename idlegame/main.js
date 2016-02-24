@@ -87,9 +87,22 @@ idleFight.items = (function(){
                 }
             }
         }
+        let crates_opened = 0;
+        let is_opening = false
         return {
             openCrate: (id) => {
+                is_opening = true
+                crates_opened += 1;
                 return rngeesusGo(id)
+            },
+            canOpen: () => {
+                return !is_opening
+            },
+            opened: () => {
+                is_opening = false
+            },
+            get crates_opened () {
+                return crates_opened
             }
         }
     }()) 
@@ -129,6 +142,9 @@ idleFight.items = (function(){
         allItems: () => {
             return all_items
         },
+        get crates () {
+            return crates
+        }
     }
 
 }())
@@ -287,6 +303,21 @@ idleFight._gui = () => {
 
                 }
             }
+        },
+        crate: {
+            draw: (crate_content) => {
+                $("#new_crate_open").fadeIn(1000)
+                let html = ""
+                html += '<p> Crates Counter: '+idleFight.items.crates.crates_opened+'</p>'
+                
+                crate_content.stats.forEach(stat => {
+                    html += '<p>'+idleFight.player.getStats()[stat].name+' +1</p>'
+                })
+                $("#opened_crate_content").html(html)
+                $("#new_crate_open").fadeOut(4000, function() {
+                    idleFight.items.crates.opened()
+                })
+            }
         }
     }
 }
@@ -311,7 +342,7 @@ idleFight.player = ( function () {
         },
         fragments: {
             name: "Ancient Fragments",
-            value: 0,
+            value: 5,
             display: "fragments"
         },
         hp: {
@@ -403,9 +434,9 @@ idleFight.player = ( function () {
                 let stat = stats[key]
                 if (stat.lvl_up_increase) {
                     if (stat.max) {
-                        stat.max += Math.floor(stat.lvl_up_increase*100)/100
+                        stat.max = Math.floor(stat.max*100 + stat.lvl_up_increase*100)/100
                     }
-                    stat.value += Math.floor(stat.lvl_up_increase*100)/100
+                    stat.value = Math.floor(stat.value*100 + stat.lvl_up_increase*100)/100
                 }
             })
         },
@@ -425,7 +456,7 @@ idleFight.player = ( function () {
             stats.charge.value = 0
         },
         parseCrate: (crate_content) => {
-            $(opened_crate_content).html($(opened_crate_content).html() + '<br>' + JSON.stringify(crate_content))
+            gui.crate.draw(crate_content)
             crate_content.stats.forEach(stat => {
                 stats[stat].value += 1
                 if (stats[stat].max) {
@@ -555,9 +586,11 @@ idleFight.combat = ( function () {
 
 idleFight.shop = {
     buyCrate: (id) => {
-        if (idleFight.player.spendFragments(1)) {
-            idleFight.items.useItem(id)
-            idleFight.player.draw()
+        if (idleFight.items.crates.canOpen()) {
+            if (idleFight.player.spendFragments(1)) {
+                idleFight.items.useItem(id)
+                idleFight.player.draw()
+            }
         }
         
     }
