@@ -314,9 +314,13 @@ idleFight._gui = () => {
                     html += '<p>'+idleFight.player.getStats()[stat].name+' +1</p>'
                 })
                 $("#opened_crate_content").html(html)
-                $("#new_crate_open").fadeOut(4000, function() {
-                    idleFight.items.crates.opened()
-                })
+                
+                window.setTimeout(function(){
+                    console.log('ay')
+                    $("#new_crate_open").fadeOut(1000, function() {
+                        idleFight.items.crates.opened()
+                    })
+                }, 3000)
             }
         }
     }
@@ -342,7 +346,7 @@ idleFight.player = ( function () {
         },
         fragments: {
             name: "Ancient Fragments",
-            value: 5,
+            value: 1,
             display: "fragments"
         },
         hp: {
