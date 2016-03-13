@@ -5,3 +5,5 @@ videojs('trailerSycko').ready(function(){
   // myPlayer.play();
   myPlayer.volume(0.5)
 });
+
+$(".content-section").css("padding-top", "100px");

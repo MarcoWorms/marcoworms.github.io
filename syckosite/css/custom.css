@@ -5,3 +5,8 @@
     height:440px;
     margin: auto;
 }
+
+@media (min-width: 767px)
+.content-section {
+    padding-top: 100px;
+}
