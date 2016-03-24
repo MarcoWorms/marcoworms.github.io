@@ -1,10 +1,55 @@
-.board {
-	width: 297px;
+* {
+    outline: none;
+    -ms-touch-action: manipulation;	/* IE10  */
+	touch-action: manipulation;		/* IE11+ */
 }
 
-.board .field {
+body {
+	background-color: #00032D;
+}
+
+#counter-wrapper {
+	text-align: center;
+	margin-top: 20px;
+}
+
+p {
+	display: inline;
+	color: white;
+	font-family: Arial;
+	font-size: 38px;
+}
+
+#board {
+	width: 297px;
+	margin: auto;
+	margin-top: 30px;
+	clear: both;
+}
+
+#board .field {
 	float: left;
 	border: solid 1px black;
-	width: 31px;
-	height: 31px;
+	width: 30px;
+	height: 30px;
+	border-radius: 18px;
+}
+
+
+.btn {
+  -webkit-border-radius: 8;
+  -moz-border-radius: 8;
+  border-radius: 8px;
+  font-family: Arial;
+  color: #000000;
+  font-size: 20px;
+  background: #e6e6e6;
+  padding: 10px 20px 10px 20px;
+  border: solid #1e421b 1px;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #b5b5b5;
+  text-decoration: none;
 }
