@@ -1,0 +1,10 @@
+.board {
+	width: 297px;
+}
+
+.board .field {
+	float: left;
+	border: solid 1px black;
+	width: 31px;
+	height: 31px;
+}
