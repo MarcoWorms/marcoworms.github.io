@@ -17079,10 +17079,13 @@ cr.getObjectRefTable = function () { return [
 	cr.behaviors.scrollto,
 	cr.behaviors.solid,
 	cr.system_object.prototype.cnds.EveryTick,
-	cr.behaviors.EightDir.prototype.cnds.IsMoving,
 	cr.plugins_.Sprite.prototype.cnds.IsAnimPlaying,
+	cr.behaviors.EightDir.prototype.cnds.IsMoving,
 	cr.plugins_.Sprite.prototype.acts.SetAnim,
 	cr.system_object.prototype.cnds.Else,
+	cr.plugins_.Keyboard.prototype.cnds.IsKeyDown,
+	cr.plugins_.Sprite.prototype.acts.SetMirrored,
 	cr.plugins_.Keyboard.prototype.cnds.OnKey,
-	cr.plugins_.Sprite.prototype.acts.SetMirrored
+	cr.behaviors.EightDir.prototype.acts.SetEnabled,
+	cr.plugins_.Sprite.prototype.cnds.OnAnimFinished
 ];};
