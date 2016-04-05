@@ -16915,6 +16915,1416 @@ cr.behaviors.EightDir = function(runtime)
 }());
 ;
 ;
+cr.behaviors.Pathfinding = function(runtime)
+{
+	this.runtime = runtime;
+};
+(function ()
+{
+	var behaviorProto = cr.behaviors.Pathfinding.prototype;
+	behaviorProto.Type = function(behavior, objtype)
+	{
+		this.behavior = behavior;
+		this.objtype = objtype;
+		this.runtime = behavior.runtime;
+	};
+	var behtypeProto = behaviorProto.Type.prototype;
+	behtypeProto.onCreate = function()
+	{
+		this.obstacleTypes = [];		// object types to treat as obstacles in custom mode
+		this.costTypes = [];			// object types with cost: { obj: type, cost: n }
+	};
+	var cellData = {};
+	behaviorProto.Instance = function(type, inst)
+	{
+		this.type = type;
+		this.behavior = type.behavior;
+		this.inst = inst;				// associated object instance to modify
+		this.runtime = type.runtime;
+	};
+	var behinstProto = behaviorProto.Instance.prototype;
+	behinstProto.onCreate = function()
+	{
+		this.cellSize = this.properties[0];
+		if (this.cellSize < 3)
+			this.cellSize = 3;
+		this.cellBorder = this.properties[1];
+		this.obstacles = this.properties[2];		// 0 = solids, 1 = custom
+		this.maxSpeed = this.properties[3];
+		this.acc = this.properties[4];
+		this.dec = this.properties[5];
+		this.av = cr.to_radians(this.properties[6]);
+		this.rotateEnabled = (this.properties[7] !== 0);
+		this.diagonalsEnabled = (this.properties[8] !== 0);
+		this.enabled = (this.properties[9] !== 0);
+		this.isMoving = false;
+		this.movingFromStopped = false;
+		this.firstTickMovingWhileMoving = false;
+		this.hasPath = false;
+		this.moveNode = 0;
+		this.a = this.inst.angle;
+		this.lastKnownAngle = this.inst.angle;
+		this.s = 0;
+		this.rabbitX = 0;
+		this.rabbitY = 0;
+		this.rabbitA = 0;
+		this.myHcells = Math.ceil(this.runtime.running_layout.width / this.cellSize);
+		this.myVcells = Math.ceil(this.runtime.running_layout.height / this.cellSize);
+		this.myPath = [];				// copy of path returned from pathfinder
+		this.delayFindPath = false;
+		this.delayPathX = 0;
+		this.delayPathY = 0;
+		this.is_destroyed = false;
+		this.isCalculating = false;
+		this.calcPathX = 0;
+		this.calcPathY = 0;
+		this.firstRun = true;
+		var self = this;
+		if (!this.recycled)
+		{
+			this.pathSuccessFn = function ()
+			{
+				if (self.is_destroyed)
+					return;
+				self.isCalculating = false;
+				self.copyResultPath();
+				self.hasPath = (self.myPath.length > 0);
+				self.moveNode = 0;
+				self.runtime.trigger(cr.behaviors.Pathfinding.prototype.cnds.OnPathFound, self.inst);
+				self.doDelayFindPath();		// run next pathfind if queued
+			};
+			this.pathFailFn = function ()
+			{
+				if (self.is_destroyed)
+					return;
+				self.isCalculating = false;
+				self.clearResultPath();
+				self.hasPath = false;
+				self.isMoving = false;
+				self.moveNode = 0;
+				self.runtime.trigger(cr.behaviors.Pathfinding.prototype.cnds.OnFailedToFindPath, self.inst);
+				self.doDelayFindPath();		// run next pathfind if queued
+			};
+		}
+	};
+	behinstProto.onDestroy = function ()
+	{
+		this.is_destroyed = true;		// start ignoring callbacks
+		this.delayFindPath = false;
+	};
+	behinstProto.saveToJSON = function ()
+	{
+		var o = {
+			"cs": this.cellSize,
+			"cb": this.cellBorder,
+			"ms": this.maxSpeed,
+			"acc": this.acc,
+			"dec": this.dec,
+			"av": this.av,
+			"re": this.rotateEnabled,
+			"de": this.diagonalsEnabled,
+			"im": this.isMoving,
+			"mfs": this.movingFromStopped,
+			"ftmwm": this.firstTickMovingWhileMoving,
+			"hp": this.hasPath,
+			"mn": this.moveNode,
+			"a": this.a,
+			"lka": this.lastKnownAngle,
+			"s": this.s,
+			"rx": this.rabbitX,
+			"ry": this.rabbitY,
+			"ra": this.rabbitA,
+			"myhc": this.myHcells,
+			"myvc": this.myVcells,
+			"path": this.myPath,
+			"en": this.enabled,
+			"fr": this.firstRun,
+			"obs": [],
+			"costs": []
+		};
+		if (this.isCalculating)
+		{
+			o["dfp"] = true;
+			o["dpx"] = this.calcPathX;
+			o["dpy"] = this.calcPathY;
+		}
+		else
+		{
+			o["dfp"] = this.delayFindPath;
+			o["dpx"] = this.delayPathX;
+			o["dpy"] = this.delayPathY;
+		}
+		var i, len;
+		for (i = 0, len = this.type.obstacleTypes.length; i < len; i++)
+		{
+			o["obs"].push(this.type.obstacleTypes[i].sid);
+		}
+		for (i = 0, len = this.type.costTypes.length; i < len; i++)
+		{
+			o["costs"].push({ "sid": this.type.costTypes[i].obj.sid, "cost": this.type.costTypes[i].cost });
+		}
+		return o;
+	};
+	behinstProto.loadFromJSON = function (o)
+	{
+		this.cellSize = o["cs"];
+		this.cellBorder = o["cb"];
+		this.maxSpeed = o["ms"];
+		this.acc = o["acc"];
+		this.dec = o["dec"];
+		this.av = o["av"];
+		this.rotateEnabled = o["re"];
+		this.diagonalsEnabled = o["de"];
+		this.isMoving = o["im"];
+		this.movingFromStopped = o["mfs"];
+		this.firstTickMovingWhileMoving = o["ftmwm"];
+		this.hasPath = o["hp"];
+		this.moveNode = o["mn"];
+		this.a = o["a"];
+		this.lastKnownAngle = o["lka"];
+		this.s = o["s"];
+		this.rabbitX = o["rx"];
+		this.rabbitY = o["ry"];
+		this.rabbitA = o["ra"];
+		this.myHcells = o["myhc"];
+		this.myVcells = o["myvc"];
+		this.myPath = o["path"];
+		this.enabled = o["en"];
+		this.firstRun = o["fr"];
+		this.delayFindPath = o["dfp"];
+		this.delayPathX = o["dpx"];
+		this.delayPathY = o["dpy"];
+		cr.clearArray(this.type.obstacleTypes);
+		var obsarr = o["obs"];
+		var i, len, t;
+		for (i = 0, len = obsarr.length; i < len; i++)
+		{
+			t = this.runtime.getObjectTypeBySid(obsarr[i]);
+			if (t)
+				this.type.obstacleTypes.push(t);
+		}
+		cr.clearArray(this.type.costTypes);
+		var costarr = o["costs"];
+		for (i = 0, len = costarr.length; i < len; i++)
+		{
+			t = this.runtime.getObjectTypeBySid(costarr[i]["sid"]);
+			if (t)
+				this.type.costTypes.push({ obj: t, cost: costarr[i]["cost"] });
+		}
+		this.getMyInfo().pathfinder["setDiagonals"](this.diagonalsEnabled);
+	};
+	behinstProto.afterLoad = function ()
+	{
+		this.getMyInfo().regenerate = true;
+	};
+	behinstProto.tick = function ()
+	{
+		if (!this.enabled || !this.isMoving)
+			return;
+		if (this.rotateEnabled && this.inst.angle !== this.lastKnownAngle)
+			this.a = this.inst.angle;
+		var dt = this.runtime.getDt(this.inst);
+		var targetAngle, da, dist, nextX, nextY, t, r, curveDist, curMaxSpeed;
+		var inst = this.inst;
+		var rabbitAheadDist = Math.min(this.maxSpeed * 0.4, Math.abs(this.inst.width) * 2);
+		var rabbitSpeed = Math.max(this.s * 1.5, 30);
+		if (this.moveNode < this.myPath.length)
+		{
+			nextX = this.myPath[this.moveNode].x;
+			nextY = this.myPath[this.moveNode].y;
+			dist = cr.distanceTo(this.rabbitX, this.rabbitY, nextX, nextY);
+			if (dist < 3 * rabbitSpeed * dt) // within 3 ticks of movement at the max speed
+			{
+				this.moveNode++;
+				this.rabbitX = nextX;
+				this.rabbitY = nextY;
+				if (this.moveNode < this.myPath.length)
+				{
+					nextX = this.myPath[this.moveNode].x;
+					nextY = this.myPath[this.moveNode].y;
+				}
+			}
+		}
+		else
+		{
+			nextX = this.myPath[this.myPath.length - 1].x;
+			nextY = this.myPath[this.myPath.length - 1].y;
+		}
+		this.rabbitA = cr.angleTo(this.rabbitX, this.rabbitY, nextX, nextY);
+		var distToRabbit = cr.distanceTo(inst.x, inst.y, this.rabbitX, this.rabbitY);
+		if (distToRabbit < rabbitAheadDist && this.moveNode < this.myPath.length)
+		{
+			var moveDist;
+			if (this.firstTickMovingWhileMoving)
+			{
+				moveDist = rabbitAheadDist;
+				this.firstTickMovingWhileMoving = false;
+			}
+			else
+				moveDist = rabbitSpeed * dt;
+			this.rabbitX += Math.cos(this.rabbitA) * moveDist;
+			this.rabbitY += Math.sin(this.rabbitA) * moveDist;
+		}
+		targetAngle = cr.angleTo(inst.x, inst.y, this.rabbitX, this.rabbitY);
+		da = cr.angleDiff(this.a, targetAngle);
+		var distToFinish = cr.distanceTo(inst.x, inst.y, this.myPath[this.myPath.length - 1].x, this.myPath[this.myPath.length - 1].y);
+		var decelDist = (this.maxSpeed * this.maxSpeed) / (2 * this.dec);
+		if (distToRabbit > 1)
+		{
+			this.a = cr.angleRotate(this.a, targetAngle, this.av * dt);
+			if (cr.to_degrees(da) <= 0.5)
+			{
+				curMaxSpeed = this.maxSpeed;
+			}
+			else if (cr.to_degrees(da) >= 120 || (this.movingFromStopped && this.moveNode === 0))
+			{
+				curMaxSpeed = 0;
+				this.movingFromStopped = true;	// we're way off, so make sure it rotates all the way round
+			}
+			else
+			{
+				t = da / this.av;
+				dist = cr.distanceTo(inst.x, inst.y, this.rabbitX, this.rabbitY);
+				r = dist / (2 * Math.sin(da));
+				curveDist = r * da;
+				curMaxSpeed = curveDist / t;
+				if (curMaxSpeed < 0)
+					curMaxSpeed = 0;
+				if (curMaxSpeed > this.maxSpeed)
+					curMaxSpeed = this.maxSpeed;
+			}
+			if (distToFinish < decelDist)
+				curMaxSpeed = Math.min(curMaxSpeed, (distToFinish / decelDist) * this.maxSpeed + (this.maxSpeed / 40));
+			this.s += this.acc * dt;
+			if (this.s > curMaxSpeed)
+				this.s = curMaxSpeed;
+		}
+		/*
+		targetAngle = cr.angleTo(inst.x, inst.y, nextX, nextY);
+		da = cr.angleDiff(this.a, targetAngle);
+		if (this.moveNode === 0)
+		{
+			this.nextMaxSpeed = this.maxSpeed;
+			if (cr.to_degrees(da) <= 0.5)
+			{
+				this.s += this.acc * dt;
+				if (this.s > this.maxSpeed)
+					this.s = this.maxSpeed;
+			}
+			else
+			{
+				this.a = cr.angleRotate(this.a, targetAngle, this.av * dt);
+				this.s = 0;
+			}
+		}
+		else
+		{
+			if (cr.to_degrees(da) <= 0.5)
+				this.nextMaxSpeed = this.maxSpeed;
+			this.s += this.acc * dt;
+			if (this.s > Math.min(this.maxSpeed, this.nextMaxSpeed))
+				this.s = Math.min(this.maxSpeed, this.nextMaxSpeed);
+			this.a = cr.angleRotate(this.a, targetAngle, this.av * dt);
+			if (cr.to_degrees(da) > 50)
+				this.s = 0;
+		}
+		*/
+		inst.x += Math.cos(this.a) * this.s * dt;
+		inst.y += Math.sin(this.a) * this.s * dt;
+		if (this.rotateEnabled)
+		{
+			inst.angle = this.a;
+			this.lastKnownAngle = this.a;
+		}
+		inst.set_bbox_changed();
+		if (this.moveNode === this.myPath.length && cr.distanceTo(inst.x, inst.y, nextX, nextY) < Math.max(3 * this.s * dt, 10))
+		{
+			this.isMoving = false;
+			this.hasPath = false;
+			this.moveNode = 0;
+			this.s = 0;
+			this.runtime.trigger(cr.behaviors.Pathfinding.prototype.cnds.OnArrived, inst);
+			return;
+		}
+	};
+	behinstProto.tick2 = function ()
+	{
+		if (!this.enabled)
+			return;
+		this.generateMap();			// not actually done every tick, just checks for regenerate flag
+		this.doDelayFindPath();
+	};
+	behinstProto.doDelayFindPath = function()
+	{
+		if (this.delayFindPath && !this.is_destroyed)
+		{
+			this.delayFindPath = false;
+			this.doFindPath(this.inst.x, this.inst.y, this.delayPathX, this.delayPathY);
+		}
+	};
+	behinstProto.getMyInfo = function ()
+	{
+		var cellkey = "" + this.cellSize + "," + this.cellBorder;
+		if (!cellData.hasOwnProperty(cellkey))
+		{
+			cellData[cellkey] = {
+				pathfinder: new window["Pathfinder"](),
+				cells: null,
+				regenerate: false,
+				regenerateRegions: []
+			};
+		}
+		return cellData[cellkey];
+	};
+	behinstProto.generateMap = function ()
+	{
+		var myinfo = this.getMyInfo();
+		if (myinfo.pathfinder["isReady"]() && !myinfo.regenerate && !myinfo.regenerateRegions.length)
+			return;		// already got a map and not marked to regenerate
+		var arr, x, y, lenx, leny, i, len, r, cx1, cy1, cx2, cy2, q;
+		if (!myinfo.pathfinder["isReady"]() || myinfo.regenerate)
+		{
+			arr = [];
+			arr.length = this.myHcells;
+			lenx = this.myHcells;
+			leny = this.myVcells;
+			for (x = 0; x < lenx; ++x)
+			{
+				arr[x] = [];
+				arr[x].length = leny;
+				for (y = 0; y < leny; ++y)
+					arr[x][y] = this.queryCellCollision(x, y);
+			}
+			myinfo.cells = arr;
+			myinfo.pathfinder["init"](this.myHcells, this.myVcells, arr, this.diagonalsEnabled);
+			myinfo.regenerate = false;
+			cr.clearArray(myinfo.regenerateRegions);
+		}
+		else if (myinfo.regenerateRegions.length)
+		{
+			for (i = 0, len = myinfo.regenerateRegions.length; i < len; ++i)
+			{
+				r = myinfo.regenerateRegions[i];
+				cx1 = r[0];
+				cy1 = r[1];
+				cx2 = r[2];
+				cy2 = r[3];
+				arr = [];
+				lenx = cx2 - cx1;
+				leny = cy2 - cy1;
+				arr.length = lenx;
+				for (x = 0; x < lenx; ++x)
+				{
+					arr[x] = [];
+					arr[x].length = leny;
+					for (y = 0; y < leny; ++y)
+					{
+						q = this.queryCellCollision(cx1 + x, cy1 + y);
+						arr[x][y] = q;
+						myinfo.cells[cx1 + x][cy1 + y] = q;
+					}
+				}
+				myinfo.pathfinder["updateRegion"](cx1, cy1, lenx, leny, arr);
+			}
+			cr.clearArray(myinfo.regenerateRegions);
+		}
+	};
+	behinstProto.clearResultPath = function ()
+	{
+		var i, len;
+		for (i = 0, len = this.myPath.length; i < len; i++)
+			window["freeResultNode"](this.myPath[i]);
+		cr.clearArray(this.myPath);
+	};
+	behinstProto.copyResultPath = function ()
+	{
+		var pathfinder = this.getMyInfo().pathfinder;
+		var pathList = pathfinder["pathList"];
+		this.clearResultPath();
+		var i, len, n, m;
+		for (i = 0, len = pathList.length; i < len; i++)
+		{
+			n = pathList[i];
+			m = window["allocResultNode"]();
+			m.x = (n.x + 0.5) * this.cellSize;
+			m.y = (n.y + 0.5) * this.cellSize;
+			this.myPath.push(m);
+		}
+	};
+	var candidates = [];
+	var tmpRect = new cr.rect();
+	behinstProto.queryCellCollision = function (x_, y_)
+	{
+		var i, len, t, j, lenj, cost, ret = 0;
+		tmpRect.left = x_ * this.cellSize - this.cellBorder;
+		tmpRect.top = y_ * this.cellSize - this.cellBorder;
+		tmpRect.right = (x_ + 1) * this.cellSize + this.cellBorder;
+		tmpRect.bottom = (y_ + 1) * this.cellSize + this.cellBorder;
+		if (this.obstacles === 0)	// solids
+		{
+			if (this.runtime.testRectOverlapSolid(tmpRect))
+				return window["PF_OBSTACLE"];
+		}
+		else
+		{
+			this.runtime.getTypesCollisionCandidates(this.inst.layer, this.type.obstacleTypes, tmpRect, candidates);
+			for (i = 0, len = candidates.length; i < len; ++i)
+			{
+				if (this.runtime.testRectOverlap(tmpRect, candidates[i]))
+				{
+					cr.clearArray(candidates);
+					return window["PF_OBSTACLE"];
+				}
+			}
+			candidates.length = 0;
+		}
+		for (i = 0, len = this.type.costTypes.length; i < len; i++)
+		{
+			t = this.type.costTypes[i].obj;
+			cost = this.type.costTypes[i].cost;
+			this.runtime.getCollisionCandidates(this.inst.layer, t, tmpRect, candidates);
+			for (j = 0, lenj = candidates.length; j < lenj; ++j)
+			{
+				if (this.runtime.testRectOverlap(tmpRect, candidates[j]))
+					ret += cost;
+			}
+			cr.clearArray(candidates);
+		}
+		return ret;
+	};
+	behinstProto.doFindPath = function (startX, startY, endX, endY)
+	{
+		var pathfinder = this.getMyInfo().pathfinder;
+		if (!pathfinder["isReady"]())
+			return false;		// not yet ready
+		this.isCalculating = true;
+		this.calcPathX = endX;
+		this.calcPathY = endY;
+		var cellX = Math.floor(startX / this.cellSize);
+		var cellY = Math.floor(startY / this.cellSize);
+		var destCellX = Math.floor(endX / this.cellSize);
+		var destCellY = Math.floor(endY / this.cellSize);
+		var bestDist, bestX, bestY, x, y, dx, dy, curDist;
+		if (pathfinder["at"](destCellX, destCellY) === window["PF_OBSTACLE"])
+		{
+			bestDist = 1000000;
+			bestX = 0;
+			bestY = 0;
+			for (x = 0; x < this.myHcells; x++)
+			{
+				for (y = 0; y < this.myVcells; y++)
+				{
+					if (pathfinder["at"](x, y) !== window["PF_OBSTACLE"])
+					{
+						dx = destCellX - x;
+						dy = destCellY - y;
+						curDist = dx*dx + dy*dy;
+						if (curDist < bestDist)
+						{
+							bestDist = curDist;
+							bestX = x;
+							bestY = y;
+						}
+					}
+				}
+			}
+			destCellX = bestX;
+			destCellY = bestY;
+		}
+		var self = this;
+		pathfinder["findPath"](cellX, cellY, destCellX, destCellY, this.pathSuccessFn, this.pathFailFn);
+	};
+	behinstProto.onLayoutChange = function ()
+	{
+		this.getMyInfo().regenerate = true;
+	};
+	function Cnds() {};
+	Cnds.prototype.OnPathFound = function ()
+	{
+		return true;
+	};
+	Cnds.prototype.OnFailedToFindPath = function ()
+	{
+		return true;
+	};
+	Cnds.prototype.IsCellObstacle = function (x_, y_)
+	{
+		return (this.getMyInfo().pathfinder["at"](x_, y_) === window["PF_OBSTACLE"]);
+	};
+	Cnds.prototype.IsCalculatingPath = function ()
+	{
+		return this.isCalculating;
+	};
+	Cnds.prototype.IsMoving = function ()
+	{
+		return this.isMoving;
+	};
+	Cnds.prototype.OnArrived = function ()
+	{
+		return true;
+	};
+	Cnds.prototype.CompareSpeed = function (cmp, x)
+	{
+		return cr.do_cmp(this.isMoving ? this.s : 0, cmp, x);
+	};
+	Cnds.prototype.DiagonalsEnabled = function (cmp, x)
+	{
+		return this.diagonalsEnabled;
+	};
+	behaviorProto.cnds = new Cnds();
+	function Acts() {};
+	Acts.prototype.FindPath = function (x_, y_)
+	{
+		if (!this.enabled)
+			return;
+		if (this.isCalculating || !this.getMyInfo().pathfinder["isReady"]())
+		{
+			this.delayFindPath = true;
+			this.delayPathX = x_;
+			this.delayPathY = y_;
+		}
+		else
+			this.doFindPath(this.inst.x, this.inst.y, x_, y_);
+	};
+	Acts.prototype.StartMoving = function ()
+	{
+		if (this.hasPath)
+		{
+			if (this.isMoving)
+				this.firstTickMovingWhileMoving = true;
+			this.movingFromStopped = !this.isMoving;
+			this.isMoving = true;
+			this.rabbitX = this.inst.x;
+			this.rabbitY = this.inst.y;
+			this.rabbitA = this.inst.angle;
+		}
+	};
+	Acts.prototype.Stop = function ()
+	{
+		this.isMoving = false;
+	};
+	Acts.prototype.SetEnabled = function (e)
+	{
+		this.enabled = (e !== 0);
+	};
+	Acts.prototype.RegenerateMap = function ()
+	{
+		this.getMyInfo().regenerate = true;
+	};
+	Acts.prototype.AddObstacle = function (obj_)
+	{
+		var obstacleTypes = this.type.obstacleTypes;
+		if (obstacleTypes.indexOf(obj_) !== -1)
+			return;
+		var i, len, t;
+		for (i = 0, len = obstacleTypes.length; i < len; i++)
+		{
+			t = obstacleTypes[i];
+			if (t.is_family && t.members.indexOf(obj_) !== -1)
+				return;
+		}
+		obstacleTypes.push(obj_);
+	};
+	Acts.prototype.ClearObstacles = function ()
+	{
+		cr.clearArray(this.type.obstacleTypes);
+	};
+	Acts.prototype.AddCost = function (obj_, cost_)
+	{
+		var costTypes = this.type.costTypes;
+		var i, len, t;
+		for (i = 0, len = costTypes.length; i < len; i++)
+		{
+			t = costTypes[i].obj;
+			if (t === obj_)
+				return;			// already added this one
+			if (t.is_family && t.members.indexOf(obj_) !== -1)
+				return;			// already added via family
+		}
+		costTypes.push({ obj: obj_, cost: cost_ });
+	};
+	Acts.prototype.ClearCost = function ()
+	{
+		cr.clearArray(this.type.costTypes);
+	};
+	Acts.prototype.SetMaxSpeed = function (x_)
+	{
+		this.maxSpeed = x_;
+	};
+	Acts.prototype.SetSpeed = function (x_)
+	{
+		if (x_ < 0)
+			x_ = 0;
+		if (x_ > this.maxSpeed)
+			x_ = this.maxSpeed;
+		this.s = x_;
+	};
+	Acts.prototype.SetAcc = function (x_)
+	{
+		this.acc = x_;
+	};
+	Acts.prototype.SetDec = function (x_)
+	{
+		this.dec = x_;
+	};
+	Acts.prototype.SetRotateSpeed = function (x_)
+	{
+		this.av = cr.to_radians(x_);
+	};
+	Acts.prototype.SetDiagonalsEnabled = function (e)
+	{
+		this.diagonalsEnabled = (e !== 0);
+		this.getMyInfo().pathfinder["setDiagonals"](this.diagonalsEnabled);
+	};
+	Acts.prototype.RegenerateRegion = function (startx, starty, endx, endy)
+	{
+		this.doRegenerateRegion(startx, starty, endx, endy);
+	};
+	Acts.prototype.RegenerateObjectRegion = function (obj)
+	{
+		if (!obj)
+			return;
+		var instances = obj.getCurrentSol().getObjects();
+		var i, len, inst;
+		for (i = 0, len = instances.length; i < len; ++i)
+		{
+			inst = instances[i];
+			if (!inst.update_bbox)
+				continue;
+			inst.update_bbox();
+			this.doRegenerateRegion(inst.bbox.left, inst.bbox.top, inst.bbox.right, inst.bbox.bottom);
+		}
+	};
+	behinstProto.doRegenerateRegion = function (startx, starty, endx, endy)
+	{
+		var x1 = Math.min(startx, endx) - this.cellBorder;
+		var y1 = Math.min(starty, endy) - this.cellBorder;
+		var x2 = Math.max(startx, endx) + this.cellBorder;
+		var y2 = Math.max(starty, endy) + this.cellBorder;
+		var cellX1 = Math.max(Math.floor(x1 / this.cellSize), 0);
+		var cellY1 = Math.max(Math.floor(y1 / this.cellSize), 0);
+		var cellX2 = Math.min(Math.ceil(x2 / this.cellSize), this.myHcells);
+		var cellY2 = Math.min(Math.ceil(y2 / this.cellSize), this.myVcells);
+		if (cellX1 >= cellX2 || cellY1 >= cellY2)
+			return;		// empty area to regenerate
+		this.getMyInfo().regenerateRegions.push([cellX1, cellY1, cellX2, cellY2]);
+	};
+	behaviorProto.acts = new Acts();
+	function Exps() {};
+	Exps.prototype.NodeCount = function (ret)
+	{
+		ret.set_int(this.myPath.length);
+	};
+	Exps.prototype.NodeXAt = function (ret, i)
+	{
+		i = Math.floor(i);
+		if (i < 0 || i >= this.myPath.length)
+			ret.set_float(0);
+		else
+			ret.set_float(this.myPath[i].x);
+	};
+	Exps.prototype.NodeYAt = function (ret, i)
+	{
+		i = Math.floor(i);
+		if (i < 0 || i >= this.myPath.length)
+			ret.set_float(0);
+		else
+			ret.set_float(this.myPath[i].y);
+	};
+	Exps.prototype.CellSize = function (ret)
+	{
+		ret.set_int(this.cellSize);
+	};
+	Exps.prototype.RabbitX = function (ret)
+	{
+		ret.set_float(this.rabbitX);
+	};
+	Exps.prototype.RabbitY = function (ret)
+	{
+		ret.set_float(this.rabbitY);
+	};
+	Exps.prototype.MaxSpeed = function (ret)
+	{
+		ret.set_float(this.maxSpeed);
+	};
+	Exps.prototype.Acceleration = function (ret)
+	{
+		ret.set_float(this.acc);
+	};
+	Exps.prototype.Deceleration = function (ret)
+	{
+		ret.set_float(this.dec);
+	};
+	Exps.prototype.RotateSpeed = function (ret)
+	{
+		ret.set_float(cr.to_degrees(this.av));
+	};
+	Exps.prototype.MovingAngle = function (ret)
+	{
+		ret.set_float(cr.to_degrees(this.a));
+	};
+	Exps.prototype.CurrentNode = function (ret)
+	{
+		ret.set_int(this.moveNode);
+	};
+	Exps.prototype.Speed = function (ret)
+	{
+		ret.set_float(this.isMoving ? this.s : 0);
+	};
+	behaviorProto.exps = new Exps();
+}());
+;
+;
+cr.behaviors.Rex_MoveTo = function(runtime)
+{
+	this.runtime = runtime;
+};
+(function ()
+{
+	var behaviorProto = cr.behaviors.Rex_MoveTo.prototype;
+	behaviorProto.Type = function(behavior, objtype)
+	{
+		this.behavior = behavior;
+		this.objtype = objtype;
+		this.runtime = behavior.runtime;
+	};
+	var behtypeProto = behaviorProto.Type.prototype;
+	behtypeProto.onCreate = function()
+	{
+	};
+	behaviorProto.Instance = function(type, inst)
+	{
+		this.type = type;
+		this.behavior = type.behavior;
+		this.inst = inst;				// associated object instance to modify
+		this.runtime = type.runtime;
+	};
+	var behinstProto = behaviorProto.Instance.prototype;
+	behinstProto.onCreate = function()
+	{
+        this.enabled = (this.properties[0] == 1);
+        if (!this.recycled)
+        {
+            this.move_params = {"max":0,
+                                "acc":0,
+                                "dec":0};
+        }
+        this.move_params["max"] = this.properties[1];
+        this.move_params["acc"] = this.properties[2];
+        this.move_params["dec"] = this.properties[3];
+        this.soild_stop_enable = (this.properties[4] === 1);
+        this.is_continue_mode = (this.properties[5] === 1);
+        if (!this.recycled)
+        {
+            this.target = {"x":0 , "y":0, "a":0};
+        }
+        this.is_moving = false;
+        this.current_speed = 0;
+        this.remain_distance = 0;
+        this.remain_dt = 0;
+        if (!this.recycled)
+        {
+            this._pre_pos = {"x":0,"y":0};
+        }
+        this._pre_pos["x"] = 0;
+        this._pre_pos["y"] = 0;
+        this._moving_angle_info = new_point(this._moving_angle_info);
+        this._moving_angle_start_info = new_point(this._moving_angle_start_info);
+        this._last_tick = null;
+        this.is_my_call = false;
+	};
+    var new_point = function (point)
+    {
+        if (point == null)
+            point = {};
+        point["x"] = 0;
+        point["y"] = 0;
+        point["a"] = -1;
+        return point;
+    };
+	behinstProto.tick = function ()
+	{
+	    this.remain_dt = 0;
+        if ( (!this.enabled) || (!this.is_moving) )
+            return;
+		var dt = this.runtime.getDt(this.inst);
+		this.move(dt);
+	};
+	behinstProto.move = function (dt)
+	{
+        if (dt == 0)   // can not move if dt == 0
+            return;
+        if ((this._pre_pos["x"] !== this.inst.x) || (this._pre_pos["y"] !== this.inst.y))
+		    this._reset_current_pos();    // reset this.remain_distance
+        var is_slow_down = false;
+        if (this.move_params["dec"] != 0)
+        {
+            var _speed = this.current_speed;
+            var _distance = (_speed*_speed)/(2*this.move_params["dec"]); // (v*v)/(2*a)
+            is_slow_down = (_distance >= this.remain_distance);
+        }
+        var acc = (is_slow_down)? (-this.move_params["dec"]):this.move_params["acc"];
+        if (acc != 0)
+        {
+            this.SetCurrentSpeed( this.current_speed + (acc * dt) );
+        }
+        var distance = this.current_speed * dt;
+        this.remain_distance -= distance;
+        var is_hit_target = false;
+        if ( (this.remain_distance <= 0) || (this.current_speed <= 0) )
+        {
+            is_hit_target = true;
+            this.inst.x = this.target["x"];
+            this.inst.y = this.target["y"];
+            if (this.current_speed > 0)
+                this.remain_dt = (-this.remain_distance)/this.current_speed;
+            this.moving_angle_get();
+            this.SetCurrentSpeed(0);
+        }
+        else
+        {
+            var angle = this.target["a"];
+            this.inst.x += (distance * Math.cos(angle));
+            this.inst.y += (distance * Math.sin(angle));
+        }
+		this.inst.set_bbox_changed();
+        var is_solid_stop = false;
+        if (this.soild_stop_enable)
+        {
+		    var collobj = this.runtime.testOverlapSolid(this.inst);
+		    if (collobj)
+		    {
+			    this.runtime.registerCollision(this.inst, collobj);
+			    this.runtime.pushOutSolidNearest(this.inst);
+                is_solid_stop = true;
+		    }
+        }
+		this._pre_pos["x"] = this.inst.x;
+		this._pre_pos["y"] = this.inst.y;
+        if (is_solid_stop)
+        {
+            this.is_moving = false;  // stop
+            this.is_my_call = true;
+            this.runtime.trigger(cr.behaviors.Rex_MoveTo.prototype.cnds.OnSolidStop, this.inst);
+            this.is_my_call = false;
+        }
+        else if (is_hit_target)
+        {
+            this.is_moving = false;  // stop
+            this.is_my_call = true;
+            this.runtime.trigger(cr.behaviors.Rex_MoveTo.prototype.cnds.OnHitTarget, this.inst);
+            this.is_my_call = false;
+        }
+	};
+	behinstProto.tick2 = function ()
+	{
+        this._moving_angle_info["x"] = this.inst.x;
+		this._moving_angle_info["y"] = this.inst.y;
+    };
+	behinstProto.SetCurrentSpeed = function(speed)
+	{
+        if (speed != null)
+        {
+            this.current_speed = (speed > this.move_params["max"])?
+                                 this.move_params["max"]: speed;
+        }
+        else if (this.move_params["acc"]==0)
+        {
+            this.current_speed = this.move_params["max"];
+        }
+	};
+	behinstProto._reset_current_pos = function ()
+	{
+        var dx = this.target["x"] - this.inst.x;
+        var dy = this.target["y"] - this.inst.y;
+        this.target["a"] = Math.atan2(dy, dx);
+        this.remain_distance = Math.sqrt( (dx*dx) + (dy*dy) );
+		this._pre_pos["x"] = this.inst.x;
+		this._pre_pos["y"] = this.inst.y;
+	};
+	behinstProto.SetTargetPos = function (_x, _y)
+	{
+		this.target["x"] = _x;
+        this.target["y"] = _y;
+        this.SetCurrentSpeed(null);
+        this._reset_current_pos();
+		this._moving_angle_info["x"] = this.inst.x;
+		this._moving_angle_info["y"] = this.inst.y;
+        this.is_moving = true;
+        this._moving_angle_start_info["x"] = this.inst.x;
+        this._moving_angle_start_info["y"] = this.inst.y;
+        this._moving_angle_start_info["a"] = cr.to_clamped_degrees(cr.angleTo(this.inst.x, this.inst.y, _x, _y));
+        if (this.is_continue_mode)
+            this.move(this.remain_dt);
+	};
+	behinstProto.is_tick_changed = function ()
+	{
+	    var cur_tick = this.runtime.tickcount;
+		var tick_changed = (this._last_tick != cur_tick);
+        this._last_tick = cur_tick;
+		return tick_changed;
+	};
+ 	behinstProto.moving_angle_get = function (ret)
+	{
+        if (this.is_tick_changed())
+        {
+            var dx = this.inst.x - this._moving_angle_info["x"];
+            var dy = this.inst.y - this._moving_angle_info["y"];
+            if ((dx!=0) || (dy!=0))
+                this._moving_angle_info["a"] = cr.to_clamped_degrees(Math.atan2(dy,dx));
+        }
+		return this._moving_angle_info["a"];
+	};
+	behinstProto.saveToJSON = function ()
+	{
+		return { "en": this.enabled,
+		         "v": this.move_params,
+                 "t": this.target,
+                 "is_m": this.is_moving,
+                 "c_spd" : this.current_speed,
+                 "rd" : this.remain_distance,
+                 "pp": this._pre_pos,
+                 "ma": this._moving_angle_info,
+                 "ms": this._moving_angle_start_info,
+                 "lt": this._last_tick,
+               };
+	};
+	behinstProto.loadFromJSON = function (o)
+	{
+		this.enabled = o["en"];
+		this.move_params = o["v"];
+		this.target = o["t"];
+		this.is_moving = o["is_m"];
+		this.current_speed = o["c_spd"];
+		this.remain_distance = o["rd"];
+        this._pre_pos = o["pp"];
+        this._moving_angle_info = o["ma"];
+        this._moving_angle_start_info = o["ms"];
+        this._last_tick = o["lt"];
+	};
+	function Cnds() {};
+	behaviorProto.cnds = new Cnds();
+	Cnds.prototype.OnHitTarget = function ()
+	{
+		return (this.is_my_call);
+	};
+	Cnds.prototype.CompareSpeed = function (cmp, s)
+	{
+		return cr.do_cmp(this.current_speed, cmp, s);
+	};
+    Cnds.prototype.OnMoving = function ()  // deprecated
+	{
+		return false;
+	};
+	Cnds.prototype.IsMoving = function ()
+	{
+		return (this.enabled && this.is_moving);
+	};
+	Cnds.prototype.CompareMovingAngle = function (cmp, s)
+	{
+        var angle = this.moving_angle_get();
+        if (angle != (-1))
+		    return cr.do_cmp(this.moving_angle_get(), cmp, s);
+        else
+            return false;
+	};
+	Cnds.prototype.OnSolidStop = function ()
+	{
+		return (this.is_my_call);
+	};
+	function Acts() {};
+	behaviorProto.acts = new Acts();
+	Acts.prototype.SetEnabled = function (en)
+	{
+		this.enabled = (en === 1);
+	};
+	Acts.prototype.SetMaxSpeed = function (s)
+	{
+		this.move_params["max"] = s;
+        this.SetCurrentSpeed(null);
+	};
+	Acts.prototype.SetAcceleration = function (a)
+	{
+		this.move_params["acc"] = a;
+        this.SetCurrentSpeed(null);
+	};
+	Acts.prototype.SetDeceleration = function (a)
+	{
+		this.move_params["dec"] = a;
+	};
+	Acts.prototype.SetTargetPos = function (x, y)
+	{
+        this.SetTargetPos(x, y)
+	};
+	Acts.prototype.SetCurrentSpeed = function (s)
+	{
+        this.SetCurrentSpeed(s);
+	};
+ 	Acts.prototype.SetTargetPosOnObject = function (objtype)
+	{
+		if (!objtype)
+			return;
+		var inst = objtype.getFirstPicked();
+        if (inst != null)
+            this.SetTargetPos(inst.x, inst.y);
+	};
+ 	Acts.prototype.SetTargetPosByDeltaXY = function (dx, dy)
+	{
+        this.SetTargetPos(this.inst.x + dx, this.inst.y + dy);
+	};
+ 	Acts.prototype.SetTargetPosByDistanceAngle = function (distance, angle)
+	{
+        var a = cr.to_clamped_radians(angle);
+        var dx = distance*Math.cos(a);
+        var dy = distance*Math.sin(a);
+        this.SetTargetPos(this.inst.x + dx, this.inst.y + dy);
+	};
+ 	Acts.prototype.Stop = function ()
+	{
+        this.is_moving = false;
+	};
+	function Exps() {};
+	behaviorProto.exps = new Exps();
+	Exps.prototype.Activated = function (ret)
+	{
+		ret.set_int((this.enabled)? 1:0);
+	};
+	Exps.prototype.Speed = function (ret)
+	{
+		ret.set_float(this.current_speed);
+	};
+	Exps.prototype.MaxSpeed = function (ret)
+	{
+		ret.set_float(this.move_params["max"]);
+	};
+	Exps.prototype.Acc = function (ret)
+	{
+		ret.set_float(this.move_params["acc"]);
+	};
+ 	Exps.prototype.Dec = function (ret)
+	{
+		ret.set_float(this.move_params["dec"]);
+	};
+	Exps.prototype.TargetX = function (ret)
+	{
+		ret.set_float(this.target["x"]);
+	};
+ 	Exps.prototype.TargetY = function (ret)
+	{
+		ret.set_float(this.target["y"]);
+	};
+ 	Exps.prototype.MovingAngle = function (ret)
+	{
+		ret.set_float(this.moving_angle_get());
+	};
+ 	Exps.prototype.MovingAngleStart = function (ret)
+	{
+		ret.set_float(this._moving_angle_start_info["a"]);
+	};
+}());
+;
+;
+cr.behaviors.Sin = function(runtime)
+{
+	this.runtime = runtime;
+};
+(function ()
+{
+	var behaviorProto = cr.behaviors.Sin.prototype;
+	behaviorProto.Type = function(behavior, objtype)
+	{
+		this.behavior = behavior;
+		this.objtype = objtype;
+		this.runtime = behavior.runtime;
+	};
+	var behtypeProto = behaviorProto.Type.prototype;
+	behtypeProto.onCreate = function()
+	{
+	};
+	behaviorProto.Instance = function(type, inst)
+	{
+		this.type = type;
+		this.behavior = type.behavior;
+		this.inst = inst;				// associated object instance to modify
+		this.runtime = type.runtime;
+		this.i = 0;		// period offset (radians)
+	};
+	var behinstProto = behaviorProto.Instance.prototype;
+	var _2pi = 2 * Math.PI;
+	var _pi_2 = Math.PI / 2;
+	var _3pi_2 = (3 * Math.PI) / 2;
+	behinstProto.onCreate = function()
+	{
+		this.active = (this.properties[0] === 1);
+		this.movement = this.properties[1]; // 0=Horizontal|1=Vertical|2=Size|3=Width|4=Height|5=Angle|6=Opacity|7=Value only
+		this.wave = this.properties[2];		// 0=Sine|1=Triangle|2=Sawtooth|3=Reverse sawtooth|4=Square
+		this.period = this.properties[3];
+		this.period += Math.random() * this.properties[4];								// period random
+		if (this.period === 0)
+			this.i = 0;
+		else
+		{
+			this.i = (this.properties[5] / this.period) * _2pi;								// period offset
+			this.i += ((Math.random() * this.properties[6]) / this.period) * _2pi;			// period offset random
+		}
+		this.mag = this.properties[7];													// magnitude
+		this.mag += Math.random() * this.properties[8];									// magnitude random
+		this.initialValue = 0;
+		this.initialValue2 = 0;
+		this.ratio = 0;
+		this.init();
+	};
+	behinstProto.saveToJSON = function ()
+	{
+		return {
+			"i": this.i,
+			"a": this.active,
+			"mv": this.movement,
+			"w": this.wave,
+			"p": this.period,
+			"mag": this.mag,
+			"iv": this.initialValue,
+			"iv2": this.initialValue2,
+			"r": this.ratio,
+			"lkv": this.lastKnownValue,
+			"lkv2": this.lastKnownValue2
+		};
+	};
+	behinstProto.loadFromJSON = function (o)
+	{
+		this.i = o["i"];
+		this.active = o["a"];
+		this.movement = o["mv"];
+		this.wave = o["w"];
+		this.period = o["p"];
+		this.mag = o["mag"];
+		this.initialValue = o["iv"];
+		this.initialValue2 = o["iv2"] || 0;
+		this.ratio = o["r"];
+		this.lastKnownValue = o["lkv"];
+		this.lastKnownValue2 = o["lkv2"] || 0;
+	};
+	behinstProto.init = function ()
+	{
+		switch (this.movement) {
+		case 0:		// horizontal
+			this.initialValue = this.inst.x;
+			break;
+		case 1:		// vertical
+			this.initialValue = this.inst.y;
+			break;
+		case 2:		// size
+			this.initialValue = this.inst.width;
+			this.ratio = this.inst.height / this.inst.width;
+			break;
+		case 3:		// width
+			this.initialValue = this.inst.width;
+			break;
+		case 4:		// height
+			this.initialValue = this.inst.height;
+			break;
+		case 5:		// angle
+			this.initialValue = this.inst.angle;
+			this.mag = cr.to_radians(this.mag);		// convert magnitude from degrees to radians
+			break;
+		case 6:		// opacity
+			this.initialValue = this.inst.opacity;
+			break;
+		case 7:
+			this.initialValue = 0;
+			break;
+		case 8:		// forwards/backwards
+			this.initialValue = this.inst.x;
+			this.initialValue2 = this.inst.y;
+			break;
+		default:
+;
+		}
+		this.lastKnownValue = this.initialValue;
+		this.lastKnownValue2 = this.initialValue2;
+	};
+	behinstProto.waveFunc = function (x)
+	{
+		x = x % _2pi;
+		switch (this.wave) {
+		case 0:		// sine
+			return Math.sin(x);
+		case 1:		// triangle
+			if (x <= _pi_2)
+				return x / _pi_2;
+			else if (x <= _3pi_2)
+				return 1 - (2 * (x - _pi_2) / Math.PI);
+			else
+				return (x - _3pi_2) / _pi_2 - 1;
+		case 2:		// sawtooth
+			return 2 * x / _2pi - 1;
+		case 3:		// reverse sawtooth
+			return -2 * x / _2pi + 1;
+		case 4:		// square
+			return x < Math.PI ? -1 : 1;
+		};
+		return 0;
+	};
+	behinstProto.tick = function ()
+	{
+		var dt = this.runtime.getDt(this.inst);
+		if (!this.active || dt === 0)
+			return;
+		if (this.period === 0)
+			this.i = 0;
+		else
+		{
+			this.i += (dt / this.period) * _2pi;
+			this.i = this.i % _2pi;
+		}
+		switch (this.movement) {
+		case 0:		// horizontal
+			if (this.inst.x !== this.lastKnownValue)
+				this.initialValue += this.inst.x - this.lastKnownValue;
+			this.inst.x = this.initialValue + this.waveFunc(this.i) * this.mag;
+			this.lastKnownValue = this.inst.x;
+			break;
+		case 1:		// vertical
+			if (this.inst.y !== this.lastKnownValue)
+				this.initialValue += this.inst.y - this.lastKnownValue;
+			this.inst.y = this.initialValue + this.waveFunc(this.i) * this.mag;
+			this.lastKnownValue = this.inst.y;
+			break;
+		case 2:		// size
+			this.inst.width = this.initialValue + this.waveFunc(this.i) * this.mag;
+			this.inst.height = this.inst.width * this.ratio;
+			break;
+		case 3:		// width
+			this.inst.width = this.initialValue + this.waveFunc(this.i) * this.mag;
+			break;
+		case 4:		// height
+			this.inst.height = this.initialValue + this.waveFunc(this.i) * this.mag;
+			break;
+		case 5:		// angle
+			if (this.inst.angle !== this.lastKnownValue)
+				this.initialValue = cr.clamp_angle(this.initialValue + (this.inst.angle - this.lastKnownValue));
+			this.inst.angle = cr.clamp_angle(this.initialValue + this.waveFunc(this.i) * this.mag);
+			this.lastKnownValue = this.inst.angle;
+			break;
+		case 6:		// opacity
+			this.inst.opacity = this.initialValue + (this.waveFunc(this.i) * this.mag) / 100;
+			if (this.inst.opacity < 0)
+				this.inst.opacity = 0;
+			else if (this.inst.opacity > 1)
+				this.inst.opacity = 1;
+			break;
+		case 8:		// forwards/backwards
+			if (this.inst.x !== this.lastKnownValue)
+				this.initialValue += this.inst.x - this.lastKnownValue;
+			if (this.inst.y !== this.lastKnownValue2)
+				this.initialValue2 += this.inst.y - this.lastKnownValue2;
+			this.inst.x = this.initialValue + Math.cos(this.inst.angle) * this.waveFunc(this.i) * this.mag;
+			this.inst.y = this.initialValue2 + Math.sin(this.inst.angle) * this.waveFunc(this.i) * this.mag;
+			this.lastKnownValue = this.inst.x;
+			this.lastKnownValue2 = this.inst.y;
+			break;
+		}
+		this.inst.set_bbox_changed();
+	};
+	behinstProto.onSpriteFrameChanged = function (prev_frame, next_frame)
+	{
+		switch (this.movement) {
+		case 2:	// size
+			this.initialValue *= (next_frame.width / prev_frame.width);
+			this.ratio = next_frame.height / next_frame.width;
+			break;
+		case 3:	// width
+			this.initialValue *= (next_frame.width / prev_frame.width);
+			break;
+		case 4:	// height
+			this.initialValue *= (next_frame.height / prev_frame.height);
+			break;
+		}
+	};
+	function Cnds() {};
+	Cnds.prototype.IsActive = function ()
+	{
+		return this.active;
+	};
+	Cnds.prototype.CompareMovement = function (m)
+	{
+		return this.movement === m;
+	};
+	Cnds.prototype.ComparePeriod = function (cmp, v)
+	{
+		return cr.do_cmp(this.period, cmp, v);
+	};
+	Cnds.prototype.CompareMagnitude = function (cmp, v)
+	{
+		if (this.movement === 5)
+			return cr.do_cmp(this.mag, cmp, cr.to_radians(v));
+		else
+			return cr.do_cmp(this.mag, cmp, v);
+	};
+	Cnds.prototype.CompareWave = function (w)
+	{
+		return this.wave === w;
+	};
+	behaviorProto.cnds = new Cnds();
+	function Acts() {};
+	Acts.prototype.SetActive = function (a)
+	{
+		this.active = (a === 1);
+	};
+	Acts.prototype.SetPeriod = function (x)
+	{
+		this.period = x;
+	};
+	Acts.prototype.SetMagnitude = function (x)
+	{
+		this.mag = x;
+		if (this.movement === 5)	// angle
+			this.mag = cr.to_radians(this.mag);
+	};
+	Acts.prototype.SetMovement = function (m)
+	{
+		if (this.movement === 5)
+			this.mag = cr.to_degrees(this.mag);
+		this.movement = m;
+		this.init();
+	};
+	Acts.prototype.SetWave = function (w)
+	{
+		this.wave = w;
+	};
+	Acts.prototype.SetPhase = function (x)
+	{
+		this.i = (x * _2pi) % _2pi;
+	};
+	Acts.prototype.UpdateInitialState = function ()
+	{
+		this.init();
+	};
+	behaviorProto.acts = new Acts();
+	function Exps() {};
+	Exps.prototype.CyclePosition = function (ret)
+	{
+		ret.set_float(this.i / _2pi);
+	};
+	Exps.prototype.Period = function (ret)
+	{
+		ret.set_float(this.period);
+	};
+	Exps.prototype.Magnitude = function (ret)
+	{
+		if (this.movement === 5)	// angle
+			ret.set_float(cr.to_degrees(this.mag));
+		else
+			ret.set_float(this.mag);
+	};
+	Exps.prototype.Value = function (ret)
+	{
+		ret.set_float(this.waveFunc(this.i) * this.mag);
+	};
+	behaviorProto.exps = new Exps();
+}());
+;
+;
 cr.behaviors.scrollto = function(runtime)
 {
 	this.runtime = runtime;
@@ -17078,14 +18488,36 @@ cr.getObjectRefTable = function () { return [
 	cr.behaviors.EightDir,
 	cr.behaviors.scrollto,
 	cr.behaviors.solid,
+	cr.behaviors.Sin,
+	cr.behaviors.Pathfinding,
+	cr.behaviors.Rex_MoveTo,
 	cr.system_object.prototype.cnds.EveryTick,
 	cr.plugins_.Sprite.prototype.cnds.IsAnimPlaying,
 	cr.behaviors.EightDir.prototype.cnds.IsMoving,
 	cr.plugins_.Sprite.prototype.acts.SetAnim,
 	cr.system_object.prototype.cnds.Else,
+	cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
+	cr.plugins_.Sprite.prototype.cnds.CompareFrame,
+	cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
+	cr.plugins_.Sprite.prototype.acts.SetInstanceVar,
+	cr.plugins_.Sprite.prototype.cnds.CompareInstanceVar,
+	cr.plugins_.Sprite.prototype.acts.Destroy,
+	cr.system_object.prototype.acts.Wait,
 	cr.plugins_.Keyboard.prototype.cnds.IsKeyDown,
 	cr.plugins_.Sprite.prototype.acts.SetMirrored,
 	cr.plugins_.Keyboard.prototype.cnds.OnKey,
 	cr.behaviors.EightDir.prototype.acts.SetEnabled,
-	cr.plugins_.Sprite.prototype.cnds.OnAnimFinished
+	cr.plugins_.Sprite.prototype.cnds.OnAnimFinished,
+	cr.system_object.prototype.cnds.Every,
+	cr.system_object.prototype.acts.CreateObject,
+	cr.system_object.prototype.exps.random,
+	cr.system_object.prototype.exps.layoutwidth,
+	cr.behaviors.Rex_MoveTo.prototype.acts.SetTargetPos,
+	cr.plugins_.Sprite.prototype.exps.X,
+	cr.behaviors.Rex_MoveTo.prototype.cnds.IsMoving,
+	cr.behaviors.Pathfinding.prototype.acts.FindPath,
+	cr.plugins_.Sprite.prototype.exps.ImagePointX,
+	cr.plugins_.Sprite.prototype.exps.ImagePointY,
+	cr.behaviors.Pathfinding.prototype.cnds.OnPathFound,
+	cr.behaviors.Pathfinding.prototype.acts.StartMoving
 ];};
