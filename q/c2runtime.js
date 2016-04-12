@@ -17191,15 +17191,15 @@ cr.getObjectRefTable = function () { return [
 	cr.behaviors.EightDir,
 	cr.system_object.prototype.cnds.OnLayoutStart,
 	cr.system_object.prototype.cnds.EveryTick,
-	cr.system_object.prototype.acts.CreateObject,
-	cr.plugins_.Sprite.prototype.exps.X,
-	cr.plugins_.Sprite.prototype.exps.Y,
 	cr.plugins_.Sprite.prototype.cnds.IsBoolInstanceVarSet,
 	cr.plugins_.Sprite.prototype.acts.SetBoolInstanceVar,
 	cr.plugins_.Keyboard.prototype.cnds.IsKeyDown,
 	cr.plugins_.Function.prototype.acts.CallFunction,
 	cr.system_object.prototype.cnds.Else,
 	cr.system_object.prototype.acts.Wait,
+	cr.system_object.prototype.acts.CreateObject,
+	cr.plugins_.Sprite.prototype.exps.X,
+	cr.plugins_.Sprite.prototype.exps.Y,
 	cr.plugins_.Sprite.prototype.acts.MoveAtAngle,
 	cr.system_object.prototype.exps.angle,
 	cr.system_object.prototype.exps.dt,
@@ -17213,6 +17213,5 @@ cr.getObjectRefTable = function () { return [
 	cr.behaviors.Fade.prototype.cnds.OnFadeOutEnd,
 	cr.behaviors.Fade.prototype.acts.RestartFade,
 	cr.plugins_.Sprite.prototype.cnds.OnCollision,
-	cr.plugins_.Sprite.prototype.acts.Destroy,
-	cr.system_object.prototype.cnds.PickRandom
+	cr.plugins_.Sprite.prototype.acts.Destroy
 ];};
