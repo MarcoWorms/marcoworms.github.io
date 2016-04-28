@@ -14,7 +14,7 @@ var frases = [
     "O metrô estará lotado de manhã",
     "Você irá piscar seu olho",
     "Você irá ao banheiro",
-    "Haverá um acidente de carro",
+    "Haverá um acidente de carro no Brasil",
     "O céu será azul e as nuvens serão brancas"
 ]
 
