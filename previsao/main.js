@@ -15,7 +15,15 @@ var frases = [
     "Você irá piscar seu olho",
     "Você irá ao banheiro",
     "Haverá um acidente de carro no Brasil",
-    "O céu será azul e as nuvens serão brancas"
+    "O céu será azul e as nuvens serão brancas",
+    "A paixão chegará a ti",
+    "Andarás",
+    "A tua mente verterá á vossa maior companhia",
+    "O Noticiario mostrará algo de teu interesse",
+    "O mundo conspirará contra ti, causando arrependimento",
+    "Olharás que horas são e perceberá que tua percepção de tempo não é precisa",
+    "Comprará algo que considere necessário ou importante",
+    "Matará tempo com coisas futeis e sem sentido lógico"
 ]
 
 var buttons = document.getElementsByClassName("fodase")
