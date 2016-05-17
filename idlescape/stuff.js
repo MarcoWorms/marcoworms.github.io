@@ -12,13 +12,14 @@ var cities = Vue.extend({
         <span>{{ city.name }}</span>
       </a>
     </div>
+    <p id="selCity">{{ selected_city }}</p>
   `,
   data: function () {
     return {
       selected_city: 'lumbridge',
       all_cities: idlescape.all_cities,
       container_size: {
-        width: '40px'
+        width: '137px'
       }
     }
   },

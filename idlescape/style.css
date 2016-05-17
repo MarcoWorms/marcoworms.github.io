@@ -23,7 +23,6 @@ body {
 .game-content {
   width: 960px;
   background-color: #8D8D8D;
-  padding-bottom: 1px
 }
 
 .city {
@@ -37,9 +36,8 @@ body {
   border-radius: 0px 10px 10px 0px 
 }
 
-.cities:first-child {
-  position: relative;
-  top: 1px;
+.cities {
+  float: left;
 }
 
 .selected-city {
@@ -54,3 +52,6 @@ body {
   background-color: #EAF1F1;
 }
 
+#selCity {
+  float: left;
+}
