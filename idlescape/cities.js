@@ -1,5 +1,8 @@
+'use strict'
+
 idlescape.all_cities = {
   lumbridge: {
+    name: "Lumbridge",
     skilling_spots: {
       fishing: [
         'fly_fishing',
@@ -22,6 +25,24 @@ idlescape.all_cities = {
       'restless_ghost',
       'rune_mysteries'
     ]
+  },
+  draynor: {
+
+  },
+  falador: {
+
+  },
+  edgeville: {
+
+  },
+  varrock: {
+
+  },
+  port_sarim: {
+
+  },
+  karamja_east: {
+
   }
 }
 {

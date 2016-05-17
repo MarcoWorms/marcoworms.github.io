@@ -1,3 +1,5 @@
+'use strict'
+
 idlescape.quests = {
   cooks_assistant: {
     name: "Cook's Assistant",

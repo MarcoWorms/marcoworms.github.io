@@ -1,3 +1,5 @@
+'use strict'
+
 idlescape.combat_spots = {
   farm: {
     name: 'Cow Farm',

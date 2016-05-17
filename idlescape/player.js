@@ -1,3 +1,5 @@
+'use strict'
+
 idlescape.player = (function () {
 
   const all_skills = {

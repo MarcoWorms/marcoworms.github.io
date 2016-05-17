@@ -1,3 +1,5 @@
+'use strict'
+
 idlescape.skilling_spots = {
   fishing: {
     fly_fishing: {

@@ -1,3 +1,5 @@
+'use strict'
+
 idlescape.xp_table = {
   1: 0,
   2: 83,

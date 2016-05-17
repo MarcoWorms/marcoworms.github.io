@@ -1,3 +1,5 @@
+'use strict'
+
 idlescape.all_items = {
   coin: {
     name: 'Coins'
