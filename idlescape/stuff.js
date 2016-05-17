@@ -1,3 +1,5 @@
+'use strict'
+
 const xp_table = {
   1: 0,
   2: 83,
@@ -121,7 +123,6 @@ const xp_table = {
   120: 104273166
 }
 
-
 const player = (function () {
 
   const all_skills = {
@@ -241,8 +242,6 @@ const all_items = {
     'soul'
   ]
 
-
-
   var all_runes = rune_types.map((rune_type) => {
      return {
       uid: rune_type + '_rune',
@@ -258,7 +257,7 @@ const all_items = {
   
 }
 
-const monsters = {
+const all_monsters = {
   cow: {
     name: 'Cow',
     lvl: 2,
@@ -316,8 +315,12 @@ const monsters = {
     drops: []
   },
 }
+{
+  console.log('All monsters: ', all_monsters)
+}
 
-const cities = {
+
+const all_cities = {
   lumbridge: {
     skilling_spots: {
       fishing: {
@@ -405,4 +408,7 @@ const cities = {
       }
     }
   }
+}
+{
+  console.log('All cities: ', all_cities)
 }
