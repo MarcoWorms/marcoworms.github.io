@@ -132,7 +132,7 @@ const player = (function () {
       name: 'Cooking'
     },
     prayer: {
-      name: 'Cooking'
+      name: 'Prayer'
     }
   }
 
@@ -147,12 +147,15 @@ const player = (function () {
     Object.assign(skill, initial_stats)
   })
 
-  const inventory = {}
+  var quest_points = 0
 
-  const quests = {}
+  const inventory = {}
+  const quests = []
+  const perks = []
+
 
   return {
-    inventory : {
+    inventory: {
       add: (item_uid) => {
         inventory[item_uid] ? inventory[item_uid] += 1 : inventory[item_uid] = 1
       },
@@ -164,6 +167,38 @@ const player = (function () {
       },
       _debug: () => {
         return inventory
+      }
+    },
+    perks: {
+      add: (perk) => {
+        perks.push(perk)
+      },
+      have: (_perk) => {
+        perks.forEach((perk) => {
+          if (perk === _perk) {
+            return true
+          }
+        })
+        return false
+      }
+    },
+    quests: {
+      add: (quest) => {
+        quests.push(quest)
+      },
+      have: (_quest) => {
+        quests.forEach((quest) => {
+          if (quest === _quest) {
+            return true
+          }
+        })
+        return false
+      },
+      add_points: (ammount) => {
+        quest_points += ammount
+      },
+      total_points: () => {
+        return quest_points
       }
     }
   }
@@ -293,7 +328,7 @@ const cities = {
         },
         bait_fishing: {
           name: "Bait fishing",
-          level: 20,
+          level: 25,
           drops: [100, 'pike']
         },
       },
@@ -306,6 +341,12 @@ const cities = {
           name: 'Cook-o-matic 100',
           level: 1,
           required_perks: ['can use cook-o-matic']
+        }
+      },
+      smithing: {
+        forge: {
+          name: 'Forge',
+          level: 1
         }
       }
     },
