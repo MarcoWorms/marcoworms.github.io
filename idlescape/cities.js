@@ -27,22 +27,22 @@ idlescape.all_cities = {
     ]
   },
   draynor: {
-
+    name: 'Draynor Village'
   },
   falador: {
-
+    name: 'Falador'
   },
   edgeville: {
-
+    name: 'Edgeville'
   },
   varrock: {
-
+    name: 'Varrock'
   },
   port_sarim: {
-
+    name: 'Port Sarim'
   },
   karamja_east: {
-
+    name: 'Karamja East'
   }
 }
 {

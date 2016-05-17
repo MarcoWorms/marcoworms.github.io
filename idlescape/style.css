@@ -1,0 +1,56 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+body {
+  background-color: #DEDEDE;
+}
+
+.div960 {
+  width: 960px; 
+  margin: auto; 
+  padding-top: 10px;
+  background-color: #D0D0D0;
+}
+
+.logo {
+  font-family: Aclonica;
+  padding: 10px 0px 20px 20px;
+}
+
+.game-content {
+  width: 960px;
+  background-color: #8D8D8D;
+  padding-bottom: 1px
+}
+
+.city {
+  display: block;
+  height: 35px;
+  width: 122px;
+  border: 1px solid black;
+  text-align: center;
+  line-height: 35px;
+  background-color: #D0D0D0;
+  border-radius: 0px 10px 10px 0px 
+}
+
+.cities:first-child {
+  position: relative;
+  top: 1px;
+}
+
+.selected-city {
+  background-color: #EAF1F1;
+  border: 1px solid white;
+}
+.city:hover {
+  cursor: pointer;
+  background-color: #E3E3E3
+}
+.selected-city:hover {
+  background-color: #EAF1F1;
+}
+

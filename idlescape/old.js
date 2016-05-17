@@ -77,47 +77,12 @@ var skillaction = Vue.extend({
         height: '100px',
         backgroundColor: 'grey'
       },
-      buttonStyleObject: {
-        width: '100px',
-        height: '20px',
-      }
     }
   },
   methods: {
     activate: function () {
       auxiliar.clearAllActive()
       this.active = true;
-    },
-    damage: function () {
-      this.currentLife -= player.skills[this.skillname]
-      console.log(player.inventory.get())
-    },
-    reborn: function () {
-      this.currentLife = this.totalLife
-      if (this.itemrequirement) {
-        if (player.inventory.tryRemove(this.itemrequirement, 1)) {
-          if (this.itemprize) {
-            player.inventory.add(this.itemprize, 1)
-          }
-        }
-      }
-      else {
-        if (this.itemprize) {
-          player.inventory.add(this.itemprize, 1)
-        }
-      }
-
-    },
-    checkAlive: function () {
-      if (this.currentLife < 0) {
-        this.reborn()
-      }
-    },
-    tryDamage: function () {
-      if (this.active) {
-        this.damage()
-        this.checkAlive()
-      }
     }
   }
 })
@@ -125,9 +90,7 @@ var skillaction = Vue.extend({
 // register
 Vue.component('skillaction', skillaction)
 
-var rootVue = new Vue({
-  el: '#rootVue'
-})
+
 
 
 
