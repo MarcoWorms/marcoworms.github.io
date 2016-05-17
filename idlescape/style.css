@@ -32,8 +32,10 @@ body {
   border: 1px solid black;
   text-align: center;
   line-height: 35px;
-  background-color: #D0D0D0;
-  border-radius: 0px 10px 10px 0px 
+  background-color: #333333;
+  color: white;
+  box-shadow: 4px 4px 10px #888888;
+  font-size: 14px;
 }
 
 .cities {
@@ -41,15 +43,12 @@ body {
 }
 
 .selected-city {
-  background-color: #EAF1F1;
+  background-color: #575757;
   border: 1px solid white;
 }
 .city:hover {
   cursor: pointer;
   background-color: #E3E3E3
-}
-.selected-city:hover {
-  background-color: #EAF1F1;
 }
 
 #selCity {
