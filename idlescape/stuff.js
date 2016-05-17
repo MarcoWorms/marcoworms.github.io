@@ -12,7 +12,7 @@ var cities = Vue.extend({
         <span>{{ city.name }}</span>
       </a>
     </div>
-    <p id="selCity">{{ selected_city }}</p>
+    <p id="selCity" style="color:white;">{{ selected_city }}</p>
   `,
   data: function () {
     return {
