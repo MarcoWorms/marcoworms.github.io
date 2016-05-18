@@ -21,18 +21,10 @@ body {
 
 .game-content {
   width: 960px;
-  height: 1000px;
   background-color: #1B1B1B;
+  overflow: hidden;
   
   box-shadow: 0px 0px 20px rgba(0,0,0,1);
-}
-
-#city-map {
-    float: left;
-    width: 650px;
-    height: 500px;
-    background-color: rgb(31, 43, 49);
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.83);
 }
 
 .footer {

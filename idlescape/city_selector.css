@@ -31,3 +31,15 @@
 #selCity {
   float: left;
 }
+
+#city-map {
+    float: left;
+    width: 650px;
+    height: 500px;
+    background-color: rgb(31, 43, 49);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.83);
+    background-image: url('./f2p_map.png');
+    background-repeat: no-repeat;
+    background-position: -693px -670px;
+    opacity: 0.3;
+}

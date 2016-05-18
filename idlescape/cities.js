@@ -3,6 +3,9 @@
 idlescape.all_cities = {
   lumbridge: {
     name: "Lumbridge",
+    css: {
+        backgroundPosition: '-693px -670px'
+    },
     skilling_spots: {
       fishing: [
         'fly_fishing',
@@ -27,7 +30,10 @@ idlescape.all_cities = {
     ]
   },
   draynor: {
-    name: 'Draynor Village'
+    name: 'Draynor Village',
+    css: {
+        backgroundPosition: '-449px -530px'
+    }
   },
   falador: {
     name: 'Falador'

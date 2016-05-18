@@ -27,5 +27,3 @@ idlescape.root_vue.$on('city changed', function () {
   idlescape.root_vue.update_selected_city()
   console.log('city changed', idlescape.root_vue.selected_city)
 })
-
-idlescape.root_vue.inventory_functions().add('coin', 10)

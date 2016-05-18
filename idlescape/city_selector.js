@@ -5,6 +5,8 @@ idlescape.vues.city_selector = Vue.extend({
         <span>{{ city.name }}</span>
       </a>
     </div>
+
+    <div id="city-map" :style="city_css_position"></div> 
   `,
   data: function () {
     return {
@@ -13,6 +15,11 @@ idlescape.vues.city_selector = Vue.extend({
       container_size: {
         width: '137px'
       }
+    }
+  },
+  computed: {
+    city_css_position: function () {
+      return this.all_cities[this.selected_city].css
     }
   },
   methods: {
