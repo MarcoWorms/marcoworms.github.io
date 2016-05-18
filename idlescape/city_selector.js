@@ -1,18 +1,10 @@
-'use strict'
-
-function city_changed(city_uid) {
-  console.log('loading city', city_uid)
-}
-
-// define
-var cities = Vue.extend({
+idlescape.vues.city_selector = Vue.extend({
   template: `
     <div class="cities" :style="container_size">
       <a v-for="city in all_cities" @click="select($key)" class="city" :class="{ 'selected-city': is_city_selected($key)}"">
         <span>{{ city.name }}</span>
       </a>
     </div>
-    <p id="selCity" style="color:white;">{{ selected_city }}</p>
   `,
   data: function () {
     return {
@@ -26,7 +18,7 @@ var cities = Vue.extend({
   methods: {
     select: function (city_uid) {
       this.selected_city = city_uid
-      city_changed(city_uid)
+      this.$dispatch('city changed')
     },
     is_city_selected: function (city_uid) {
       return city_uid === this.selected_city ? true : false
@@ -35,9 +27,3 @@ var cities = Vue.extend({
 })
 
 // register
-Vue.component('cities', cities)
-
-
-var rootVue = new Vue({
-  el: '#rootVue'
-})

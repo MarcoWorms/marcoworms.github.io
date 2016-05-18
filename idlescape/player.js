@@ -35,23 +35,6 @@ idlescape.player = (function () {
   const perks = []
 
   const public_methods = {
-    create_inventory_methods: () => {
-      const inventory_methods = {
-        add: (item_uid) => {
-          inventory[item_uid] ? inventory[item_uid] += 1 : inventory[item_uid] = 1
-        },
-        remove: (item_uid) => {
-          inventory[item_uid] -= 1  
-        },
-        have: (item_uid, ammount) => {
-          return inventory[item_uid] >= ammount ? true : false
-        },
-        _debug: () => {
-          return inventory
-        }
-      }
-      return inventory_methods
-    },
     create_perks_methods: () => {
       const perks_methods = {
         add: (perk) => {
@@ -92,7 +75,6 @@ idlescape.player = (function () {
   }
 
   return {
-    inventory: public_methods.create_inventory_methods(),
     perks: public_methods.create_perks_methods(),
     quests: public_methods.create_quest_methods()
   }

@@ -5,3 +5,4 @@ String.prototype.capitalize = function() {
 }
 
 const idlescape = {}
+idlescape.vues = {}
