@@ -9,7 +9,13 @@ idlescape.spots.skilling = {
       fishing: 20
     },
     drops: [
-      [100, 'trout', 20]
+      {
+        rate: 100,
+        item_uid: 'trout',
+        required_levels: {
+          fishing: 20
+        },
+      }
     ],
     locations: {
       lumbridge: {
@@ -25,7 +31,13 @@ idlescape.spots.skilling = {
       fishing: 20
     },
     drops: [
-      [100, 'pike', 20]
+      {
+        rate: 100,
+        item_uid: 'pike',
+        required_levels: {
+          fishing: 25
+        },
+      }
     ],
     locations: {
       lumbridge: {
@@ -81,5 +93,26 @@ idlescape.spots.skilling = {
         distance_to_bank: 1
       }
     }
+  },
+  
+  //woodcutting
+  trees: {
+    name: 'Trees',
+    required_levels: {
+      woodcutting:1
+    },
+    locations: {
+      lumbridge: {
+        x: 246,
+        y: 241,
+        distance_to_bank: 1
+      }
+    },
+    drops: [
+      {
+        rate: 100,
+        item_uid: 'logs'
+      }
+    ],
   }
 }

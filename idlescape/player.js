@@ -11,7 +11,11 @@ idlescape.player = (function () {
     },
     prayer: {
       name: 'Prayer'
-    }
+    },
+    woodcutting: {
+      name: 'Woodcutting'
+    },
+    
   }
   
   // add skill stats

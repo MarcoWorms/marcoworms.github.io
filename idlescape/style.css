@@ -29,7 +29,18 @@ body {
 
 .footer {
     margin: auto;
-    text-align: center;
+    text-align: right;
     color: rgba(255, 255, 255, 0.32);
     font-size: 14px;
+    text-decoration: none;
+    line-height: 18px
+}
+
+.footer a:link {
+    color: #BDBDBD;
+}
+
+/* visited link */
+.footer a:visited {
+    color: #BDBDBD;
 }

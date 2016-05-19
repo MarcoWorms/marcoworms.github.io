@@ -15,6 +15,9 @@ idlescape.all_items = {
   },
   trout: {
     name: 'Trout'
+  },
+  logs: {
+    name: 'Logs'
   }
 }
 // generate runes
