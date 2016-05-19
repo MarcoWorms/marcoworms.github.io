@@ -12,10 +12,10 @@ idlescape.root_vue = new Vue({
   methods: {
     inventory_functions: function () {
       return {
-        add: this.$children[1].add,
-        remove: this.$children[1].remove,
-        have: this.$children[1].have,
-        get_all: this.$children[1].get_all
+        add: this.$children[2].add,
+        remove: this.$children[2].remove,
+        have: this.$children[2].have,
+        get_all: this.$children[2].get_all
       }
     }
   }

@@ -1,6 +1,8 @@
 idlescape.vues.inventory = Vue.extend({
   template: `
-    <div class="inventory" :style="container_size">
+    <p class="inv-title">Bank:</p>
+    <div class="inventory">
+      
       <p v-for="item in all_inventory" v-if="item.ammount > 0">
         {{ item.object.name }} : {{ item.ammount }}
       </p>
@@ -9,9 +11,6 @@ idlescape.vues.inventory = Vue.extend({
   data: function () {
     return {
       all_inventory: {},
-      container_size: {
-        width: '137px'
-      }
     }
   },
   methods: {

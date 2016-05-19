@@ -1,5 +1,17 @@
 .inventory {
-  padding: 20px 0 0 0;
   color: white;
-  float: right;
+  float: left;
+  width: 152px;
+  height: 459px;
+  overflow: overlay;
+  border: solid 1px rgba(189, 234, 255, 0.66);
+  padding: 8px 4px;
+  margin-left: 6px;
+}
+
+.inv-title {
+  float: left;
+  color: #BDEAFF;
+  font-weight: bold;
+  margin: 5px 0 0 5px;
 }
