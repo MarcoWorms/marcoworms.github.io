@@ -17,8 +17,10 @@
 
         <div class="game-content">
             <cityselector></cityselector>
-
+            
             <inventory></inventory>
+            
+            <cityexplorer></cityexplorer>
             
         </div>
 
@@ -29,30 +31,31 @@
 
     </div>
 
-    <script src="vue.js"></script>
+    <script src="dependencies/vue.js"></script>
 
     <script src="auxiliar.js"></script>
 
     <!-- Model -->
-    <script src="xp_table.js"></script>
-    <script src="itens.js"></script>
-    <script src="monsters.js"></script>
-    <script src="quests.js"></script>
-    <script src="combat_spots.js"></script>
-    <script src="skilling_spots.js"></script>
-    <script src="cities.js"></script>
+    <script src="model/xp_table.js"></script>
+    <script src="model/itens.js"></script>
+    <script src="model/monsters.js"></script>
+    <script src="model/quests.js"></script>
+    <script src="model/combat_spots.js"></script>
+    <script src="model/skilling_spots.js"></script>
+    <script src="model/cities.js"></script>
     <!-- / Model -->
 
-    <script src="player.js"></script>
-
     <!-- Vue components -->
-    <link rel="stylesheet" href="city_selector.css">
-    <script src="city_selector.js"></script>
-    <link rel="stylesheet" href="inventory.css">
-    <script src="inventory.js"></script>
+    <link rel="stylesheet" href="vue_components/city_selector.css">
+    <script src="vue_components/city_selector.js"></script>
+    <link rel="stylesheet" href="vue_components/inventory.css">
+    <script src="vue_components/inventory.js"></script>
+    <link rel="stylesheet" href="vue_components/city_explorer.css">
+    <script src="vue_components/city_explorer.js"></script>
 
-    <script src="root_vue.js"></script>
     <!-- / Vue components -->
-
+    <script src="root_vue.js"></script>
+    
+    
 </body>
 </html>

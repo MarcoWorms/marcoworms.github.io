@@ -2,6 +2,7 @@
 
 Vue.component('cityselector', idlescape.vues.city_selector)
 Vue.component('inventory', idlescape.vues.inventory)
+Vue.component('cityexplorer', idlescape.vues.city_explorer)
 
 idlescape.root_vue = new Vue({
   el: '#root_vue',
@@ -9,9 +10,6 @@ idlescape.root_vue = new Vue({
     selected_city: 'lumbridge'
   },
   methods: {
-    update_selected_city: function () {
-      this.selected_city = this.$children[0].selected_city
-    },
     inventory_functions: function () {
       return {
         add: this.$children[1].add,
@@ -23,7 +21,7 @@ idlescape.root_vue = new Vue({
   }
 })
 
-idlescape.root_vue.$on('city changed', function () {
-  idlescape.root_vue.update_selected_city()
+idlescape.root_vue.$on('city changed', function (selected_city) {
+  this.selected_city = selected_city
   console.log('city changed', idlescape.root_vue.selected_city)
 })

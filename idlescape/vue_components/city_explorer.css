@@ -1,0 +1,30 @@
+#city-map {
+    float: left;
+    width: 650px;
+    height: 500px;
+    background-color: rgb(31, 43, 49);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.83);
+    background-image: url('../imgs/f2p_map.png');
+    background-repeat: no-repeat;
+    background-position: -693px -670px;
+    opacity: 0.7;
+    position:relative;
+    font-size:10px;
+}
+
+.spot {
+    text-align: center;
+    height:40px;
+    width:40px; 
+    position:absolute;
+    color: yellow;
+}
+
+.combat {
+    background-color:rgba(0, 0, 0, 0.7);;
+}
+
+.skilling {
+    
+    background-color: rgba(55, 34, 255, 0.87);
+}
