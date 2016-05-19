@@ -20,7 +20,7 @@ idlescape.vues.bank = Vue.extend({
         this.$set ('bank.'+item_uid+'.ammount', this.bank[item_uid].ammount + ammount) 
       } else {
         this.$set ('bank.'+item_uid, {
-          object: idlescape.all_items[item_uid],
+          object: idlescape.models.all_items[item_uid],
           ammount: ammount
         }) 
       } 
