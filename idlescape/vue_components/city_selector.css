@@ -10,9 +10,14 @@
 
 
   color: white;
-  box-shadow: 4px 4px 10px black;
+  box-shadow: 0 0 5px black;
   font-size: 14px;
-  border-radius: 0 0 5px 0
+  border-radius: 0 0 5px 0;
+  margin-top: 3px;
+}
+
+.city:first-child {
+  margin-top: 0px;
 }
 
 .cities {

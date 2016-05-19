@@ -1,6 +1,6 @@
 'use strict'
 
-idlescape.all_cities = {
+idlescape.models.all_cities = {
   lumbridge: {
     name: "Lumbridge",
     css: {
@@ -8,10 +8,11 @@ idlescape.all_cities = {
     },
     spots_uids: {
       skilling: [
-          'fly_fishing',
-          'bait_fishing',
-          'cook_o_matic_100',
-          'forge'
+        'fly_fishing',
+        'bait_fishing',
+        'cook_o_matic_100',
+        'forge',
+        'trees'
       ],
       combat: [
         'farm',
@@ -20,7 +21,6 @@ idlescape.all_cities = {
       quests: [
         'cooks_assistant',
         'restless_ghost',
-        'rune_mysteries'
       ]
     }
   },

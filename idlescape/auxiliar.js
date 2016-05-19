@@ -6,4 +6,5 @@ String.prototype.capitalize = function() {
 
 const idlescape = {}
 idlescape.vues = {}
-idlescape.spots = {}
+idlescape.models = {}
+idlescape.models.spots = {}

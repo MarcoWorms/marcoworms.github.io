@@ -1,6 +1,6 @@
 'use strict'
 
-idlescape.quests = {
+idlescape.models.spots.quests = {
   cooks_assistant: {
     name: "Cook's Assistant",
     time: 2,
@@ -10,6 +10,13 @@ idlescape.quests = {
     rewards: {
       xp: {
         cooking: 300
+      }
+    },
+    locations: {
+      lumbridge: {
+        x: 306,
+        y: 203,
+        distance_to_bank: 1
       }
     }
   },
@@ -23,6 +30,13 @@ idlescape.quests = {
       xp: {
         prayer: 1125
       }
+    },
+    locations: {
+      lumbridge: {
+        x: 400,
+        y: 254,
+        distance_to_bank: 1
+      }
     }
   },
   rune_mysteries: {
@@ -35,6 +49,13 @@ idlescape.quests = {
       perks: [
         'can use runecrafting skill'
       ]
+    },
+    locations: {
+      lumbridge: {
+        x: 400,
+        y: 254,
+        distance_to_bank: 1
+      }
     }
   }
 }

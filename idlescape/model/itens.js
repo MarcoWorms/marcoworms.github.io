@@ -1,6 +1,6 @@
 'use strict'
 
-idlescape.all_items = {
+idlescape.models.all_items = {
   coin: {
     name: 'Coins'
   },
@@ -47,7 +47,7 @@ idlescape.all_items = {
   })
 
   all_runes.forEach((rune) => {
-    idlescape.all_items[rune.uid] = { name: rune.name }
+    idlescape.models.all_items[rune.uid] = { name: rune.name }
   })
   
 }

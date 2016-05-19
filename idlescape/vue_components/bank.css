@@ -1,4 +1,4 @@
-.inventory {
+.bank {
   color: white;
   float: left;
   width: 152px;
@@ -9,7 +9,7 @@
   margin-left: 6px;
 }
 
-.inv-title {
+.bank-title {
   float: left;
   color: #BDEAFF;
   font-weight: bold;

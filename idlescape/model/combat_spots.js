@@ -1,6 +1,6 @@
 'use strict'
 
-idlescape.spots.combat = {
+idlescape.models.spots.combat = {
   farm: {
     name: 'Cow Farm',
     monsters: ['cow', 'cow_calf'],

@@ -28,3 +28,26 @@
     
     background-color: rgba(55, 34, 255, 0.87);
 }
+
+.quests {
+    
+    background-color: rgba(200, 0, 0, 0.87);
+}
+
+#city-filters {
+    position: absolute;
+    top: 422px;
+    left: 10px;
+    background-color: #434343;
+    width: 100px;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px black;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.pointer_cursor {
+    cursor: pointer;
+}

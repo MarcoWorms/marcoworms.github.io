@@ -1,6 +1,6 @@
 'use strict'
 
-idlescape.spots.skilling = {
+idlescape.models.spots.skilling = {
   
   //fishing
   fly_fishing: {
@@ -28,15 +28,12 @@ idlescape.spots.skilling = {
   bait_fishing: {
     name: "Bait fishing",
     required_levels: {
-      fishing: 20
+      fishing: 25
     },
     drops: [
       {
         rate: 100,
         item_uid: 'pike',
-        required_levels: {
-          fishing: 25
-        },
       }
     ],
     locations: {
@@ -71,7 +68,7 @@ idlescape.spots.skilling = {
     locations: {
       lumbridge: {
         x: 306,
-        y: 230,
+        y: 254,
         distance_to_bank: 1
       }
     },

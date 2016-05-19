@@ -9,10 +9,14 @@ idlescape.vues.city_selector = Vue.extend({
   data: function () {
     return {
       selected_city: 'lumbridge',
-      all_cities: idlescape.all_cities,
       container_size: {
         width: '137px'
       }
+    }
+  },
+  computed: {
+    all_cities: function () {
+      return idlescape.models.all_cities
     }
   },
   methods: {

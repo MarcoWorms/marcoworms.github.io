@@ -1,22 +1,18 @@
 'use strict'
 
 Vue.component('cityselector', idlescape.vues.city_selector)
-Vue.component('inventory', idlescape.vues.inventory)
 Vue.component('cityexplorer', idlescape.vues.city_explorer)
+Vue.component('bank', idlescape.vues.bank)
 
 idlescape.root_vue = new Vue({
   el: '#root_vue',
   data: {
-    selected_city: 'lumbridge'
+    selected_city: 'lumbridge',
+    skillingFilter: true
   },
   methods: {
-    inventory_functions: function () {
-      return {
-        add: this.$children[2].add,
-        remove: this.$children[2].remove,
-        have: this.$children[2].have,
-        get_all: this.$children[2].get_all
-      }
+    bank: function () {
+      return this.$children[2]
     }
   }
 })

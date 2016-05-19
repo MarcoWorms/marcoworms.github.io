@@ -1,6 +1,6 @@
 'use strict'
 
-idlescape.all_monsters = {
+idlescape.models.all_monsters = {
   cow: {
     name: 'Cow',
     lvl: 2,

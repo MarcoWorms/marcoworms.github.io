@@ -1,6 +1,6 @@
 'use strict'
 
-idlescape.xp_table = {
+idlescape.models.xp_table = {
   1: 0,
   2: 83,
   3: 174,
