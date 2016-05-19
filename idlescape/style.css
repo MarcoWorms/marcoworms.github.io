@@ -32,8 +32,6 @@ body {
 }
 
 .footer {
-    margin: auto;
-    text-align: right;
     color: rgba(255, 255, 255, 0.32);
     font-size: 14px;
     text-decoration: none;
@@ -47,4 +45,14 @@ body {
 /* visited link */
 .footer a:visited {
     color: #BDBDBD;
+}
+
+.left {
+  float: left;
+  text-align: left;
+}
+
+.right {
+  float: right;
+  text-align: right;
 }

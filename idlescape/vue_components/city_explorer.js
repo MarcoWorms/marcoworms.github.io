@@ -24,6 +24,7 @@ idlescape.vues.city_explorer = Vue.extend({
     </div> 
 
     <div id="city-filters">
+      <p>Filter Spots:</p>
       <div class='pointer_cursor'>
         <input v-model="filters.skilling" type="checkbox">
         <span @click="toggle_bool('skilling')" >Skilling</span><br>
