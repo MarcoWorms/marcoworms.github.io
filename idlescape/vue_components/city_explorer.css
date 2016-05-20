@@ -18,6 +18,7 @@
     width:40px; 
     position:absolute;
     color: yellow;
+    cursor: pointer;
 }
 
 .combat {
