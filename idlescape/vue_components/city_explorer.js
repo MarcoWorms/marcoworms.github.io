@@ -1,46 +1,54 @@
-idlescape.vues.city_explorer = Vue.extend({
-  template: `
-    <div id="city-map" :style="map_position">
-      <div v-if="filters.combat"
-      v-for="combat_spot in spots.combat"
-      class="spot combat" :style="get_pin_position(combat_spot, 'combat')"
-      >
-          {{ get_pin_name(combat_spot, 'combat') }}
-      </div> 
-      
-      <div v-if="filters.skilling"
-      v-for="skilling_spot in spots.skilling"
-      class="spot skilling":style="get_pin_position(skilling_spot, 'skilling')"
-      >
-          {{ get_pin_name(skilling_spot, 'skilling') }}
-      </div> 
+const pin_template = `
+  <div id="city-map" :style="map_position">
 
-      <div v-if="filters.quests"
-      v-for="quest_spot in spots.quests"
-      class="spot quests":style="get_pin_position(quest_spot, 'quests')"
-      >
-          {{ get_pin_name(quest_spot, 'quests') }}
-      </div> 
+    <div v-if="filters.combat"
+    v-for="combat_spot in spots.combat"
+    class="spot combat" :style="get_pin_position(combat_spot, 'combat')"
+    >
+        {{ get_pin_name(combat_spot, 'combat') }}
+    </div> 
+    
+    <div v-if="filters.skilling"
+    v-for="skilling_spot in spots.skilling"
+    class="spot skilling":style="get_pin_position(skilling_spot, 'skilling')"
+    @click="this.$dispatch('open_popup', 'skilling', skilling_spot)"
+    >
+        <img class='pin_icon' :src="get_pin_img(skilling_spot, 'skilling')" alt="" />
+        <!--{{ get_pin_name(skilling_spot, 'skilling') }}-->
     </div> 
 
-    <div id="city-filters">
-      <p>Filter Spots:</p>
-      <div class='pointer_cursor'>
-        <input v-model="filters.skilling" type="checkbox">
-        <span @click="toggle_bool('skilling')" >Skilling</span><br>
-      </div>
-      
-      <div class='pointer_cursor'>
-        <input v-model="filters.combat" type="checkbox">
-        <span @click="toggle_bool('combat')" >Combat</span><br>
-      </div>
-      <div class='pointer_cursor'>
-        <input v-model="filters.quests" type="checkbox">
-        <span @click="toggle_bool('quests')" >Quests</span>
-      </div>
-    </div>
+    <div v-if="filters.quests"
+    v-for="quest_spot in spots.quests"
+    class="spot quests":style="get_pin_position(quest_spot, 'quests')"
+    >
+        {{ get_pin_name(quest_spot, 'quests') }}
+    </div> 
 
-  `,
+    <mainpopup :location="selected_city"></mainpopup>
+
+  </div> 
+`
+const filter_template = `
+  <div id="city-filters">
+    <p>Filter Spots:</p>
+    <div class='pointer_cursor'>
+      <input v-model="filters.skilling" type="checkbox">
+      <span @click="toggle_bool('skilling')" >Skilling</span><br>
+    </div>
+    
+    <div class='pointer_cursor'>
+      <input v-model="filters.combat" type="checkbox">
+      <span @click="toggle_bool('combat')" >Combat</span><br>
+    </div>
+    <div class='pointer_cursor'>
+      <input v-model="filters.quests" type="checkbox">
+      <span @click="toggle_bool('quests')" >Quests</span>
+    </div>
+  </div>
+`
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+idlescape.vues.city_explorer = Vue.extend({
+  template: pin_template + filter_template,
   data: function () {
     return { 
       filters: {
@@ -70,6 +78,9 @@ idlescape.vues.city_explorer = Vue.extend({
     },
     get_pin_name: function (spot_uid, spot_type) {
       return idlescape.models.spots[spot_type][spot_uid].name
+    },
+    get_pin_img: function (spot_uid, spot_type) {
+      return './imgs/large_icons/' + Object.keys(idlescape.models.spots[spot_type][spot_uid].required_levels)[0] + '.png'
     },
     toggle_bool: function (filter_to_toggle) {
       this.filters[filter_to_toggle] = !this.filters[filter_to_toggle]

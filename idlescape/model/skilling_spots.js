@@ -19,9 +19,9 @@ idlescape.models.spots.skilling = {
     ],
     locations: {
       lumbridge: {
-        x: 420,
-        y: 200,
-        distance_to_bank: 1
+        x: 430,
+        y: 204,
+        difficulty: 1
       }
     }
   },
@@ -40,7 +40,7 @@ idlescape.models.spots.skilling = {
       lumbridge: {
         x: 400,
         y: 104,
-        distance_to_bank: 1
+        difficulty: 1
       }
     }
   },
@@ -55,7 +55,7 @@ idlescape.models.spots.skilling = {
       lumbridge: {
         x: 0,
         y: 0,
-        distance_to_bank: 1
+        difficulty: 1
       }
     }
   },
@@ -69,7 +69,7 @@ idlescape.models.spots.skilling = {
       lumbridge: {
         x: 306,
         y: 254,
-        distance_to_bank: 1
+        difficulty: 1
       }
     },
     special: {
@@ -83,11 +83,27 @@ idlescape.models.spots.skilling = {
     required_levels: {
       smithing: 1
     },
+    required_items: [
+      { 
+        uid: 'copper',
+        ammount: 1
+      },
+      { 
+        uid: 'tin',
+        ammount: 1
+      }
+    ],
+    drops: [
+      {
+        rate: 100,
+        uid: 'bronze_bar'
+      }
+    ],
     locations: {
       lumbridge: {
         x: 350,
         y: 120,
-        distance_to_bank: 1
+        difficulty: 1
       }
     }
   },
@@ -102,13 +118,13 @@ idlescape.models.spots.skilling = {
       lumbridge: {
         x: 246,
         y: 241,
-        distance_to_bank: 1
+        difficulty: 1
       }
     },
     drops: [
       {
         rate: 100,
-        item_uid: 'logs'
+        uid: 'logs'
       }
     ],
   }
