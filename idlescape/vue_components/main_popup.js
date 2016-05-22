@@ -11,9 +11,8 @@ idlescape.vues.main_popup = Vue.extend({
     
     <h1 class="popup_title">{{ spot.name }}</h1>
 
-    <div class="popup_content_container">
-      <skilling-spot-mechanic></skilling-spot-mechanic>
-    </div>
+    <skilling-spot-mechanic></skilling-spot-mechanic>
+    
   </div>
 `,
   data: function() {
