@@ -1,6 +1,6 @@
 idlescape.vues.main_popup = Vue.extend({
   template: `
-  <div v-if="visible" id="main_popup" transition="fade">
+  <div v-if="visible" id="main_popup">
     <div @click="hide" class="close_button_container">
       <p class="close_button">X</p>
     </div>

@@ -16,9 +16,22 @@ idlescape.models.all_items = {
   trout: {
     name: 'Trout'
   },
+  pike: {
+    name: 'Pike'
+  },
   logs: {
     name: 'Logs'
-  }
+  },
+  copper: {
+    name: 'Copper'
+  },
+  tin: {
+    name: 'Tin'
+  },
+  bronze_bar: {
+    name: 'Bronze bar'
+  },
+  
 }
 // generate runes
 {

@@ -10,6 +10,11 @@
     opacity: 0.7;
     position:relative;
     font-size:10px;
+    
+    transition: background-position .2s ease-out;
+    -moz-transition: background-position .2s ease-out;
+    -webkit-transition: background-position .2s ease-out;
+    -o-transition: background-position .2s ease-out;
 }
 
 .spot {
@@ -22,15 +27,19 @@
     border-radius: 50px;
     padding: 5px;
     box-shadow: 0 0 5px black;
+    opacity: 0;
 
-    transition: background-color .15s ease-out;
-    -moz-transition: background-color .15s ease-out;
-    -webkit-transition: background-color .15s ease-out;
-    -o-transition: background-color .15s ease-out;
+    transition: background-color .15s, opacity .5s ease-in;
+    -moz-transition: background-color .15s, opacity .5s ease-in;
+    -webkit-transition: background-color .15s, opacity .5s ease-in;
+    -o-transition: background-color .15s, opacity .5s ease-in;
+}
+.spot_can_see {
+    opacity: 100
 }
 
 .combat {
-    background-color: rgba(0, 0, 0, 0.7);;
+    background-color: rgba(0, 0, 0, 0.8);;
 }
 
 .combat:hover {
@@ -48,11 +57,12 @@
 
 .quests {
     
-    background-color: rgba(200, 0, 0, 0.7);
+    
+    background-color: rgba(92, 97, 255, 0.7);;
 }
 .quests:hover {
     
-    background-color: rgba(200, 0, 0, 0.9);
+    background-color: rgba(92, 97, 255, 0.95);;
 }
 
 #city-filters {
@@ -69,8 +79,19 @@
     line-height: 20px;
 }
 
-.pointer_cursor {
+.filter-text {
     cursor: pointer;
+    color: #FFCACA;
+    
+    transition: color .2s ease-out;
+    -moz-transition: color .2s ease-out;
+    -webkit-transition: color .2s ease-out;
+    -o-transition: color .2s ease-out;
+}
+
+.filter-text.enabled {
+    cursor: pointer;
+    color: #CEFFCE;
 }
 
 .pin_icon {

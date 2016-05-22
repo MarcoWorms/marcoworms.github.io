@@ -1,5 +1,7 @@
 'use strict'
 
+idlescape.models.spots.quests_completed = ['cooks_assistant']
+
 idlescape.models.spots.quests = {
   cooks_assistant: {
     name: "Cook's Assistant",

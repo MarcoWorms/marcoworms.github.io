@@ -11,7 +11,7 @@ idlescape.models.spots.skilling = {
     drops: [
       {
         rate: 100,
-        item_uid: 'trout',
+        uid: 'trout',
         required_levels: {
           fishing: 20
         },
@@ -33,7 +33,7 @@ idlescape.models.spots.skilling = {
     drops: [
       {
         rate: 100,
-        item_uid: 'pike',
+        uid: 'pike',
       }
     ],
     locations: {
@@ -96,7 +96,8 @@ idlescape.models.spots.skilling = {
     drops: [
       {
         rate: 100,
-        uid: 'bronze_bar'
+        uid: 'bronze_bar',
+        exp: 15
       }
     ],
     locations: {
@@ -124,7 +125,8 @@ idlescape.models.spots.skilling = {
     drops: [
       {
         rate: 100,
-        uid: 'logs'
+        uid: 'logs',
+        exp: 13
       }
     ],
   }

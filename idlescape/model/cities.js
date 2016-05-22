@@ -31,19 +31,28 @@ idlescape.models.all_cities = {
     }
   },
   falador: {
-    name: 'Falador'
+    name: 'Falador',
+    css: {
+        backgroundPosition: '-39px -300px'
+    }
   },
   edgeville: {
-    name: 'Edgeville'
+    name: 'Edgeville',
+    css: {
+      backgroundPosition: '-399px -6px'
+    }
   },
   varrock: {
-    name: 'Varrock'
+    name: 'Varrock',
+    css : {
+      backgroundPosition: '-729px -36px'
+    }
   },
   port_sarim: {
-    name: 'Port Sarim'
-  },
-  karamja_east: {
-    name: 'Karamja East'
+    name: 'Port Sarim',
+    css: {
+      backgroundPosition: '-8px -736px'
+    }
   }
 }
 // {
