@@ -8,3 +8,6 @@ const idlescape = {}
 idlescape.vues = {}
 idlescape.models = {}
 idlescape.models.spots = {}
+
+idlescape.player = {}
+idlescape.player.bank = {}

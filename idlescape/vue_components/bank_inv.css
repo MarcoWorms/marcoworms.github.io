@@ -1,0 +1,36 @@
+.bank-skill-title {
+  float: left;
+  color: #BDEAFF;
+  font-weight: bold;
+  margin: 5px 0 0 5px;
+}
+
+.bank-skill-tab {
+float: left;
+margin-left: 13px;
+background-color: #383838;
+cursor: pointer;
+padding: 2px 12px;
+color: white;
+}
+
+.bank-skill-tab:hover {
+  background-color: #8D8D8D;
+}
+
+.bank_skill_selected_tab {
+  background-color: #575757;
+  border: 1px solid #BDEAFF;
+  border-bottom: 0;
+}
+
+.bank-skill-container {
+  color: white;
+  float: left;
+  width: 152px;
+  height: 459px;
+  overflow: overlay;
+  border: solid 1px rgba(189, 234, 255, 0.66);
+  padding: 8px 4px;
+  margin-left: 6px;
+}

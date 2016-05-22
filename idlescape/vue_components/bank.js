@@ -1,16 +1,14 @@
 idlescape.vues.bank = Vue.extend({
   template: `
-    <p class="bank-title">Bank:</p>
-    <div class="bank">
-      
+    
       <p v-for="item in bank" v-if="item.ammount > 0">
         {{ item.object.name }} : {{ item.ammount }}
       </p>
-    </div>
+    
   `,
-  data: function () {
-    return {
-      bank: {},
+  computed: {
+    bank: function () {
+      return this.$parent.$parent.player_bank
     }
   },
   methods: {
