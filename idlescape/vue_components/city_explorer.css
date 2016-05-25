@@ -10,6 +10,7 @@
     opacity: 0.7;
     position:relative;
     font-size:10px;
+    border-radius: 3px;
     
     transition: background-position .2s ease-out;
     -moz-transition: background-position .2s ease-out;
@@ -38,21 +39,21 @@
     opacity: 100
 }
 
-.combat {
-    background-color: rgba(0, 0, 0, 0.8);;
+.combat:hover {
+    background-color: rgba(183, 0, 0, 0.9);
 }
 
-.combat:hover {
-    background-color: rgba(0, 0, 0, 0.9);;
+.combat {
+    background-color: rgba(177, 30, 30, 0.8);
 }
 
 .skilling {
     
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 235, 0, 0.7);;
 }
 .skilling:hover {
     
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 235, 0, 0.9);;
 }
 
 .quests {
@@ -97,4 +98,10 @@
 .pin_icon {
     height:40px;
     width:40px; 
+}
+
+.combat .pin_icon {
+    height:35px;
+    width:35px;
+    margin-top: 3px;
 }
