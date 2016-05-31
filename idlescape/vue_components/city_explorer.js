@@ -57,9 +57,9 @@ idlescape.vues.city_explorer = Vue.extend({
         skilling: true,
         combat: true,
         quests: true,
-        custom_css: {
-          spot_can_see: false
-        }
+      },
+      custom_css: {
+        is_visible: false
       }
     }
   },
@@ -74,7 +74,7 @@ idlescape.vues.city_explorer = Vue.extend({
       this.hide_icons()
       window.setTimeout(() => {
         this.show_icons()
-      }, 0)
+      }, 1)
       
       return this.$parent.selected_city
     }
@@ -99,10 +99,10 @@ idlescape.vues.city_explorer = Vue.extend({
       this.filters[filter_to_toggle] = !this.filters[filter_to_toggle]
     },
     show_icons: function() {
-      this.$set('custom_css.spot_can_see', true)
+      this.custom_css.is_visible = true
     },
     hide_icons: function() {
-      this.$set('custom_css.spot_can_see', false)
+      this.custom_css.is_visible = false
     }
   }
 })

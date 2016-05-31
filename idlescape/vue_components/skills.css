@@ -46,7 +46,7 @@
   line-height: 18px;
   opacity: 0;
   font-weight: bold;
-  background-color: rgba(255,255,255,0.5);
+  background-color: rgba(255,255,255,0.9);
   
   transition: opacity .15s ease-out;
   -moz-transition: opacity .15s ease-out;
@@ -54,8 +54,19 @@
   -o-transition: opacity .15s ease-out;
 }
 
+.skill-progress-bar-text-fixed {
+  background-color: transparent;
+  opacity: 100;
+  color: black;
+  font-size: 14px;
+}
+
 .skill-progress-bar-text:hover {
   opacity: 100;
+}
+
+.skill-progress-bar-text-fixed:hover {
+  opacity: 0;
 }
 
 .skill-container {

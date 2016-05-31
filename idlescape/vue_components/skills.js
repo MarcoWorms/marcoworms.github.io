@@ -14,8 +14,9 @@ idlescape.vues.skills = Vue.extend({
         
 
         <div class="skill-progress-bar">
-            <div class="skill-progress-bar-content" :style="get_width_percentage(skill.exp_current, skill.exp_to_next_lvl, skill.current_lvl)">
+            <div class="skill-progress-bar-content" :style="get_width_percentage(skill)">
             </div>
+            <span class="skill-progress-bar-text skill-progress-bar-text-fixed">{{ get_progress_percentage(skill) }}%</span>
             <span class="skill-progress-bar-text">{{skill.exp_current}} / {{skill.exp_to_next_lvl}}</span>
         </div>
         
@@ -28,14 +29,14 @@ idlescape.vues.skills = Vue.extend({
     }
   },
   methods: {
-    get_width_percentage: function (exp_current, exp_to_next_lvl, current_lvl) {
-      let width_percentage = 0
-      let start_exp_this_lvl = idlescape.models.xp_table[current_lvl]
-      let total_exp_this_lvl = exp_to_next_lvl - start_exp_this_lvl
-      let relative_exp = exp_current - start_exp_this_lvl
-
-      width_percentage = Math.ceil(relative_exp * 100 / total_exp_this_lvl)
-
+    get_progress_percentage: function (skill) {
+      let start_exp_this_lvl = idlescape.models.xp_table[skill.current_lvl]
+      let total_exp_this_lvl = skill.exp_to_next_lvl - start_exp_this_lvl
+      let relative_exp = skill.exp_current - start_exp_this_lvl
+      return Math.floor(relative_exp * 10000 / total_exp_this_lvl)/100
+    },
+    get_width_percentage: function (skill) {
+      width_percentage = Math.floor(this.get_progress_percentage(skill))
       return {
         width: width_percentage + '%'
       }

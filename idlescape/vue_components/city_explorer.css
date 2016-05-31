@@ -35,7 +35,7 @@
     -webkit-transition: background-color .15s, opacity .5s ease-in;
     -o-transition: background-color .15s, opacity .5s ease-in;
 }
-.spot_can_see {
+.is_visible {
     opacity: 100
 }
 
@@ -48,22 +48,27 @@
 }
 
 .skilling {
-    
-    background-color: rgba(255, 235, 0, 0.7);;
+    background-color: rgba(255, 235, 0, 0.7);
 }
+
 .skilling:hover {
-    
-    background-color: rgba(255, 235, 0, 0.9);;
+    background-color: rgba(255, 235, 0, 0.9);
+}
+
+.spot_doesnt_meet_lvl_requirement {
+    background-color: rgba(255, 235, 0, 0.1);
+}
+
+.spot_doesnt_meet_lvl_requirement:hover {
+    background-color: rgba(255, 235, 0, 0.2);
 }
 
 .quests {
-    
-    
     background-color: rgba(92, 97, 255, 0.7);;
 }
 .quests:hover {
     
-    background-color: rgba(92, 97, 255, 0.95);;
+    background-color: rgba(92, 97, 255, 0.95);
 }
 
 #city-filters {
@@ -81,7 +86,6 @@
 }
 
 .filter-text {
-    cursor: pointer;
     color: #FFCACA;
     
     transition: color .2s ease-out;
@@ -90,14 +94,31 @@
     -o-transition: color .2s ease-out;
 }
 
-.filter-text.enabled {
+.filter-text input,.filter-text span {
     cursor: pointer;
+}
+
+.filter-text.enabled {
     color: #CEFFCE;
 }
 
 .pin_icon {
     height:40px;
     width:40px; 
+    cursor: pointer;
+}
+
+.combat .pin_icon {
+    cursor: default;
+}
+.quests .pin_icon {
+    cursor: default;
+}
+.combat {
+    cursor: default;
+}
+.quests {
+    cursor: default;
 }
 
 .combat .pin_icon {

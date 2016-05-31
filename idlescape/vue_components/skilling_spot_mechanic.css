@@ -8,6 +8,13 @@
   border-radius: 7px;
   border: solid 2px black;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup_content_container h3 {
+  color: #BDEAFF;
 }
 
 .pop_up_content{
@@ -24,7 +31,7 @@
 
 .pop_up_content_right {
   float: left;
-  border-left: solid 1px white;
+  border-left: dashed 1px #BDEAFF;
   padding: 0px 0 10px 10px;;
 }
 
@@ -37,6 +44,7 @@
 }
 
 .progress_bar {
+  position:relative;
   margin: auto;
   width: 95%;
   height: 40%;
@@ -46,16 +54,54 @@
 }
 
 .progress {
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
+  
+}
+
+.progress_instant {
+  background-color: #F0F7FD;
+  border-radius: 0 15px 15px 0;
+}
+.progress_medium {
+  background-color: #BCEAFF;
+  border-radius: 0 15px 15px 0;
+
+  transition: width .3s ease-out;
+  -moz-transition: width .3s ease-out;
+  -webkit-transition: width .3s ease-out;
+  -o-transition: width .3s ease-out;
+}
+
+.progress_slow {
   background-color: #84D8FF;
   border-radius: 0 15px 15px 0;
+  transition: width .6s ease-out;
+  -moz-transition: width .6s ease-out;
+  -webkit-transition: width .6s ease-out;
+  -o-transition: width .6s ease-out;
+}
+
+.progress_complete {
+  width: 100%;
+  background-color: white;
+  border-radius: 0 15px 15px 0;
+
+  transition: opacity .15s ease-out;
+  -moz-transition: opacity .15s ease-out;
+  -webkit-transition: opacity .15s ease-out;
+  -o-transition: opacity .15s ease-out;
+
 }
 
 .pop_up_actions {
-    clear: both;
-    position: absolute;
-    top: 95px;
-    left: 476px;
+  clear: both;
+  position: absolute;
+  top: 95px;
+  left: 476px;
+  color: white;
 }
 
 .pop_up_actions button {

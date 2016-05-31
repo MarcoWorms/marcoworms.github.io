@@ -24,7 +24,3 @@ idlescape.root_vue.$on('city changed', function (selected_city) {
 idlescape.root_vue.$on('open_popup', function (...args) {
   this.$children[1].$children[0].open_spot(...args)
 })
-
-idlescape.player.bank.add('coin', 10)
-idlescape.player.bank.add('copper', 13)
-idlescape.player.bank.add('logs', 5)

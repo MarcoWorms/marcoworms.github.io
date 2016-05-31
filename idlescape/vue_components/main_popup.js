@@ -25,6 +25,7 @@ idlescape.vues.main_popup = Vue.extend({
   props: ['location'],
   methods: {
     hide: function () {
+      this.$children[0].stop_skilling()
       this.visible = false
     },
     open_spot: function (template_type, spot_uid) {

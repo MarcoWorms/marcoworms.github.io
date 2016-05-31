@@ -8,11 +8,13 @@ idlescape.models.all_cities = {
     },
     spots_uids: {
       skilling: [
-        'fly_fishing',
-        'bait_fishing',
-        'cook_o_matic_100',
-        'forge',
-        'trees'
+        // 'fly_fishing',
+        // 'bait_fishing',
+        // 'cook_o_matic_100',
+        // 'forge',
+        'trees',
+        'oaks',
+        'fm_logs'
       ],
       combat: [
         'farm',
@@ -28,6 +30,17 @@ idlescape.models.all_cities = {
     name: 'Draynor Village',
     css: {
         backgroundPosition: '-449px -530px'
+    },
+    spots_uids: {
+      skilling: [
+        'willows'
+      ],
+      combat: [
+        
+      ],
+      quests: [
+        
+      ]
     }
   },
   falador: {
@@ -40,6 +53,17 @@ idlescape.models.all_cities = {
     name: 'Edgeville',
     css: {
       backgroundPosition: '-399px -6px'
+    },
+    spots_uids: {
+      skilling: [
+        'yews'
+      ],
+      combat: [
+        
+      ],
+      quests: [
+        
+      ]
     }
   },
   varrock: {
