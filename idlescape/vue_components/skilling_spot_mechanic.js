@@ -4,10 +4,12 @@ idlescape.vues.skilling_spot_mechanic = Vue.extend({
     <div class="pop_up_content">
       
       <div class="pop_up_content_left">
-        <h3>Level Requirement:</h3>
-        <span v-for="required_level in spot.required_levels"><br>- {{$key.capitalize()}} : {{ required_level }}</span>
-
-        <div v-if="has_item_requirement">
+        <div :class="{ no_requirement: !meets_level_requirement }">
+          <h3>Level Requirement:</h3>
+          <span v-for="required_level in spot.required_levels"><br>- {{$key.capitalize()}} : {{ required_level }}</span>
+        </div>
+        
+        <div :class="{ no_requirement: !is_meeting_item_requirement }" v-if="has_item_requirement">
           <h3><br>Consumes:</h3>
           <span v-for="item in spot.required_items"><br>- {{ get_item_name(item.uid) }} : {{ item.ammount }}</span>
         </div>
@@ -62,7 +64,8 @@ idlescape.vues.skilling_spot_mechanic = Vue.extend({
       total_ticks: 0,
       progress_complete: {
         opacity: 0
-      }
+      },
+      is_meeting_item_requirement: true
     }
   },
   computed: {
@@ -98,7 +101,7 @@ idlescape.vues.skilling_spot_mechanic = Vue.extend({
       }
     },
     disable_start: function () {
-      return (this.is_state('farming') || !this.meets_level_requirement)
+      return (this.is_state('farming') || (!this.meets_level_requirement || !this.meets_item_requirement()) )
     },
     meets_level_requirement: function () {
       let player_meets_level_requirement = true
@@ -134,23 +137,25 @@ idlescape.vues.skilling_spot_mechanic = Vue.extend({
           idlescape.player.bank.add(drop.uid)
           idlescape.player.add_exp(drop.exp.skill_uid, drop.exp.ammount)
         })
+
+         if (!this.meets_item_requirement()) {
+          this.stop_skilling()
+         }
       }
     },
     start_skilling: function () {
-
       this.total_ticks = 0
       this.max_hp = this.spot.hp
       this.hp = 0
       this.state = 'farming'
       this.farm_loop = window.setInterval(
         function () {
-          if (!this.spot.required_items || idlescape.player.bank.have(this.spot.required_items[0].uid, this.spot.required_items[0].ammount)) {
+          if (this.meets_item_requirement()) {
             var max_dmg = this.spot.hp / this.spot.min_ticks_to_farm
             this.total_ticks += 1
             var damage = idlescape.player.skill_damage_per_tick(Object.keys(this.spot.required_levels)[0])
             damage = damage + (((Math.random() * damage) - damage)/4)
             if (damage >= max_dmg) { damage = max_dmg }
-            // console.log(damage)
             this.hp += damage
             this.detect_death()
           } else {
@@ -163,6 +168,21 @@ idlescape.vues.skilling_spot_mechanic = Vue.extend({
     stop_skilling: function () {
       this.state = 'idle'
       window.clearInterval(this.farm_loop)
+    },
+    meets_item_requirement: function () {
+      if (this.spot.required_items) {
+        console.log(idlescape.player.bank.have(this.spot.required_items[0].uid, this.spot.required_items[0].ammount))
+        if (idlescape.player.bank.have(this.spot.required_items[0].uid, this.spot.required_items[0].ammount)) {
+          this.is_meeting_item_requirement = true
+          return true
+        } else {
+          this.is_meeting_item_requirement = false
+            return false
+        }
+      } else {
+          this.is_meeting_item_requirement = true
+          return true
+      }
     }
   }
 })

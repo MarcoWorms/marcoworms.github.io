@@ -26,7 +26,11 @@
 .pop_up_content_left {
   float: left;
   padding-right: 10px;
-  
+  color: green; 
+}
+
+.no_requirement {
+  color: red;
 }
 
 .pop_up_content_right {
@@ -109,3 +113,4 @@
   height: 40px;
   margin-top: 10px;
 }
+
