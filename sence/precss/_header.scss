@@ -1,0 +1,160 @@
+header {
+    height: 114px;
+    // background-color: green;
+
+    .header-section {
+        float: left;
+        vertical-align: top;
+        height: 100%;
+    }
+
+    .logo {
+        @extend .header-section;
+        width: 360px;
+        background-image: url("../img/logo.png")
+    }
+
+    nav {
+        @extend .header-section;
+        width: 539px;
+        // background-color: yellow;
+
+        ul {
+            @extend .ul-with-horizontal-li;
+            top: 70px;
+            li {
+                display: inline-block;
+                a {
+                    box-sizing: content-box;
+                    padding: 72px 12px 24px 12px;
+                    font-family: arial;
+                    font-size: 14px;
+                    color: black;
+                    transition: background-color 0.4s;
+                }
+
+                a:hover {
+                    //TODO: animação
+                    background-color: rgba(0,0,0,0.1);
+                }
+
+                .bolder {
+                    padding: 70px 10px 22px 10px;
+                }
+            }
+        }
+    }
+
+    .search {
+        @extend .header-section;
+        width: 245px;
+
+        .search-container {
+            position: relative;
+            top: 55px;
+            border-bottom: solid 1px black;
+            width: 230px;
+        }
+
+        input {
+
+            height: 30px;
+            width: 170px;
+            font-size: 18px;
+        }
+
+        .lupa {
+            display: inline-block;
+            background-image: url("../img/lupa.png");
+            background-size: cover;
+            width: 27px;
+            height: 27px;
+            vertical-align: bottom;
+            margin-bottom: 5px;
+            margin-left: 16px
+        }
+    }
+
+    .social {
+        @extend .header-section;
+        width: 376px;
+        // background-color: yellow;
+
+        .social-container {
+
+            ul {
+                @extend .ul-with-horizontal-li;
+                top: 58px;
+                left: 10px;
+                background-color: green;
+                li{
+                    float: left;
+                }
+            }
+
+            .black-button {
+                width: 175px;
+                height: 40px;
+                span {
+                    font-size: 14px;
+                    line-height: 40px;
+                }
+            }
+
+            .langs {
+
+                position: relative;
+                top: 10px;
+                left: 3px;
+
+                a {
+                    display: inline-block;
+                    color: black;
+                    padding: 0 5px;
+                    font-size: 12px;
+                    font-family: arial;
+                    transition: background-color 0.4s;
+                    height: 15px;
+                    line-height: 15px;
+                    border-left: solid 1px black;
+                }
+
+                a:first-child {
+                    border-left: solid 1px white;
+                }
+
+                a:hover {
+                    //TODO: animação
+                    background-color: rgba(0,0,0,0.1);
+                }
+            }
+
+            .social-buttons {
+                position: relative;
+                height: 30px;
+                top: 3px;
+                left: 13px;
+                a {
+                    display: block;
+                    float: left;
+                    width: 30px;
+                    height: 30px;
+                    background-size: 90%;
+                    background-repeat: no-repeat;
+                }
+                a:not(:first-child) {
+                    margin-left: 4px;
+                }
+                .icon-facebook {
+                    background-image: url("../img/facebook.png")
+                }
+                .icon-google {
+                    background-image: url("../img/google.png")
+                }
+                .icon-twitter {
+                    background-image: url("../img/twitter.png")
+                }
+            }
+        }
+    }
+}

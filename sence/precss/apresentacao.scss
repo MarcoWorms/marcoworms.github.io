@@ -1,0 +1,281 @@
+@import 'global';
+@import 'header';
+
+::-webkit-input-placeholder {
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+:-moz-placeholder { /* Firefox 18- */
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+::-moz-placeholder {  /* Firefox 19+ */
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+:-ms-input-placeholder {
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+
+.mini-seta-direita {
+    background-image: url("../img/seta_direita.png");
+    width: 15px;
+    height: 26px;
+    background-size: 100%;
+    display: inline-block;
+}
+
+.news {
+    height: 411px;
+    border-bottom: solid 1px #a4a4a4;
+
+    .container-titulo {
+        position: absolute;
+        top: 96px;
+        left: 822px;
+        width: 540px;
+        height: 107px;
+        text-align: center;
+        h1 {
+            @extend .titulo;
+            font-size: 22px;
+            color: black;
+        }
+
+        .container-sub {
+            color: black;
+            position: relative;
+            top: 20px;
+            text-align: justify;
+            text-align-last: right;
+            -moz-text-align-last: right;
+            font-family: arial;
+            font-size: 13px;
+        }
+
+        .black-button {
+            float: left;
+            margin-left: 10px;
+            width: 249px;
+            height: 47px;
+            line-height: 47px;
+            font-size: 20px;
+        }
+        .letra-menor {
+            font-size: 17px;
+        }
+
+
+    }
+
+    .imagem {
+        position: absolute;
+        left: 147px;
+        top: 108px;
+        background-image: url("../img/usp.png");
+        width: 437px;
+        height: 172px;
+        background-size: 100%;
+    }
+}
+
+.news2 {
+   @extend .news;
+   height: 465px;
+
+   .container-titulo {
+        left: 128px;
+        top: 143px;
+
+        .container-sub {
+            text-align-last: left;
+            -moz-text-align-last: left;
+        }
+   }
+
+   .imagem {
+        background-image: url("../img/stanford.png");
+        left: 863px;
+        top: 69px;
+        width: 424px;
+        height: 312px;
+    }
+
+
+}
+
+.projetos-especiais {
+    height: 495px;
+    color: #a4a4a4;
+    border-bottom: solid 1px #a4a4a4;
+    background-image: url("../img/full_width_bg_4.png");
+    background-position: center;
+
+    h2 {
+        @extend .titulo;
+        height: 75px;
+        line-height: 75px;
+        margin-left: 180px;
+    }
+
+    .projetos {
+        display: inline-block;
+        width: 1130px;
+        padding: 10px 0;
+
+        .projeto {
+            display: block;
+            float: left;
+            width: 289px;
+            font-family: arial;
+            line-height: 33px;
+            color: #a4a4a4;
+            transition: background-color 0.3s;
+            border-radius: 7px;
+
+            .icone-projeto {
+                width: 186px;
+                height: 186px;
+                border: solid 1px #a7a7a7;
+                border-radius: 100%;
+            }
+
+            .titulo-projeto {
+                // font-weight: bold;
+                // letter-spacing: 1px;
+                font-size: 18px;
+                font-family: aspex;
+            }
+            .saiba-mais {
+                vertical-align: top;
+                position: relative;
+                top: -5px;
+            }
+        }
+
+        .projeto:first-child {
+            margin-left: -26px;
+        }
+
+        .projeto:hover {
+            background-color: rgba(0,0,0,0.05)
+        }
+    }
+
+    .seta {
+        display: block;
+        width: 31px;
+        height: 50px;
+        position: absolute;
+        top: 114px;
+        background-size: 100%;
+        box-sizing: content-box;
+    }
+    .esquerda {
+        background-image: url("../img/seta_esquerda_branca.png");
+        left: 118px;
+    }
+
+    .direita {
+        background-image: url("../img/seta_direita_branca.png");
+        right: 157px    ;
+    }
+
+}
+
+.criar_conta {
+    height: 748px;
+    line-height: 12px;
+
+    h1 {
+            @extend .titulo;
+            white-space: nowrap;
+            font-size: 40px;
+            color: #a4a4a4;
+            text-align: center;
+            margin-top: 84px;
+        }
+
+    .container-sub {
+        color: black;
+        display: inline-block;
+        text-align: justify;
+        text-align-last: center;
+        -moz-text-align-last: center;
+        font-family: arial;
+        font-size: 13px;
+        width: 561px;
+        line-height: 15px;
+    }
+
+    input {
+        border: solid 1px #a4a4a4;
+        width: 558px;
+        height: 38px;
+        text-align: center;
+        font-size: 20px;
+    }
+
+    .black-button {
+        display: inline-block;
+        width: 555px;
+        height: 50px;
+        line-height: 50px;
+        position: relative;
+        top: 30px;
+    }
+
+    .break-ou {
+        font-family: arial;
+        color: #a4a4a4;
+        font-size: 18px;
+    }
+    .botao-facebook {
+        display: inline-block;
+        width: 291px;
+        height: 44px;
+        background-image: url("../img/facebook-grande.png");
+        background-size: 100%;
+    }
+    .botao-twitter {
+        display: inline-block;
+        width: 251px;
+        height: 47px;
+        background-image: url("../img/twitter-grande.png");
+        background-size: 100%;
+    }
+}
+
+.apresentacao {
+    background-image: url("../img/full_width_bg_3.png");
+    height: 288px;
+
+    h1 {
+        @extend .titulo;
+        white-space: nowrap;
+        font-size: 40px;
+        color: black;
+        text-align: center;
+        margin-top: 84px;
+        }
+
+    .container-sub {
+        display: inline-block;
+        text-align: justify;
+        text-align-last: center;
+        -moz-text-align-last: center;
+        font-family: arial;
+        font-size: 13px;
+        width: 902px;
+        line-height: 15px;
+    }
+}

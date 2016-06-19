@@ -1,0 +1,399 @@
+@import 'global';
+@import 'header';
+
+::-webkit-input-placeholder {
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: left;
+    position: relative;
+    left: 10px;
+    font-family: arial;
+
+}
+:-moz-placeholder { /* Firefox 18- */
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: left;
+    position: relative;
+    left: 10px;
+    font-family: arial;
+
+}
+::-moz-placeholder {  /* Firefox 19+ */
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: left;
+    position: relative;
+    left: 10px;
+    font-family: arial;
+
+}
+:-ms-input-placeholder {
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: left;
+    position: relative;
+    left: 10px;
+    font-family: arial;
+
+}
+
+.mini-seta-direita {
+    background-image: url("../img/seta_direita.png");
+    width: 15px;
+    height: 26px;
+    background-size: 100%;
+    display: inline-block;
+}
+
+
+
+.space-only {
+    height: 200px;
+}
+
+
+.perfil-usuario {
+
+    .container1520 {
+        background-image: url("../img/full_width_bg_6.png")
+    }
+
+    height: 482px;
+    background-image: url("../img/full_width_bg_3.png");
+    background-repeat: no-repeat;
+
+    .container-perfil {
+        margin-top: 142px;
+        display: inline-block;
+        width: 1220px;
+        height: 275px;
+        margin-left: 83px;
+
+        .container-foto-perfil {
+            width: 257px;
+            height: 100%;
+            float: left;
+
+            .foto-perfil {
+                width: 210px;
+                height: 210px;
+                border-radius: 100%;
+                position: relative;
+                top: 21px;
+                left: 11px;
+                background-image: url("../img/person-placeholder.jpg");
+                background-size: 100%;
+                border: solid 1px #e1e1e1;
+            }
+
+        }
+
+        .info-perfil {
+            float: left;
+            text-align: left;
+            position: relative;
+            width: 963px;
+
+            h1 {
+                @extend .titulo;
+                font-size: 43px;
+            }
+
+            p {
+                font-family: arial;
+                font-size: 14px;
+                width:  857px
+            }
+
+            .black-button {
+                box-sizing: content-box;
+                display: inline-block;
+                height: 26px;
+                line-height: 26px;
+                padding: 3px 8px;
+            }
+        }
+
+
+        .mini-botoes {
+            width: 210px;
+            height: 15px;
+            position: absolute;
+            text-align: left;
+            left: 1097px;
+            top: 181px;
+            a {
+                color: black;
+                font-family: arial;
+                font-size: 14px;
+            }
+
+            a:hover {
+                text-decoration: underline;
+            }
+        }
+
+    }
+}
+
+
+.row-header-followers {
+    text-align: left;
+    height: 105px;
+
+    .container {
+        position: absolute;
+        left: 419px;
+        top: 39px;
+
+        .mini-botoes {
+            display: inline;
+            width: 210px;
+            height: 15px;
+            a {
+                color: #a5a5a5;
+                font-family: arial;
+                font-size: 14px;
+
+                img {
+                    position: relative;
+                    top: 4px;
+                }
+            }
+
+            a:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .search-container {
+        display: inline-block;
+        border-bottom: solid 1px black;
+        width: 251px;
+        height: 40px;
+        margin-left: 500px;
+
+        input {
+            height: 30px;
+            width: 197px;
+            font-size: 18px;
+        }
+        .lupa {
+            display: inline-block;
+            background-image: url("../img/lupa.png");
+            background-size: cover;
+            width: 30px;
+            height: 30px;
+            vertical-align: bottom;
+            margin-bottom: -5px;
+            margin-left: 16px
+        }
+
+        .seta-baixo {
+            @extend .lupa;
+            width: 40px;
+            background-image: url("../img/seta_baixo.png");
+            background-size: 100%;
+        }
+    }
+}
+
+.top-users {
+    height: 420px;
+    color: #a4a4a4;
+    background-position: center;
+
+    h1 {
+        @extend .titulo;
+        display: inline-block;
+        text-align: left;
+        position: absolute;
+        top: 90px;
+        left: 146px;
+        color: black;
+        margin-left: 50px;
+    }
+
+    .ver-todos {
+        position: absolute;
+        height: 24px;
+        left: 1225px;
+        top: 100px;
+        text-align: left;
+        line-height: 24px;
+
+        .mini-seta-direita {
+            float: left;
+        }
+
+        span {
+            float: left;
+            font-family: arial;
+            font-size: 16px;
+            color: #bcbcbc;
+            margin-left: 7px;
+        }
+    }
+
+    .projetos {
+        display: inline-block;
+        width: 1184px;
+        margin-bottom: 100px;
+
+        .projeto {
+            display: block;
+            float: left;
+            width: 143px;
+            height: 211px;
+            font-family: arial;
+            // line-height: 33px;
+            border-radius: 10px;
+            margin-left: 54px;
+            margin-top: 20px;
+            position: relative;
+
+            .icone {
+                width: 102px;
+                height: 102px;
+                border: solid 1px #a7a7a7;
+                border-radius: 100%;
+            }
+
+            .titulo {
+                // font-weight: bold;
+                // letter-spacing: 1px;
+                font-size: 12px;
+                font-family: aspex;
+                color: black;
+                font-weight: bold;
+            }
+
+            .black-button {
+                display: inline-block;
+                width: 140px;
+                height: 30px;
+                line-height: 30px;
+
+                span {
+                    font-size: 14px;
+                    font-weight: normal;
+                }
+            }
+
+            .black-button2 {
+                @extend .black-button;
+                margin-top: 10px;
+
+                width: 108px;
+                height: 22px;
+                line-height: 22px;
+
+                span {
+                    font-size: 10px;
+                }
+            }
+
+
+        }
+
+        .projeto:first-child {
+            margin-left: 24px;
+        }
+    }
+
+}
+
+.upload {
+    height: 572px;
+    width: 1220;
+    vertical-align: bottom;
+
+    .container-titulo {
+        margin-top: 100px;
+        height: 42px;
+        display: inline-block;
+
+        .subtitulo {
+            font-family: aspex;
+            font-size: 20px;
+            font-weight: normal;
+        }
+
+        .titulo {
+            @extend .subtitulo;
+            font-size: 30px;
+        }
+
+        img {
+            margin-left: 338px;
+        }
+
+        span {
+            font-family: arial;
+            font-size:12px;
+        }
+    }
+
+    .upload_form {
+        display: inline-block;
+        width: 100%;
+        height: 20px;
+        width: 1120px;
+        text-align: left;
+
+
+        .buscar {
+            display: inline-block;
+
+            width: 219px;
+            height: 41px;
+            line-height: 41px;
+            span {
+                margin-left: 75px;
+                color: white;
+            }
+        }
+
+        .salvar {
+            display: inline-block;
+            margin-left: 562px;
+            width: 219px;
+            height: 41px;
+            line-height: 41px;
+            img {
+                margin-left: 41px;
+            }
+            span {
+                margin-left: 13px;
+                color: white;
+            }
+        }
+
+        .half_input {
+            border: solid 1px #a7a7a7;
+            height: 35px;
+            width: 550px;
+            padding: 10px
+        }
+
+        .half_input_short {
+            @extend .half_input;
+            width: 328px;
+        }
+
+        .full_input {
+            @extend .half_input;
+            width: 1104px;
+            height: 142px;
+            font-style: arial;
+        }
+
+        span {
+            font-family: arial;
+            color: #a7a7a7;
+            font-size: 14px;
+        }
+    }
+}

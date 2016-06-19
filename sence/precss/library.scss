@@ -1,0 +1,320 @@
+@import 'global';
+@import 'header';
+
+::-webkit-input-placeholder {
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+:-moz-placeholder { /* Firefox 18- */
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+::-moz-placeholder {  /* Firefox 19+ */
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+:-ms-input-placeholder {
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+
+.mini-seta-direita {
+    background-image: url("../img/seta_direita.png");
+    width: 15px;
+    height: 26px;
+    background-size: 100%;
+    display: inline-block;
+}
+
+.library {
+    height: 612px;
+    color: #a4a4a4;
+    background-position: center;
+
+    h1 {
+        @extend .titulo;
+        display: inline-block;
+        text-align: left;
+        position: absolute;
+        top: 90px;
+        left: 146px;
+        color: black;
+        margin-left: 50px;
+    }
+
+    .ver-todos {
+        position: absolute;
+        height: 24px;
+        left: 1225px;
+        top: 100px;
+        text-align: left;
+        line-height: 24px;
+
+        .mini-seta-direita {
+            float: left;
+        }
+
+        span {
+            float: left;
+            font-family: arial;
+            font-size: 16px;
+            color: #bcbcbc;
+            margin-left: 7px;
+        }
+    }
+
+    h2 {
+        @extend .titulo;
+        height: 75px;
+        line-height: 75px;
+        margin-left: 180px;
+    }
+
+    .projetos {
+        display: inline-block;
+        width: 1184px;
+        margin-bottom: 100px;
+
+        .projeto {
+            display: block;
+            float: left;
+            width: 266px;
+            height: 408px;
+            font-family: arial;
+            // line-height: 33px;
+            border-radius: 10px;
+            margin-left: 40px;
+            margin-top: 160px;
+            border: 1px solid #ededed;
+            position: relative;
+
+            .icone {
+                width: 186px;
+                height: 186px;
+                border: solid 1px #a7a7a7;
+                border-radius: 100%;
+            }
+
+            .titulo {
+                // font-weight: bold;
+                // letter-spacing: 1px;
+                font-size: 18px;
+                font-family: aspex;
+                color: black;
+                font-weight: bold;
+            }
+            .descricao {
+                text-align: justify;
+                text-align-last: left;
+                -moz-text-align-last: left;
+                line-height:14px;
+                padding: 0 16px;
+                .texto {
+                    color: black;
+                    position: relative;
+                    top: 20 px;
+                    font-family: arial;
+                    font-size: 13px;
+                }
+            }
+
+            .player-placeholder {
+                float: left;
+                display: inline-block;
+                width: 256px;
+                height: 75px;
+                background-color: $player_color;
+                border-radius: 10px;
+                position: absolute;
+                top: 326px;
+                left: 4px;
+
+            }
+
+        }
+
+        .projeto:first-child {
+            margin-left: 0;
+        }
+        .projeto:nth-child(5) {
+            margin-left: 0;
+        }
+    }
+
+}
+
+.library:first-child {
+    border-bottom: solid 1px #DBDBDB;
+}
+
+.top-users {
+    height: 520px;
+    color: #a4a4a4;
+    background-position: center;
+
+    h1 {
+        @extend .titulo;
+        display: inline-block;
+        text-align: left;
+        position: absolute;
+        top: 90px;
+        left: 146px;
+        color: black;
+        margin-left: 50px;
+    }
+
+    .ver-todos {
+        position: absolute;
+        height: 24px;
+        left: 1225px;
+        top: 100px;
+        text-align: left;
+        line-height: 24px;
+
+        .mini-seta-direita {
+            float: left;
+        }
+
+        span {
+            float: left;
+            font-family: arial;
+            font-size: 16px;
+            color: #bcbcbc;
+            margin-left: 7px;
+        }
+    }
+
+    .projetos {
+        display: inline-block;
+        width: 1184px;
+        margin-bottom: 100px;
+
+        .projeto {
+            display: block;
+            float: left;
+            width: 143px;
+            height: 211px;
+            font-family: arial;
+            // line-height: 33px;
+            border-radius: 10px;
+            margin-left: 54px;
+            margin-top: 160px;
+            position: relative;
+
+            .icone {
+                width: 102px;
+                height: 102px;
+                border: solid 1px #a7a7a7;
+                border-radius: 100%;
+            }
+
+            .titulo {
+                // font-weight: bold;
+                // letter-spacing: 1px;
+                font-size: 12px;
+                font-family: aspex;
+                color: black;
+                font-weight: bold;
+            }
+
+            .black-button {
+                display: inline-block;
+                width: 140px;
+                height: 30px;
+                line-height: 30px;
+
+                span {
+                    font-size: 14px;
+                    font-weight: normal;
+                }
+            }
+
+            .black-button2 {
+                @extend .black-button;
+                margin-top: 10px;
+
+                width: 108px;
+                height: 22px;
+                line-height: 22px;
+
+                span {
+                    font-size: 10px;
+                }
+            }
+
+
+        }
+
+        .projeto:first-child {
+            margin-left: 24px;
+        }
+    }
+
+}
+
+.apresentacao {
+    background-image: url("../img/full_width_bg_3.png");
+    background-repeat: no-repeat;
+    height: 532px;
+
+    h1 {
+        @extend .titulo;
+        white-space: nowrap;
+        font-size: 40px;
+        color: black;
+        text-align: center;
+        margin-top: 84px;
+        }
+
+    .container-sub {
+        display: inline-block;
+        text-align: justify;
+        text-align-last: center;
+        -moz-text-align-last: center;
+        font-family: arial;
+        font-size: 13px;
+        width: 902px;
+        line-height: 15px;
+    }
+
+    .search-container {
+        display: inline-block;
+        border-bottom: solid 1px black;
+        width: 457px;
+        height: 40px;
+        margin-left: 7px;
+
+        input {
+            height: 30px;
+            width: 390px;
+            font-size: 18px;
+        }
+        .lupa {
+            display: inline-block;
+            background-image: url("../img/lupa.png");
+            background-size: cover;
+            width: 30px;
+            height: 30px;
+            vertical-align: bottom;
+            margin-bottom: -5px;
+            margin-left: 16px
+        }
+
+        .seta-baixo {
+            @extend .lupa;
+            width: 40px;
+            background-image: url("../img/seta_baixo.png");
+            background-size: 100%;
+        }
+    }
+
+
+}

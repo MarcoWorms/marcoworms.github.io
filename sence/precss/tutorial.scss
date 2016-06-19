@@ -1,0 +1,135 @@
+@import 'global';
+@import 'header';
+
+::-webkit-input-placeholder {
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+:-moz-placeholder { /* Firefox 18- */
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+::-moz-placeholder {  /* Firefox 19+ */
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+:-ms-input-placeholder {
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+
+.mini-seta-direita {
+    background-image: url("../img/seta_direita.png");
+    width: 15px;
+    height: 26px;
+    background-size: 100%;
+    display: inline-block;
+}
+
+.tutoriais {
+    height: 1100px;
+    color: #a4a4a4;
+    background-position: center;
+
+    h2 {
+        @extend .titulo;
+        height: 75px;
+        line-height: 75px;
+        margin-left: 180px;
+    }
+
+    .projetos {
+        display: inline-block;
+        width: 1117px;
+
+        .projeto {
+            display: block;
+            float: left;
+            width: 238px;
+            height: 344px;
+            font-family: arial;
+            // line-height: 33px;
+            border-radius: 7px;
+            margin-left: 55px;
+            margin-top: 90px;
+
+            .icone {
+                width: 186px;
+                height: 186px;
+                border: solid 1px #a7a7a7;
+                border-radius: 100%;
+            }
+
+            .titulo {
+                // font-weight: bold;
+                // letter-spacing: 1px;
+                font-size: 18px;
+                font-family: aspex;
+                color: black;
+                font-weight: bold;
+            }
+            .descricao {
+                text-align: justify;
+                text-align-last: left;
+                -moz-text-align-last: left;
+                line-height:14px;
+                .texto {
+                    color: black;
+                    position: relative;
+                    top: 20 px;
+                    font-family: arial;
+                    font-size: 13px;
+                }
+            }
+
+            .black-button {
+                display: inline-block;
+                width: 220px;
+                height: 40px;
+                line-height: 40px;
+            }
+
+        }
+
+        .projeto:first-child {
+            margin-left: 0;
+        }
+        .projeto:nth-child(5) {
+            margin-left: 0;
+        }
+    }
+
+}
+
+.apresentacao {
+    background-image: url("../img/full_width_bg_3.png");
+    height: 288px;
+
+    h1 {
+        @extend .titulo;
+        white-space: nowrap;
+        font-size: 40px;
+        color: black;
+        text-align: center;
+        margin-top: 84px;
+        }
+
+    .container-sub {
+        display: inline-block;
+        text-align: justify;
+        text-align-last: center;
+        -moz-text-align-last: center;
+        font-family: arial;
+        font-size: 13px;
+        width: 902px;
+        line-height: 15px;
+    }
+}

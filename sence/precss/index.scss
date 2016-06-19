@@ -1,0 +1,242 @@
+@import 'global';
+@import 'header';
+
+::-webkit-input-placeholder {
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+:-moz-placeholder { /* Firefox 18- */
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+::-moz-placeholder {  /* Firefox 19+ */
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+:-ms-input-placeholder {
+    color: #a4a4a4;
+    font-size: 18px;
+    text-align: center;
+
+}
+
+.mini-seta-direita {
+    background-image: url("../img/seta_direita.png");
+    width: 15px;
+    height: 26px;
+    background-size: 100%;
+    display: inline-block;
+}
+
+.front-news {
+    height: 547px;
+    background-image: url("../img/full_width_bg_1.png");
+    background-size: cover;
+
+    .container-titulo {
+        position: absolute;
+        top: 190px;
+        left: 150px;
+        width: 600px;
+        height: 107px;
+        h1 {
+            @extend .titulo;
+            white-space: nowrap;
+            font-size: 50px;
+        }
+
+        .container-sub {
+            position: relative;
+            top: 10px;
+            text-align: justify;
+            font-family: arial;
+            font-size: 13px;
+        }
+
+        .black-button {
+            position: relative;
+            top: 27px;
+            width: 249px;
+            height: 47px;
+            line-height: 47px;
+            font-size: 20px;
+        }
+
+        .container-circulos {
+            position: relative;
+            top: -4px;
+            left: 426px;
+            height: 22px;
+
+            .circulo {
+                float: left;
+                position: relative;
+                margin-left: 12px;
+                height: 22px;
+                width: 22px;
+                border-radius: 100%;
+            }
+            .black {
+                background-color: black;
+            }
+            .white {
+                background-color: white;
+                transition: background-color 0.3s;
+            }
+            .white:hover {
+                background-color: #E3E3E3;
+            }
+        }
+    }
+
+    .seta {
+        display: block;
+        width: 79px;
+        height: 123px;
+        position: absolute;
+        top: 210px;
+    }
+    .esquerda {
+        background-image: url("../img/seta_esquerda.png");
+        left: 0px;
+    }
+
+    .direita {
+        background-image: url("../img/seta_direita.png");
+        right: 0px;
+    }
+}
+
+.projetos-especiais {
+    color: #a4a4a4;
+    border-bottom: solid 1px #a4a4a4;
+
+    h2 {
+        @extend .titulo;
+
+        text-align: left;
+        height: 75px;
+        line-height: 75px;
+        margin-left: 180px;
+    }
+
+    .projetos {
+        display: inline-block;
+        width: 1235px;
+        height: 100px;
+
+        .projeto {
+            display: block;
+            float: left;
+            width: 205px;
+            height: 70px;
+            font-family: arial;
+            line-height: 33px;
+            color: #a4a4a4;
+            transition: background-color 0.3s;
+            border-radius: 7px;
+
+            .titulo-projeto {
+                // font-weight: bold;
+                // letter-spacing: 1px;
+                font-size: 18px;
+            }
+            .saiba-mais {
+                vertical-align: top;
+                position: relative;
+                top: -5px;
+            }
+        }
+
+        .projeto:hover {
+            background-color: rgba(0,0,0,0.05)
+        }
+    }
+
+    .seta {
+        display: block;
+        width: 31px;
+        height: 50px;
+        position: absolute;
+        top: 80px;
+        background-size: 100%;
+    }
+    .esquerda {
+        background-image: url("../img/seta_esquerda.png");
+        left: 110px;
+    }
+
+    .direita {
+        background-image: url("../img/seta_direita.png");
+        right: 110px;
+    }
+
+}
+
+.criar_conta {
+    height: 748px;
+    line-height: 12px;
+
+    h1 {
+            @extend .titulo;
+            white-space: nowrap;
+            font-size: 40px;
+            color: #a4a4a4;
+            text-align: center;
+            margin-top: 84px;
+        }
+
+    .container-sub {
+        display: inline-block;
+        text-align: justify;
+        text-align-last: center;
+        -moz-text-align-last: center;
+        font-family: arial;
+        font-size: 13px;
+        width: 561px;
+        line-height: 15px;
+    }
+
+    input {
+        border: solid 1px #a4a4a4;
+        width: 558px;
+        height: 38px;
+        text-align: center;
+        font-size: 20px;
+    }
+
+    .black-button {
+        display: inline-block;
+        width: 555px;
+        height: 50px;
+        line-height: 50px;
+        position: relative;
+        top: 30px;
+    }
+
+    .break-ou {
+        font-family: arial;
+        color: #a4a4a4;
+        font-size: 18px;
+    }
+    .botao-facebook {
+        display: inline-block;
+        width: 291px;
+        height: 44px;
+        background-image: url("../img/facebook-grande.png");
+        background-size: 100%;
+    }
+    .botao-twitter {
+        display: inline-block;
+        width: 251px;
+        height: 47px;
+        background-image: url("../img/twitter-grande.png");
+        background-size: 100%;
+    }
+}
