@@ -1,0 +1,205 @@
+@font-face {
+    font-family: BebasNeue;
+    src: url("BebasNeue.otf") format("opentype");
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: BebasNeue;
+}
+
+header, section, footer {
+    width: 100%;
+}
+
+header {
+    height: 140px;
+    position: fixed;
+    z-index: 9999;
+    background-color: rgba(0,0,0,0.4)
+}
+
+nav ul {
+    margin-left: 150px;
+    text-align: center;
+}
+
+nav ul li {
+    list-style-type: none;
+    display: inline-block;
+    margin: 10px 10px;
+}
+
+nav ul li a {
+    display: block;
+    height: 120px;
+    line-height: 120px;
+    width: 120px;
+    font-size: 24px;
+    color: white;
+    text-decoration: none;
+}
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+nav ul li a#logo-header {
+    color: rgba(0,0,0,0);
+    background-image: url("logo.png");
+    background-size:100%;
+    margin: 0;
+}
+
+section {
+    position: relative;
+    height: 630px;
+}
+
+section.title {
+    height: 100px;
+    background-color: black;
+    text-align: center;
+    line-height: 100px;
+    font-size: 26px;
+}
+
+section.title h1 {
+    color: white;
+}
+
+section#logo {
+    height: 971px;
+    background-image: url('primeiro.png');
+    background-size: cover;
+}
+
+section#logo div {
+    position: absolute;
+    top: 200px;
+    left: 200px;
+    color: white;
+}
+
+section#logo div h2 {
+    font-size: 90px;
+    letter-spacing: 3px;
+}
+
+section#logo div h1 {
+    font-size: 131px;
+    margin-top: -29px;
+    letter-spacing: 3px;
+}
+
+.button {
+    color: #ffb10a;
+    font-size: 50px;
+    font-weight: bold;
+    margin-top: -29px;
+    letter-spacing: 3px;
+    text-decoration: none;
+    border: solid 4px #ffb10a;
+    border-radius: 10px;
+    padding: 0px 8px;
+}
+
+.button:hover {
+    color: #FFCA57;
+    border: solid 4px #FFCA57;
+}
+
+section#info {
+    background-image: url('segundo.png');
+    background-size: cover;
+    height: 670px;
+}
+
+section#info div {
+    position: relative;
+    top: 126px;
+    left: 352px;
+    width: 510px;
+}
+
+section#info div h2 {
+    color: white;
+    font-size: 40px;
+    letter-spacing: 2px;
+}
+
+section#info div p {
+    display: inline-block;
+    color: white;
+    font-size: 24px;
+    margin-top: 20px;
+}
+
+section#info div p span {
+    color: #ffb10a;
+}
+
+section#media {
+    background-color: #4E4E4E;
+}
+
+section#news {
+    background-color: #4E4E4E;
+}
+
+section#comunidades {
+    background-image: url('metalfundo.png');
+    background-size: cover;
+    height: 700px;
+}
+
+section#comunidades div {
+    position: relative;
+    top: 160px;
+}
+
+section#comunidades div ul {
+    text-align: center;
+    position: relative;
+}
+
+section#comunidades div ul#secondul {
+    top: 50px;
+}
+
+section#comunidades div ul li {
+    display: inline-block;
+    margin: 0 30px;
+}
+
+section#comunidades div ul li a {
+    display: inline-block;
+    background-color: #616161;
+    width: 180px;
+    height: 70px;
+    text-decoration: none;
+    color: #1c1c1c;
+    font-size: 40px;
+    line-height: 70px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    border-radius: 4px;
+}
+
+section#comunidades div ul li a:hover {
+    background-color: #818181;
+}
+
+footer {
+    position: relative;
+    top: 450px;
+    height: 72px;
+    color: white;
+    text-align: center;
+    line-height: 36px;
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    z-index: 9998;
+}
