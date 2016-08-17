@@ -517,10 +517,9 @@ const makeUserInteractions = (player, enemy, dom, combatLoop) => {
     },
     healAllPlayerPokemons: () => {
       if (player.healAllPokemons() === "healed") {
-        gameConsoleLog('Full heal!', '#00ff00')
+        dom.gameConsoleLog('Full heal!', '#00ff00')
         combatLoop.refresh()
         renderView(dom, enemy, player)
-        dom.renderPokeList('playerPokes', player.pokemons(), player, '#enableDelete')
       }
     },
     changeRoute: (newRouteId) => {
