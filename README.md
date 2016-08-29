@@ -1,5 +1,5 @@
-# www.worms.io
+# http://www.worms.io
 or
-# marcoworms.github.io
+# http://marcoworms.github.io
 
 My stuff :D
