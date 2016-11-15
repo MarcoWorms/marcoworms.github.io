@@ -1,6 +1,6 @@
 ﻿{
-	"name": "New project",
-	"short_name": "New project",
+	"name": "Touch Colors",
+	"short_name": "Touch Colors",
 	"start_url": "index.html",
 	"display": "fullscreen",
 	"orientation": "landscape",
