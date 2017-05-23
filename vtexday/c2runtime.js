@@ -17292,6 +17292,7 @@ cr.getObjectRefTable = function () { return [
 	cr.behaviors.Fade,
 	cr.plugins_.Button.prototype.cnds.OnClicked,
 	cr.plugins_.Function.prototype.acts.CallFunction,
+	cr.system_object.prototype.acts.ResetGlobals,
 	cr.system_object.prototype.acts.RestartLayout,
 	cr.plugins_.Function.prototype.cnds.OnFunction,
 	cr.system_object.prototype.cnds.Compare,
