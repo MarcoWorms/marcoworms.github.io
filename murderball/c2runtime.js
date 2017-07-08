@@ -32206,7 +32206,7 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.cnds.Else,
 		cr.behaviors.Bullet.prototype.acts.SetAngleOfMotion,
 		cr.plugins_.Sprite.prototype.acts.SetPos,
-		cr.system_object.prototype.exps.angle,
+		cr.behaviors.Bullet.prototype.exps.AngleOfMotion,
 		cr.behaviors.Timer.prototype.cnds.OnTimer,
 		cr.system_object.prototype.cnds.IsGroupActive,
 		cr.plugins_.gamepad.prototype.cnds.OnButtonDown,
@@ -32215,7 +32215,8 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.exps.loopindex,
 		cr.plugins_.gamepad.prototype.cnds.IsButtonDown,
 		cr.plugins_.gamepad.prototype.cnds.CompareAxis,
-		cr.plugins_.Sprite.prototype.acts.SetVisible
+		cr.plugins_.Sprite.prototype.acts.SetVisible,
+		cr.system_object.prototype.exps.angle
 	];
 };
 
