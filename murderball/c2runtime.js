@@ -21031,24 +21031,6 @@ cr.system_object.prototype.loadFromJSON = function (o)
 })();
 
 cr.shaders = {};
-cr.shaders["glowhorizontal"] = {
-	src: "varying mediump vec2 vTex;\nuniform mediump sampler2D samplerFront;\nuniform mediump float pixelWidth;\nuniform mediump float intensity;\nvoid main(void)\n{\nmediump vec4 sum = vec4(0.0);\nmediump float halfPixelWidth = pixelWidth / 2.0;\nsum += texture2D(samplerFront, vTex - vec2(pixelWidth * 7.0 + halfPixelWidth, 0.0)) * 0.06;\nsum += texture2D(samplerFront, vTex - vec2(pixelWidth * 5.0 + halfPixelWidth, 0.0)) * 0.10;\nsum += texture2D(samplerFront, vTex - vec2(pixelWidth * 3.0 + halfPixelWidth, 0.0)) * 0.13;\nsum += texture2D(samplerFront, vTex - vec2(pixelWidth * 1.0 + halfPixelWidth, 0.0)) * 0.16;\nmediump vec4 front = texture2D(samplerFront, vTex);\nsum += front * 0.10;\nsum += texture2D(samplerFront, vTex + vec2(pixelWidth * 1.0 + halfPixelWidth, 0.0)) * 0.16;\nsum += texture2D(samplerFront, vTex + vec2(pixelWidth * 3.0 + halfPixelWidth, 0.0)) * 0.13;\nsum += texture2D(samplerFront, vTex + vec2(pixelWidth * 5.0 + halfPixelWidth, 0.0)) * 0.10;\nsum += texture2D(samplerFront, vTex + vec2(pixelWidth * 7.0 + halfPixelWidth, 0.0)) * 0.06;\ngl_FragColor = mix(front, max(front, sum), intensity);\n}",
-	extendBoxHorizontal: 8,
-	extendBoxVertical: 0,
-	crossSampling: false,
-	preservesOpaqueness: false,
-	animated: false,
-	parameters: [["intensity",0,1]]
-};
-cr.shaders["glowvertical"] = {
-	src: "varying mediump vec2 vTex;\nuniform mediump sampler2D samplerFront;\nuniform mediump float pixelHeight;\nuniform mediump float intensity;\nvoid main(void)\n{\nmediump vec4 sum = vec4(0.0);\nmediump float halfPixelHeight = pixelHeight / 2.0;\nsum += texture2D(samplerFront, vTex - vec2(0.0, pixelHeight * 7.0 + halfPixelHeight)) * 0.06;\nsum += texture2D(samplerFront, vTex - vec2(0.0, pixelHeight * 5.0 + halfPixelHeight)) * 0.10;\nsum += texture2D(samplerFront, vTex - vec2(0.0, pixelHeight * 3.0 + halfPixelHeight)) * 0.13;\nsum += texture2D(samplerFront, vTex - vec2(0.0, pixelHeight * 1.0 + halfPixelHeight)) * 0.16;\nmediump vec4 front = texture2D(samplerFront, vTex);\nsum += front * 0.10;\nsum += texture2D(samplerFront, vTex + vec2(0.0, pixelHeight * 1.0 + halfPixelHeight)) * 0.16;\nsum += texture2D(samplerFront, vTex + vec2(0.0, pixelHeight * 3.0 + halfPixelHeight)) * 0.13;\nsum += texture2D(samplerFront, vTex + vec2(0.0, pixelHeight * 5.0 + halfPixelHeight)) * 0.10;\nsum += texture2D(samplerFront, vTex + vec2(0.0, pixelHeight * 7.0 + halfPixelHeight)) * 0.06;\ngl_FragColor = mix(front, max(front, sum), intensity);\n}",
-	extendBoxHorizontal: 0,
-	extendBoxVertical: 8,
-	crossSampling: false,
-	preservesOpaqueness: false,
-	animated: false,
-	parameters: [["intensity",0,1]]
-};
 cr.shaders["hardlight"] = {
 	src: "varying mediump vec2 vTex;\nuniform lowp sampler2D samplerFront;\nuniform mediump vec2 srcStart;\nuniform mediump vec2 srcEnd;\nuniform lowp sampler2D samplerBack;\nuniform mediump vec2 destStart;\nuniform mediump vec2 destEnd;\nvoid main(void)\n{\nlowp vec4 front = texture2D(samplerFront, vTex);\nmediump vec2 tex = (vTex - srcStart) / (srcEnd - srcStart);\nlowp vec4 back = texture2D(samplerBack, mix(destStart, destEnd, tex));\nif (front.r * 0.299 + front.g * 0.587 + front.b * 0.114 <= 0.5)\n{\nfront *= back * 2.0;\n}\nelse\n{\nfront.rgb = 1.0 - ((1.0 - (2.0 * front.rgb - 1.0)) * (1.0 - back.rgb * front.a));\n}\ngl_FragColor = front;\n}",
 	extendBoxHorizontal: 0,
@@ -32176,6 +32158,7 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Sprite.prototype.acts.SetInstanceVar,
 		cr.plugins_.Sprite.prototype.exps.UID,
 		cr.behaviors.Pin.prototype.acts.Pin,
+		cr.plugins_.Sprite.prototype.cnds.CompareInstanceVar,
 		cr.system_object.prototype.cnds.EveryTick,
 		cr.plugins_.Sprite.prototype.cnds.PickByUID,
 		cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
@@ -32190,7 +32173,6 @@ cr.getObjectRefTable = function () {
 		cr.behaviors.Physics.prototype.acts.SetEnabled,
 		cr.plugins_.Sprite.prototype.acts.SetPosToObject,
 		cr.system_object.prototype.cnds.PickAll,
-		cr.plugins_.Sprite.prototype.cnds.CompareInstanceVar,
 		cr.plugins_.Sprite.prototype.acts.Destroy,
 		cr.plugins_.Sprite.prototype.cnds.OnDestroyed,
 		cr.system_object.prototype.acts.Wait,
