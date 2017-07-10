@@ -27373,6 +27373,545 @@ cr.plugins_.Text = function(runtime)
 		
 }());
 
+// List
+// ECMAScript 5 strict mode
+
+;
+;
+
+/////////////////////////////////////
+// Plugin class
+cr.plugins_.List = function(runtime)
+{
+	this.runtime = runtime;
+};
+
+(function ()
+{
+	/////////////////////////////////////
+	var pluginProto = cr.plugins_.List.prototype;
+		
+	/////////////////////////////////////
+	// Object type class
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+
+	var typeProto = pluginProto.Type.prototype;
+
+	// called on startup for each object type
+	typeProto.onCreate = function()
+	{
+	};
+
+	/////////////////////////////////////
+	// Instance class
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+	};
+	
+	var instanceProto = pluginProto.Instance.prototype;
+	
+	// called whenever an instance is created
+	instanceProto.onCreate = function()
+	{
+		this.elem = document.createElement("select");
+		this.elem.id = this.properties[7];
+		document.body.appendChild(this.elem);
+		this.elem.title = this.properties[1];
+		this.elem.disabled = !this.properties[3];
+		
+		// If type is list box, set size to 2 to force list box mode
+		if (this.properties[4] === 0)
+			this.elem.size = 2;
+		
+		this.elem["multiple"] = this.properties[5];
+		this.autoFontSize = this.properties[6];
+		
+		if (!this.properties[2])		// initially invisible
+		{
+			this.elem.style.display = "none";
+			this.visible = false;
+		}
+		
+		// add initial items if any
+		if (this.properties[0])
+		{
+			var itemsArr = this.properties[0].split("\n");
+			var i, len, o;
+			for (i = 0, len = itemsArr.length; i < len; i++)
+			{
+				o = document.createElement("option");
+				o.text = itemsArr[i];
+				this.elem.add(o);
+			}
+		}
+		
+		var self = this;
+		
+		this.elem.onchange = function() {
+				self.runtime.trigger(cr.plugins_.List.prototype.cnds.OnSelectionChanged, self);
+			};
+		
+		this.elem.onclick = function(e) {
+				e.stopPropagation();
+				self.runtime.isInUserInputEvent = true;
+				self.runtime.trigger(cr.plugins_.List.prototype.cnds.OnClicked, self);
+				self.runtime.isInUserInputEvent = false;
+			};
+		
+		this.elem.ondblclick = function(e) {
+				e.stopPropagation();
+				self.runtime.isInUserInputEvent = true;
+				self.runtime.trigger(cr.plugins_.List.prototype.cnds.OnDoubleClicked, self);
+				self.runtime.isInUserInputEvent = false;
+			};
+		
+		// Prevent touches reaching the canvas
+		this.elem.addEventListener("touchstart", function (e) {
+			e.stopPropagation();
+		}, false);
+		
+		this.elem.addEventListener("touchmove", function (e) {
+			e.stopPropagation();
+		}, false);
+		
+		this.elem.addEventListener("touchend", function (e) {
+			e.stopPropagation();
+		}, false);
+		
+		// Prevent clicks being blocked
+		this.elem.addEventListener("mousedown", function (e) {
+			e.stopPropagation();
+		});
+		
+		this.elem.addEventListener("mouseup", function (e) {
+			e.stopPropagation();
+		});
+		
+		this.lastLeft = 0;
+		this.lastTop = 0;
+		this.lastRight = 0;
+		this.lastBottom = 0;
+		this.lastWinWidth = 0;
+		this.lastWinHeight = 0;
+		this.isVisible = true;
+		
+		this.updatePosition(true);
+		
+		this.runtime.tickMe(this);
+	};
+	
+	instanceProto.saveToJSON = function ()
+	{
+		var o = {
+			"tooltip": this.elem.title,
+			"disabled": !!this.elem.disabled,
+			"items": [],
+			"sel": []
+		};
+		
+		var i, len;
+		var itemsarr = o["items"];
+		
+		for (i = 0, len = this.elem.length; i < len; i++)
+		{
+			itemsarr.push(this.elem.options[i].text);
+		}
+		
+		var selarr = o["sel"];
+		
+		if (this.elem["multiple"])
+		{
+			for (i = 0, len = this.elem.length; i < len; i++)
+			{
+				if (this.elem.options[i].selected)
+					selarr.push(i);
+			}
+		}
+		else
+		{
+			selarr.push(this.elem["selectedIndex"]);
+		}
+		
+		return o;
+	};
+	
+	instanceProto.loadFromJSON = function (o)
+	{
+		this.elem.title = o["tooltip"];
+		this.elem.disabled = o["disabled"];
+		
+		var itemsarr = o["items"];
+		
+		// Clear the list
+		while (this.elem.length)
+			this.elem.remove(this.elem.length - 1);
+			
+		var i, len, opt;
+		for (i = 0, len = itemsarr.length; i < len; i++)
+		{
+			opt = document.createElement("option");
+			opt.text = itemsarr[i];
+			this.elem.add(opt);
+		}
+		
+		var selarr = o["sel"];
+		
+		if (this.elem["multiple"])
+		{
+			for (i = 0, len = selarr.length; i < len; i++)
+			{
+				if (selarr[i] < this.elem.length)
+					this.elem.options[selarr[i]].selected = true;
+			}
+		}
+		else if (selarr.length >= 1)
+		{
+			this.elem["selectedIndex"] = selarr[0];
+		}
+	};
+	
+	instanceProto.onDestroy = function ()
+	{
+		this.elem.parentElement.removeChild(this.elem);
+		this.elem = null;
+	};
+	
+	instanceProto.tick = function ()
+	{
+		this.updatePosition();
+	};
+	
+	instanceProto.updatePosition = function (first)
+	{
+		var left = this.layer.layerToCanvas(this.x, this.y, true);
+		var top = this.layer.layerToCanvas(this.x, this.y, false);
+		var right = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, true);
+		var bottom = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, false);
+		
+		var rightEdge = this.runtime.width / this.runtime.devicePixelRatio;
+		var bottomEdge = this.runtime.height / this.runtime.devicePixelRatio;
+		
+		// Is entirely offscreen or invisible: hide
+		if (!this.visible || !this.layer.visible || right <= 0 || bottom <= 0 || left >= rightEdge || top >= bottomEdge)
+		{
+			if (this.isVisible)
+				this.elem.style.display = "none";
+			
+			this.isVisible = false;
+			return;
+		}
+		
+		// Truncate to canvas size
+		if (left < 1)
+			left = 1;
+		if (top < 1)
+			top = 1;
+		if (right >= rightEdge)
+			right = rightEdge - 1;
+		if (bottom >= bottomEdge)
+			bottom = bottomEdge - 1;
+		
+		var curWinWidth = window.innerWidth;
+		var curWinHeight = window.innerHeight;
+			
+		// Avoid redundant updates
+		if (!first && this.lastLeft === left && this.lastTop === top && this.lastRight === right && this.lastBottom === bottom && this.lastWinWidth === curWinWidth && this.lastWinHeight === curWinHeight)
+		{
+			if (!this.isVisible)
+			{
+				this.elem.style.display = "";
+				this.isVisible = true;
+			}
+			
+			return;
+		}
+			
+		this.lastLeft = left;
+		this.lastTop = top;
+		this.lastRight = right;
+		this.lastBottom = bottom;
+		this.lastWinWidth = curWinWidth;
+		this.lastWinHeight = curWinHeight;
+		
+		if (!this.isVisible)
+		{
+			this.elem.style.display = "";
+			this.isVisible = true;
+		}
+		
+		var offx = Math.round(left) + this.runtime.canvas.offsetLeft;
+		var offy = Math.round(top) + this.runtime.canvas.offsetTop;
+		this.elem.style.position = "absolute";
+		this.elem.style.left = offx + "px";
+		this.elem.style.top = offy + "px";
+		this.elem.style.width = Math.round(right - left) + "px";
+		this.elem.style.height = Math.round(bottom - top) + "px";
+		
+		if (this.autoFontSize)
+			this.elem.style.fontSize = ((this.layer.getScale(true) / this.runtime.devicePixelRatio) - 0.2) + "em";
+	};
+	
+	// only called if a layout object
+	instanceProto.draw = function(ctx)
+	{
+	};
+	
+	instanceProto.drawGL = function(glw)
+	{
+	};
+	
+
+	//////////////////////////////////////
+	// Conditions
+	function Cnds() {};
+	
+	Cnds.prototype.CompareSelection = function (cmp_, x_)
+	{
+		return cr.do_cmp(this.elem["selectedIndex"], cmp_, x_);
+	};
+	
+	Cnds.prototype.OnSelectionChanged = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnClicked = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnDoubleClicked = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.CompareSelectedText = function (x_, case_)
+	{
+		var selected_text = "";
+		var i = this.elem["selectedIndex"];
+		
+		if (i < 0 || i >= this.elem.length)
+			return false;
+		
+		selected_text = this.elem.options[i].text;
+		
+		if (case_)
+			return selected_text == x_;
+		else
+			return cr.equals_nocase(selected_text, x_);
+	};
+	
+	Cnds.prototype.CompareTextAt = function (i_, x_, case_)
+	{
+		var text = "";
+		var i = Math.floor(i_);
+		
+		if (i < 0 || i >= this.elem.length)
+			return false;
+		
+		text = this.elem.options[i].text;
+		
+		if (case_)
+			return text == x_;
+		else
+			return cr.equals_nocase(text,x_);
+	};
+	
+	pluginProto.cnds = new Cnds();
+	
+	//////////////////////////////////////
+	// Actions
+	function Acts() {};
+	
+	Acts.prototype.Select = function (i)
+	{
+		this.elem["selectedIndex"] = i;
+	};
+	
+	Acts.prototype.SetTooltip = function (text)
+	{
+		this.elem.title = text;
+	};
+	
+	Acts.prototype.SetVisible = function (vis)
+	{
+		this.visible = (vis !== 0);
+	};
+	
+	Acts.prototype.SetEnabled = function (en)
+	{
+		this.elem.disabled = (en === 0);
+	};
+	
+	Acts.prototype.SetFocus = function ()
+	{
+		this.elem.focus();
+	};
+	
+	Acts.prototype.SetBlur = function ()
+	{
+		this.elem.blur();
+	};
+	
+	Acts.prototype.SetCSSStyle = function (p, v)
+	{
+		this.elem.style[cr.cssToCamelCase(p)] = v;
+	};
+	
+	Acts.prototype.AddItem = function (text_)
+	{
+		var o = document.createElement("option");
+		o.text = text_;
+		this.elem.add(o);
+	};
+	
+	Acts.prototype.AddItemAt = function (index_, text_)
+	{
+		index_ = Math.floor(index_);
+		
+		if (index_ < 0)
+			index_ = 0;
+			
+		var o = document.createElement("option");
+		o.text = text_;
+		
+		if (index_ >= this.elem.length)
+			this.elem.add(o);
+		else
+		{
+			this.elem.add(o, this.elem.options[index_]);
+		}
+	};
+	
+	Acts.prototype.Remove = function (index_)
+	{
+		index_ = Math.floor(index_);
+		this.elem.remove(index_);
+	};
+	
+	Acts.prototype.SetItemText = function (index_, text_)
+	{
+		index_ = Math.floor(index_);
+		if (index_ < 0 || index_ >= this.elem.length)
+			return;
+			
+		this.elem.options[index_].text = text_;
+	};
+	
+	Acts.prototype.Clear = function ()
+	{
+		// Fastest way to remove is just to clear the HTML contents, removing all <option> children
+		this.elem.innerHTML = "";
+	};
+	
+	pluginProto.acts = new Acts();
+	
+	//////////////////////////////////////
+	// Expressions
+	function Exps() {};
+	
+	Exps.prototype.ItemCount = function (ret)
+	{
+		ret.set_int(this.elem.length);
+	};
+	
+	Exps.prototype.ItemTextAt = function (ret, i)
+	{
+		i = Math.floor(i);		
+		
+		if (i < 0 || i >= this.elem.length)
+		{
+			ret.set_string("");
+			return;
+		}
+		
+		ret.set_string(this.elem.options[i].text);
+	};
+	
+	Exps.prototype.SelectedIndex = function (ret)
+	{
+		ret.set_int(this.elem["selectedIndex"]);
+	};
+	
+	Exps.prototype.SelectedText = function (ret)
+	{
+		var i = this.elem["selectedIndex"];
+		
+		if (i < 0 || i >= this.elem.length)
+		{
+			ret.set_string("");
+			return;
+		}
+		
+		ret.set_string(this.elem.options[i].text);
+	};
+	
+	Exps.prototype.SelectedCount = function (ret)
+	{
+		var i, len, count = 0;
+		for (i = 0, len = this.elem.length; i < len; i++)
+		{
+			if (this.elem.options[i].selected)
+				count++;
+		}
+		
+		ret.set_int(count);
+	};
+	
+	Exps.prototype.SelectedIndexAt = function (ret, index_)
+	{
+		index_ = Math.floor(index_);
+		
+		var i, len, count = 0, result = 0;
+		for (i = 0, len = this.elem.length; i < len; i++)
+		{
+			if (this.elem.options[i].selected)
+			{
+				if (count === index_)
+				{
+					result = i;
+					break;
+				}
+				
+				count++;
+			}
+		}
+		
+		ret.set_int(result);
+	};
+	
+	Exps.prototype.SelectedTextAt = function (ret, index_)
+	{
+		index_ = Math.floor(index_);
+		
+		var i, len, count = 0, result = "";
+		for (i = 0, len = this.elem.length; i < len; i++)
+		{
+			if (this.elem.options[i].selected)
+			{
+				if (count === index_)
+				{
+					result = this.elem.options[i].text;
+					break;
+				}
+				
+				count++;
+			}
+		}
+		
+		ret.set_string(result);
+	};
+	
+	pluginProto.exps = new Exps();
+
+}());
+
 // Sine
 // ECMAScript 5 strict mode
 
@@ -32993,6 +33532,7 @@ cr.getObjectRefTable = function () {
 		cr.behaviors.Bullet,
 		cr.behaviors.Fade,
 		cr.plugins_.Text,
+		cr.plugins_.List,
 		cr.system_object.prototype.cnds.OnLayoutStart,
 		cr.system_object.prototype.cnds.ForEach,
 		cr.system_object.prototype.acts.CreateObject,
@@ -33018,6 +33558,7 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.cnds.PickAll,
 		cr.plugins_.Sprite.prototype.acts.Destroy,
 		cr.plugins_.Sprite.prototype.cnds.OnDestroyed,
+		cr.system_object.prototype.exps.layerindex,
 		cr.plugins_.Sprite.prototype.exps.X,
 		cr.plugins_.Sprite.prototype.exps.Y,
 		cr.system_object.prototype.acts.Wait,
@@ -33035,14 +33576,22 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Sprite.prototype.acts.SetPos,
 		cr.behaviors.Bullet.prototype.exps.AngleOfMotion,
 		cr.behaviors.Timer.prototype.cnds.OnTimer,
-		cr.system_object.prototype.cnds.IsGroupActive,
-		cr.plugins_.gamepad.prototype.cnds.OnButtonDown,
-		cr.behaviors.Platform.prototype.acts.SimulateControl,
+		cr.plugins_.List.prototype.cnds.OnSelectionChanged,
+		cr.system_object.prototype.exps["int"],
+		cr.plugins_.List.prototype.exps.SelectedText,
 		cr.system_object.prototype.cnds.For,
-		cr.plugins_.gamepad.prototype.exps.GamepadCount,
+		cr.plugins_.List.prototype.cnds.CompareInstanceVar,
 		cr.system_object.prototype.exps.loopindex,
+		cr.plugins_.List.prototype.acts.Select,
+		cr.plugins_.gamepad.prototype.exps.GamepadCount,
+		cr.plugins_.Text.prototype.cnds.CompareInstanceVar,
 		cr.plugins_.Text.prototype.acts.SetText,
 		cr.plugins_.gamepad.prototype.cnds.IsButtonDown,
+		cr.system_object.prototype.acts.SetBoolVar,
+		cr.system_object.prototype.cnds.CompareBoolVar,
+		cr.system_object.prototype.cnds.LayerVisible,
+		cr.system_object.prototype.acts.SetLayerVisible,
+		cr.behaviors.Platform.prototype.acts.SimulateControl,
 		cr.plugins_.gamepad.prototype.cnds.CompareAxis,
 		cr.plugins_.Sprite.prototype.acts.SetVisible,
 		cr.system_object.prototype.exps.angle
