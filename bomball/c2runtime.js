@@ -29329,6 +29329,767 @@ cr.plugins_.Browser = function(runtime)
 	
 }());
 
+// AJAX
+// ECMAScript 5 strict mode
+
+;
+;
+
+/////////////////////////////////////
+// Plugin class
+cr.plugins_.AJAX = function(runtime)
+{
+	this.runtime = runtime;
+};
+
+(function ()
+{
+	var isNWjs = false;
+	var path = null;
+	var fs = null;
+	var nw_appfolder = "";
+	
+	var pluginProto = cr.plugins_.AJAX.prototype;
+		
+	/////////////////////////////////////
+	// Object type class
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+
+	var typeProto = pluginProto.Type.prototype;
+
+	typeProto.onCreate = function()
+	{
+	};
+
+	/////////////////////////////////////
+	// Instance class
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+		
+		this.lastData = "";
+		this.curTag = "";
+		this.progress = 0;
+		this.timeout = -1;
+		
+		isNWjs = this.runtime.isNWjs;
+		
+		if (isNWjs)
+		{
+			path = require("path");
+			fs = require("fs");
+			var process = window["process"] || nw["process"];
+			nw_appfolder = path["dirname"](process["execPath"]) + "\\";
+		}
+	};
+	
+	var instanceProto = pluginProto.Instance.prototype;
+	
+	instanceProto.onCreate = function()
+	{
+	};
+	
+	instanceProto.saveToJSON = function ()
+	{
+		return { "lastData": this.lastData };
+	};
+	
+	instanceProto.loadFromJSON = function (o)
+	{
+		this.lastData = o["lastData"];
+		this.curTag = "";
+		this.progress = 0;
+	};
+	
+	var next_request_headers = {};
+	var next_override_mime = "";
+	
+	instanceProto.doRequest = function (tag_, url_, method_, data_)
+	{
+		// Create a context object with the tag name and a reference back to this
+		var self = this;
+		var request = null;
+		
+		var doErrorFunc = function ()
+		{
+			self.curTag = tag_;
+			self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnAnyError, self);
+			self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnError, self);
+		};
+		
+		var errorFunc = function ()
+		{
+			// In node-webkit, try looking up the file on disk instead since it wasn't found in the project.
+			if (isNWjs)
+			{
+				var filepath = nw_appfolder + url_;
+				
+				if (fs["existsSync"](filepath))
+				{
+					fs["readFile"](filepath, {"encoding": "utf8"}, function (err, data) {
+						if (err)
+						{
+							doErrorFunc();
+							return;
+						}
+						
+						self.curTag = tag_;
+						self.lastData = data.replace(/\r\n/g, "\n")
+						self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnAnyComplete, self);
+						self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnComplete, self);
+					});
+				}
+				else
+					doErrorFunc();
+			}
+			else
+				doErrorFunc();
+		};
+			
+		var progressFunc = function (e)
+		{
+			if (!e["lengthComputable"])
+				return;
+				
+			self.progress = e.loaded / e.total;
+			self.curTag = tag_;
+			self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnProgress, self);
+		};
+			
+		try
+		{
+			// Windows Phone 8 can't AJAX local files using the standards-based API, but
+			// can if we use the old-school ActiveXObject. So use ActiveX on WP8 only.
+			if (this.runtime.isWindowsPhone8)
+				request = new ActiveXObject("Microsoft.XMLHTTP");
+			else
+				request = new XMLHttpRequest();
+			
+			request.onreadystatechange = function()
+			{
+				if (request.readyState === 4)
+				{
+					self.curTag = tag_;
+					
+					if (request.responseText)
+						self.lastData = request.responseText.replace(/\r\n/g, "\n");		// fix windows style line endings
+					else
+						self.lastData = "";
+					
+					if (request.status >= 400)
+					{
+						self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnAnyError, self);
+						self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnError, self);
+					}
+					else
+					{
+						// In node-webkit, don't trigger 'on success' with empty string if file not found.
+						// In a browser also don't trigger 'on success' if the returned string is empty and the status is 0,
+						// which is what happens when onerror is about to fire.
+						if ((!isNWjs || self.lastData.length) && !(!isNWjs && request.status === 0 && !self.lastData.length))
+						{
+							self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnAnyComplete, self);
+							self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnComplete, self);
+						}
+					}
+				}
+			};
+			
+			if (!this.runtime.isWindowsPhone8)
+			{
+				request.onerror = errorFunc;
+				request.ontimeout = errorFunc;
+				request.onabort = errorFunc;
+				request["onprogress"] = progressFunc;
+			}
+			
+			request.open(method_, url_);
+			
+			if (!this.runtime.isWindowsPhone8)
+			{
+				// IE requires timeout be set after open()
+				if (this.timeout >= 0 && typeof request["timeout"] !== "undefined")
+					request["timeout"] = this.timeout;
+			}
+			
+			request.responseType = "text";
+			
+			if (data_)
+			{
+				if (request["setRequestHeader"] && !next_request_headers.hasOwnProperty("Content-Type"))
+				{
+					request["setRequestHeader"]("Content-Type", "application/x-www-form-urlencoded");
+				}
+			}
+			
+			// Apply custom headers
+			if (request["setRequestHeader"])
+			{
+				var p;
+				for (p in next_request_headers)
+				{
+					if (next_request_headers.hasOwnProperty(p))
+					{
+						try {
+							request["setRequestHeader"](p, next_request_headers[p]);
+						}
+						catch (e) {}
+					}
+				}
+				
+				// Reset for next request
+				next_request_headers = {};
+			}
+			
+			// Apply MIME type override if one set
+			if (next_override_mime && request["overrideMimeType"])
+			{
+				try {
+					request["overrideMimeType"](next_override_mime);
+				}
+				catch (e) {}
+				
+				// Reset for next request
+				next_override_mime = "";
+			}
+
+			if (data_)
+				request.send(data_);
+			else
+				request.send();
+			
+		}
+		catch (e)
+		{
+			errorFunc();
+		}
+	};
+	
+
+	//////////////////////////////////////
+	// Conditions
+	function Cnds() {};
+
+	Cnds.prototype.OnComplete = function (tag)
+	{
+		return cr.equals_nocase(tag, this.curTag);
+	};
+	
+	Cnds.prototype.OnAnyComplete = function (tag)
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnError = function (tag)
+	{
+		return cr.equals_nocase(tag, this.curTag);
+	};
+	
+	Cnds.prototype.OnAnyError = function (tag)
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnProgress = function (tag)
+	{
+		return cr.equals_nocase(tag, this.curTag);
+	};
+	
+	pluginProto.cnds = new Cnds();
+
+	//////////////////////////////////////
+	// Actions
+	function Acts() {};
+
+	Acts.prototype.Request = function (tag_, url_)
+	{
+		var self = this;
+		
+		// In WKWebView mode, if the url is relative (e.g. foo.txt) it should be read as a local file
+		// as RequestFile does. Otherwise it still issues an AJAX request that fails.
+		if (this.runtime.isWKWebView && !this.runtime.isAbsoluteUrl(url_))
+		{
+			this.runtime.fetchLocalFileViaCordovaAsText(url_,
+			function (str)
+			{
+				self.curTag = tag_;
+				self.lastData = str.replace(/\r\n/g, "\n");		// fix windows style line endings
+				
+				self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnAnyComplete, self);
+				self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnComplete, self);
+			},
+			function (err)
+			{
+				self.curTag = tag_;
+				self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnAnyError, self);
+				self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnError, self);
+			});
+		}
+		// In preview mode, also convert relative URLs to local file requests.
+		else if (this.runtime.isPreview && !this.runtime.isAbsoluteUrl(url_))
+		{
+			this.doRequest(tag_, this.runtime.getLocalFileUrl(url_), "GET");
+		}
+		else
+		{
+			this.doRequest(tag_, url_, "GET");
+		}
+	};
+	
+	Acts.prototype.RequestFile = function (tag_, file_)
+	{
+		var self = this;
+		
+		// Use cordova to load local files in WKWebView mode, since AJAX requests will fail.
+		if (this.runtime.isWKWebView)
+		{
+			this.runtime.fetchLocalFileViaCordovaAsText(file_,
+			function (str)
+			{
+				self.curTag = tag_;
+				self.lastData = str.replace(/\r\n/g, "\n");		// fix windows style line endings
+				
+				self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnAnyComplete, self);
+				self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnComplete, self);
+			},
+			function (err)
+			{
+				self.curTag = tag_;
+				self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnAnyError, self);
+				self.runtime.trigger(cr.plugins_.AJAX.prototype.cnds.OnError, self);
+			});
+		}
+		else
+		{
+			this.doRequest(tag_, this.runtime.getLocalFileUrl(file_), "GET");
+		}
+	};
+	
+	Acts.prototype.Post = function (tag_, url_, data_, method_)
+	{
+		this.doRequest(tag_, url_, method_, data_);
+	};
+	
+	Acts.prototype.SetTimeout = function (t)
+	{
+		this.timeout = t * 1000;
+	};
+	
+	Acts.prototype.SetHeader = function (n, v)
+	{
+		next_request_headers[n] = v;
+	};
+	
+	Acts.prototype.OverrideMIMEType = function (m)
+	{
+		next_override_mime = m;
+	};
+	
+	pluginProto.acts = new Acts();
+
+	//////////////////////////////////////
+	// Expressions
+	function Exps() {};
+
+	Exps.prototype.LastData = function (ret)
+	{
+		ret.set_string(this.lastData);
+	};
+	
+	Exps.prototype.Progress = function (ret)
+	{
+		ret.set_float(this.progress);
+	};
+	
+	Exps.prototype.Tag = function (ret)
+	{
+		ret.set_string(this.curTag);
+	};
+	
+	pluginProto.exps = new Exps();
+
+}());
+
+// Text input
+// ECMAScript 5 strict mode
+
+;
+;
+
+/////////////////////////////////////
+// Plugin class
+cr.plugins_.TextBox = function(runtime)
+{
+	this.runtime = runtime;
+};
+
+(function ()
+{
+	/////////////////////////////////////
+	var pluginProto = cr.plugins_.TextBox.prototype;
+		
+	/////////////////////////////////////
+	// Object type class
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+
+	var typeProto = pluginProto.Type.prototype;
+
+	// called on startup for each object type
+	typeProto.onCreate = function()
+	{
+	};
+
+	/////////////////////////////////////
+	// Instance class
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+	};
+	
+	var instanceProto = pluginProto.Instance.prototype;
+	
+	var elemTypes = ["text", "password", "email", "number", "tel", "url"];
+	
+	// IE9 doesn't recognise the last four form types and crashes, so set them to 'text'.
+	if (navigator.userAgent.indexOf("MSIE 9") > -1)
+	{
+		elemTypes[2] = "text";
+		elemTypes[3] = "text";
+		elemTypes[4] = "text";
+		elemTypes[5] = "text";
+	}
+
+	// called whenever an instance is created
+	instanceProto.onCreate = function()
+	{
+		if (this.properties[7] === 6)	// textarea
+		{
+			this.elem = document.createElement("textarea");
+			this.elem.style.resize = "none";
+		}
+		else
+		{
+			this.elem = document.createElement("input");
+			this.elem.type = elemTypes[this.properties[7]];	
+		}
+		this.elem.id = this.properties[9];
+		document.body.appendChild(this.elem);
+		this.elem["autocomplete"] = "off";
+		this.elem.value = this.properties[0];
+		this.elem["placeholder"] = this.properties[1];
+		this.elem.title = this.properties[2];
+		this.elem.disabled = !this.properties[4];
+		this.elem["readOnly"] = this.properties[5];
+		this.elem["spellcheck"] = this.properties[6];
+		
+		this.autoFontSize = this.properties[8];
+		this.element_hidden = false;
+		
+		if (!this.properties[3])			// initially invisible
+		{
+			this.elem.style.display = "none";
+			this.visible = false;
+			this.element_hidden = true;
+		}
+			
+		var onchangetrigger = (function (self) {
+			return function() {
+				self.runtime.trigger(cr.plugins_.TextBox.prototype.cnds.OnTextChanged, self);
+			};
+		})(this);
+		
+		this.elem["oninput"] = onchangetrigger;
+		
+		// IE doesn't trigger oninput for 'cut'
+		if (navigator.userAgent.indexOf("MSIE") !== -1)
+			this.elem["oncut"] = onchangetrigger;
+		
+		this.elem.onclick = (function (self) {
+			return function(e) {
+				e.stopPropagation();
+				self.runtime.isInUserInputEvent = true;
+				self.runtime.trigger(cr.plugins_.TextBox.prototype.cnds.OnClicked, self);
+				self.runtime.isInUserInputEvent = false;
+			};
+		})(this);
+		
+		this.elem.ondblclick = (function (self) {
+			return function(e) {
+				e.stopPropagation();
+				self.runtime.isInUserInputEvent = true;
+				self.runtime.trigger(cr.plugins_.TextBox.prototype.cnds.OnDoubleClicked, self);
+				self.runtime.isInUserInputEvent = false;
+			};
+		})(this);
+		
+		// Prevent touches reaching the canvas
+		this.elem.addEventListener("touchstart", function (e) {
+			e.stopPropagation();
+		}, false);
+		
+		this.elem.addEventListener("touchmove", function (e) {
+			e.stopPropagation();
+		}, false);
+		
+		this.elem.addEventListener("touchend", function (e) {
+			e.stopPropagation();
+		}, false);
+		
+		// Prevent clicks being blocked
+		this.elem.addEventListener("mousedown", function (e) {
+			e.stopPropagation();
+		});
+		
+		this.elem.addEventListener("mouseup", function (e) {
+			e.stopPropagation();
+		});
+		
+		// Prevent key presses being blocked by the Keyboard object
+		this.elem.addEventListener("keydown", function (e)
+		{
+			if (e.which !== 13 && e.which != 27)	// allow enter and escape
+				e.stopPropagation();
+		});
+		
+		this.elem.addEventListener("keyup", function (e)
+		{
+			if (e.which !== 13 && e.which != 27)	// allow enter and escape
+				e.stopPropagation();
+		});
+		
+		this.lastLeft = 0;
+		this.lastTop = 0;
+		this.lastRight = 0;
+		this.lastBottom = 0;
+		this.lastWinWidth = 0;
+		this.lastWinHeight = 0;
+			
+		this.updatePosition(true);
+		
+		this.runtime.tickMe(this);
+	};
+	
+	instanceProto.saveToJSON = function ()
+	{
+		return {
+			"text": this.elem.value,
+			"placeholder": this.elem.placeholder,
+			"tooltip": this.elem.title,
+			"disabled": !!this.elem.disabled,
+			"readonly": !!this.elem.readOnly,
+			"spellcheck": !!this.elem["spellcheck"]
+		};
+	};
+	
+	instanceProto.loadFromJSON = function (o)
+	{
+		this.elem.value = o["text"];
+		this.elem.placeholder = o["placeholder"];
+		this.elem.title = o["tooltip"];
+		this.elem.disabled = o["disabled"];
+		this.elem.readOnly = o["readonly"];
+		this.elem["spellcheck"] = o["spellcheck"];
+	};
+	
+	instanceProto.onDestroy = function ()
+	{
+		this.elem.parentElement.removeChild(this.elem);
+		this.elem = null;
+	};
+	
+	instanceProto.tick = function ()
+	{
+		this.updatePosition();
+	};
+	
+	instanceProto.updatePosition = function (first)
+	{
+		var left = this.layer.layerToCanvas(this.x, this.y, true);
+		var top = this.layer.layerToCanvas(this.x, this.y, false);
+		var right = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, true);
+		var bottom = this.layer.layerToCanvas(this.x + this.width, this.y + this.height, false);
+		
+		var rightEdge = this.runtime.width / this.runtime.devicePixelRatio;
+		var bottomEdge = this.runtime.height / this.runtime.devicePixelRatio;
+		
+		// Is entirely offscreen or invisible: hide
+		if (!this.visible || !this.layer.visible || right <= 0 || bottom <= 0 || left >= rightEdge || top >= bottomEdge)
+		{
+			if (!this.element_hidden)
+				this.elem.style.display = "none";
+				
+			this.element_hidden = true;
+			return;
+		}
+		
+		// Truncate to canvas size
+		if (left < 1)
+			left = 1;
+		if (top < 1)
+			top = 1;
+		if (right >= rightEdge)
+			right = rightEdge - 1;
+		if (bottom >= bottomEdge)
+			bottom = bottomEdge - 1;
+		
+		var curWinWidth = window.innerWidth;
+		var curWinHeight = window.innerHeight;
+			
+		// Avoid redundant updates
+		if (!first && this.lastLeft === left && this.lastTop === top && this.lastRight === right && this.lastBottom === bottom && this.lastWinWidth === curWinWidth && this.lastWinHeight === curWinHeight)
+		{
+			if (this.element_hidden)
+			{
+				this.elem.style.display = "";
+				this.element_hidden = false;
+			}
+			
+			return;
+		}
+			
+		this.lastLeft = left;
+		this.lastTop = top;
+		this.lastRight = right;
+		this.lastBottom = bottom;
+		this.lastWinWidth = curWinWidth;
+		this.lastWinHeight = curWinHeight;
+		
+		if (this.element_hidden)
+		{
+			this.elem.style.display = "";
+			this.element_hidden = false;
+		}
+		
+		var offx = Math.round(left) + this.runtime.canvas.offsetLeft;
+		var offy = Math.round(top) + this.runtime.canvas.offsetTop;
+		this.elem.style.position = "absolute";
+		this.elem.style.left = offx + "px";
+		this.elem.style.top = offy + "px";
+		this.elem.style.width = Math.round(right - left) + "px";
+		this.elem.style.height = Math.round(bottom - top) + "px";
+		
+		if (this.autoFontSize)
+			this.elem.style.fontSize = ((this.layer.getScale(true) / this.runtime.devicePixelRatio) - 0.2) + "em";
+	};
+	
+	// only called if a layout object
+	instanceProto.draw = function(ctx)
+	{
+	};
+	
+	instanceProto.drawGL = function(glw)
+	{
+	};
+	
+
+	//////////////////////////////////////
+	// Conditions
+	function Cnds() {};
+	
+	Cnds.prototype.CompareText = function (text, case_)
+	{
+		if (case_ === 0)	// insensitive
+			return cr.equals_nocase(this.elem.value, text);
+		else
+			return this.elem.value === text;
+	};
+	
+	Cnds.prototype.OnTextChanged = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnClicked = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnDoubleClicked = function ()
+	{
+		return true;
+	};
+	
+	pluginProto.cnds = new Cnds();
+	
+	//////////////////////////////////////
+	// Actions
+	function Acts() {};
+	
+	Acts.prototype.SetText = function (text)
+	{
+		this.elem.value = text;
+	};
+	
+	Acts.prototype.SetPlaceholder = function (text)
+	{
+		this.elem.placeholder = text;
+	};
+	
+	Acts.prototype.SetTooltip = function (text)
+	{
+		this.elem.title = text;
+	};
+	
+	Acts.prototype.SetVisible = function (vis)
+	{
+		this.visible = (vis !== 0);
+	};
+	
+	Acts.prototype.SetEnabled = function (en)
+	{
+		this.elem.disabled = (en === 0);
+	};
+	
+	Acts.prototype.SetReadOnly = function (ro)
+	{
+		this.elem.readOnly = (ro === 0);
+	};
+	
+	Acts.prototype.SetFocus = function ()
+	{
+		this.elem.focus();
+	};
+	
+	Acts.prototype.SetBlur = function ()
+	{
+		this.elem.blur();
+	};
+	
+	Acts.prototype.SetCSSStyle = function (p, v)
+	{
+		this.elem.style[cr.cssToCamelCase(p)] = v;
+	};
+	
+	Acts.prototype.ScrollToBottom = function ()
+	{
+		this.elem.scrollTop = this.elem.scrollHeight;
+	};
+	
+	pluginProto.acts = new Acts();
+	
+	//////////////////////////////////////
+	// Expressions
+	function Exps() {};
+	
+	Exps.prototype.Text = function (ret)
+	{
+		ret.set_string(this.elem.value);
+	};
+	
+	pluginProto.exps = new Exps();
+
+}());
+
 // Solid
 // ECMAScript 5 strict mode
 
@@ -34675,14 +35436,20 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Function,
 		cr.behaviors.scrollto,
 		cr.plugins_.Browser,
+		cr.plugins_.AJAX,
+		cr.plugins_.TextBox,
+		cr.plugins_.Function.prototype.cnds.OnFunction,
+		cr.plugins_.Arr.prototype.cnds.ArrForEach,
+		cr.system_object.prototype.cnds.CompareBoolVar,
+		cr.plugins_.Arr.prototype.cnds.CompareXY,
+		cr.plugins_.Arr.prototype.exps.CurX,
+		cr.system_object.prototype.acts.SetBoolVar,
+		cr.plugins_.Arr.prototype.acts.SetXY,
+		cr.plugins_.Function.prototype.acts.CallFunction,
+		cr.plugins_.Arr.prototype.exps.CurValue,
 		cr.system_object.prototype.cnds.OnLayoutStart,
 		cr.system_object.prototype.cnds.Compare,
-		cr.plugins_.Function.prototype.acts.CallFunction,
 		cr.system_object.prototype.cnds.Else,
-		cr.system_object.prototype.acts.SetVar,
-		cr.system_object.prototype.exps.floor,
-		cr.system_object.prototype.exps.random,
-		cr.system_object.prototype.cnds.CompareVar,
 		cr.system_object.prototype.cnds.For,
 		cr.plugins_.gamepad.prototype.exps.GamepadCount,
 		cr.plugins_.Sprite.prototype.cnds.CompareInstanceVar,
@@ -34714,10 +35481,11 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Sprite.prototype.cnds.CompareFrame,
 		cr.behaviors.Physics.prototype.exps.VelocityX,
 		cr.behaviors.Physics.prototype.exps.VelocityY,
+		cr.system_object.prototype.exps.random,
 		cr.behaviors.Bullet.prototype.acts.SetSpeed,
 		cr.plugins_.Tilemap.prototype.cnds.CompareInstanceVar,
 		cr.system_object.prototype.acts.SubVar,
-		cr.plugins_.Function.prototype.cnds.OnFunction,
+		cr.system_object.prototype.acts.SetVar,
 		cr.plugins_.Function.prototype.exps.Param,
 		cr.plugins_.Function.prototype.cnds.CompareParam,
 		cr.plugins_.Text.prototype.acts.SetVisible,
@@ -34727,13 +35495,20 @@ cr.getObjectRefTable = function () {
 		cr.behaviors.scrollto.prototype.acts.Shake,
 		cr.system_object.prototype.acts.RestartLayout,
 		cr.plugins_.Keyboard.prototype.cnds.OnKey,
+		cr.system_object.prototype.exps.floor,
 		cr.plugins_.Tilemap.prototype.exps.Width,
 		cr.plugins_.Tilemap.prototype.exps.Height,
 		cr.plugins_.Tilemap.prototype.exps.TileAt,
 		cr.plugins_.Tilemap.prototype.exps.TileToPositionX,
 		cr.plugins_.Tilemap.prototype.exps.TileToPositionY,
+		cr.system_object.prototype.cnds.CompareVar,
 		cr.plugins_.Tilemap.prototype.acts.SetTile,
-		cr.plugins_.Sprite.prototype.acts.SetAnim
+		cr.plugins_.Sprite.prototype.acts.SetAnim,
+		cr.plugins_.AJAX.prototype.acts.RequestFile,
+		cr.system_object.prototype.acts.GoToLayout,
+		cr.plugins_.AJAX.prototype.cnds.OnComplete,
+		cr.plugins_.Arr.prototype.acts.JSONLoad,
+		cr.plugins_.AJAX.prototype.exps.LastData
 	];
 };
 
