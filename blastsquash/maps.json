@@ -1,0 +1,50 @@
+{
+    "c2array": true,
+    "size": [
+        5,
+        2,
+        1
+    ],
+    "data": [
+        [
+            [
+                "Tennis"
+            ],
+            [
+                0
+            ]
+        ],
+        [
+            [
+                "Pyramid"
+            ],
+            [
+                0
+            ]
+        ],
+        [
+            [
+                "SemiClassic"
+            ],
+            [
+                0
+            ]
+        ],
+        [
+            [
+                "RoundClassic"
+            ],
+            [
+                0
+            ]
+        ],
+        [
+            [
+                "CastleWars"
+            ],
+            [
+                0
+            ]
+        ]
+    ]
+}
