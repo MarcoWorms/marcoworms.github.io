@@ -35903,6 +35903,7 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.cnds.CompareVar,
 		cr.plugins_.Tilemap.prototype.acts.SetTile,
 		cr.plugins_.Sprite.prototype.acts.SetAnim,
+		cr.system_object.prototype.acts.SetMinimumFramerate,
 		cr.plugins_.Mouse.prototype.acts.SetCursor,
 		cr.plugins_.AJAX.prototype.acts.RequestFile,
 		cr.system_object.prototype.acts.GoToLayout,
