@@ -35871,6 +35871,7 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.acts.Wait,
 		cr.behaviors.Platform.prototype.cnds.IsOnFloor,
 		cr.plugins_.Sprite.prototype.cnds.OnCollision,
+		cr.plugins_.Sprite.prototype.cnds.IsOnScreen,
 		cr.behaviors.Physics.prototype.acts.SetVelocity,
 		cr.behaviors.Physics.prototype.acts.ApplyImpulseAtAngle,
 		cr.plugins_.Sprite.prototype.exps.Angle,
