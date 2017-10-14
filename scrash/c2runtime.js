@@ -26314,12 +26314,16 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Mouse.prototype.cnds.OnAnyClick,
 		cr.plugins_.Facebook.prototype.cnds.IsReady,
 		cr.plugins_.Facebook.prototype.acts.LogIn2,
-		cr.plugins_.Facebook.prototype.cnds.OnLogIn,
+		cr.system_object.prototype.cnds.TriggerOnce,
+		cr.plugins_.Facebook.prototype.cnds.IsLoggedIn,
 		cr.system_object.prototype.acts.SetVar,
 		cr.plugins_.Facebook.prototype.exps.UserIDStr,
 		cr.plugins_.Browser.prototype.acts.ConsoleLog,
-		cr.system_object.prototype.acts.Wait,
-		cr.plugins_.Facebook.prototype.acts.PublishScore
+		cr.plugins_.Facebook.prototype.acts.RequestHiscores,
+		cr.plugins_.Facebook.prototype.acts.RequestUserHiscore,
+		cr.plugins_.Facebook.prototype.cnds.OnHiscore,
+		cr.plugins_.Facebook.prototype.exps.Score,
+		cr.plugins_.Facebook.prototype.cnds.OnUserTopScoreAvailable
 	];
 };
 
