@@ -23364,17 +23364,2960 @@ cr.plugins_.Button = function(runtime)
 
 }());
 
+// Text
+// ECMAScript 5 strict mode
+
+;
+;
+
+/////////////////////////////////////
+// Plugin class
+cr.plugins_.Text = function(runtime)
+{
+	this.runtime = runtime;
+};
+
+(function ()
+{
+	var pluginProto = cr.plugins_.Text.prototype;
+
+	pluginProto.onCreate = function ()
+	{
+		// Override the 'set width' action
+		pluginProto.acts.SetWidth = function (w)
+		{
+			if (this.width !== w)
+			{
+				this.width = w;
+				this.text_changed = true;	// also recalculate text wrapping
+				this.set_bbox_changed();
+			}
+		};
+	};
+
+	/////////////////////////////////////
+	// Object type class
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+
+	var typeProto = pluginProto.Type.prototype;
+
+	typeProto.onCreate = function()
+	{
+	};
+	
+	typeProto.onLostWebGLContext = function ()
+	{
+		if (this.is_family)
+			return;
+			
+		var i, len, inst;
+		for (i = 0, len = this.instances.length; i < len; i++)
+		{
+			inst = this.instances[i];
+			inst.mycanvas = null;
+			inst.myctx = null;
+			inst.mytex = null;
+		}
+	};
+
+	/////////////////////////////////////
+	// Instance class
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+		
+		if (this.recycled)
+			cr.clearArray(this.lines);
+		else
+			this.lines = [];		// for word wrapping
+		
+		this.text_changed = true;
+	};
+	
+	var instanceProto = pluginProto.Instance.prototype;
+
+	var requestedWebFonts = {};		// already requested web fonts have an entry here
+	
+	instanceProto.onCreate = function()
+	{
+		this.text = this.properties[0];
+		this.facename = this.properties[1];
+		this.ptSize = this.properties[2];
+		this.line_height_offset = this.properties[3];
+		this.isBold = this.properties[4];
+		this.isItalic = this.properties[5];
+		var c = this.properties[6];
+		this.color = "rgb(" + Math.floor(c[0] * 255) + "," + Math.floor(c[1] * 255) + "," + Math.floor(c[2] * 255) + ")";
+		this.halign = this.properties[7];				// 0=left, 1=center, 2=right
+		this.valign = this.properties[8];				// 0=top, 1=center, 2=bottom
+		this.wrapbyword = (this.properties[9] === 0);	// 0=word, 1=character
+		this.visible = this.properties[10];
+		
+		this.lastwidth = this.width;
+		this.lastwrapwidth = this.width;
+		this.lastheight = this.height;
+		
+		this.font = "";				// complete canvas2d font name, e.g. "bold 12pt Arial", derived from other properties
+		this.fontstyle = "";
+		this.pxHeight = 0;
+		this.textWidth = 0;
+		this.textHeight = 0;
+		
+		this.updateFont();
+		
+		// For WebGL rendering
+		this.mycanvas = null;
+		this.myctx = null;
+		this.mytex = null;
+		this.need_text_redraw = false;
+		this.last_render_tick = this.runtime.tickcount;
+		
+		if (this.recycled)
+			this.rcTex.set(0, 0, 1, 1);
+		else
+			this.rcTex = new cr.rect(0, 0, 1, 1);
+			
+		// In WebGL renderer tick this text object to release memory if not rendered any more
+		if (this.runtime.glwrap)
+			this.runtime.tickMe(this);
+		
+;
+	};
+	
+	instanceProto.saveToJSON = function ()
+	{
+		return {
+			"t": this.text,
+			"f": this.font,
+			"c": this.color,
+			"ha": this.halign,
+			"va": this.valign,
+			"wr": this.wrapbyword,
+			"lho": this.line_height_offset,
+			"fn": this.facename,
+			"fs": this.fontstyle,
+			"ps": this.ptSize,
+			"pxh": this.pxHeight,
+			"tw": this.textWidth,
+			"th": this.textHeight,
+			"lrt": this.last_render_tick
+		};
+	};
+	
+	instanceProto.loadFromJSON = function (o)
+	{
+		this.text = o["t"];
+		this.font = o["f"];
+		this.color = o["c"];
+		this.halign = o["ha"];
+		this.valign = o["va"];
+		this.wrapbyword = o["wr"];
+		this.line_height_offset = o["lho"];
+		this.facename = o["fn"];
+		this.fontstyle = o["fs"];
+		this.ptSize = o["ps"];
+		this.pxHeight = o["pxh"];
+		this.textWidth = o["tw"];
+		this.textHeight = o["th"];
+		this.last_render_tick = o["lrt"];
+		
+		// Restore bold/italic flags based on fontstyle. Note for C2 compatibility, the fontstyle string is what is saved/loaded,
+		// but in C3 we use separate bold and italic flags.
+		this.isBold = this.fontstyle.indexOf("bold") !== 0;
+		this.isItalic = this.fontstyle.indexOf("italic") !== 0;
+		
+		this.text_changed = true;
+		this.lastwidth = this.width;
+		this.lastwrapwidth = this.width;
+		this.lastheight = this.height;
+	};
+	
+	instanceProto.tick = function ()
+	{
+		// In WebGL renderer, if not rendered for 300 frames (about 5 seconds), assume
+		// the object has gone off-screen and won't need its textures any more.
+		// This allows us to free its canvas, context and WebGL texture to save memory.
+		if (this.runtime.glwrap && this.mytex && (this.runtime.tickcount - this.last_render_tick >= 300))
+		{
+			// Only do this if on-screen, otherwise static scenes which aren't re-rendering will release
+			// text objects that are on-screen.
+			var layer = this.layer;
+            this.update_bbox();
+            var bbox = this.bbox;
+
+            if (bbox.right < layer.viewLeft || bbox.bottom < layer.viewTop || bbox.left > layer.viewRight || bbox.top > layer.viewBottom)
+			{
+				this.runtime.glwrap.deleteTexture(this.mytex);
+				this.mytex = null;
+				this.myctx = null;
+				this.mycanvas = null;
+			}
+		}
+	};
+	
+	instanceProto.onDestroy = function ()
+	{
+		// Remove references to allow GC to collect and save memory
+		this.myctx = null;
+		this.mycanvas = null;
+		
+		if (this.runtime.glwrap && this.mytex)
+			this.runtime.glwrap.deleteTexture(this.mytex);
+		
+		this.mytex = null;
+	};
+	
+	instanceProto.updateFont = function ()
+	{
+		this.pxHeight = Math.ceil((this.ptSize / 72.0) * 96.0) + 4;		// assume 96dpi...
+		
+		var styles = [];
+		if (this.isBold)
+			styles.push("bold");
+		if (this.isItalic)
+			styles.push("italic");
+		this.fontstyle = styles.join(" ");
+		
+		this.font = this.fontstyle + " " + this.ptSize.toString() + "pt '" + this.facename + "'";
+		this.text_changed = true;
+		this.runtime.redraw = true;
+	};
+
+	instanceProto.draw = function(ctx, glmode)
+	{
+		ctx.font = this.font;
+		ctx.textBaseline = "top";
+		ctx.fillStyle = this.color;
+		
+		ctx.globalAlpha = glmode ? 1 : this.opacity;
+
+		var myscale = 1;
+		
+		if (glmode)
+		{
+			myscale = this.layer.getScale();
+			ctx.save();
+			ctx.scale(myscale, myscale);
+		}
+		
+		// If text has changed, run the word wrap.
+		if (this.text_changed || this.width !== this.lastwrapwidth)
+		{
+			this.type.plugin.WordWrap(this.text, this.lines, ctx, this.width, this.wrapbyword);
+			this.text_changed = false;
+			this.lastwrapwidth = this.width;
+		}
+		
+		// Draw each line after word wrap
+		this.update_bbox();
+		var penX = glmode ? 0 : this.bquad.tlx;
+		var penY = glmode ? 0 : this.bquad.tly;
+		
+		if (this.runtime.pixel_rounding)
+		{
+			penX = (penX + 0.5) | 0;
+			penY = (penY + 0.5) | 0;
+		}
+		
+		if (this.angle !== 0 && !glmode)
+		{
+			ctx.save();
+			ctx.translate(penX, penY);
+			ctx.rotate(this.angle);
+			penX = 0;
+			penY = 0;
+		}
+		
+		var endY = penY + this.height;
+		var line_height = this.pxHeight;
+		line_height += this.line_height_offset;
+		var drawX;
+		var i;
+		
+		// Adjust penY for vertical alignment
+		if (this.valign === 1)		// center
+			penY += Math.max(this.height / 2 - (this.lines.length * line_height) / 2, 0);
+		else if (this.valign === 2)	// bottom
+			penY += Math.max(this.height - (this.lines.length * line_height) - 2, 0);
+		
+		for (i = 0; i < this.lines.length; i++)
+		{
+			// Adjust the line draw position depending on alignment
+			drawX = penX;
+			
+			if (this.halign === 1)		// center
+				drawX = penX + (this.width - this.lines[i].width) / 2;
+			else if (this.halign === 2)	// right
+				drawX = penX + (this.width - this.lines[i].width);
+				
+			ctx.fillText(this.lines[i].text, drawX, penY);
+			penY += line_height;
+			
+			if (penY >= endY - line_height)
+				break;
+		}
+		
+		if (this.angle !== 0 || glmode)
+			ctx.restore();
+			
+		this.last_render_tick = this.runtime.tickcount;
+	};
+	
+	instanceProto.drawGL = function(glw)
+	{
+		if (this.width < 1 || this.height < 1)
+			return;
+		
+		var need_redraw = this.text_changed || this.need_text_redraw;
+		this.need_text_redraw = false;
+		var layer_scale = this.layer.getScale();
+		var layer_angle = this.layer.getAngle();
+		var rcTex = this.rcTex;
+		
+		// Calculate size taking in to account scale
+		var floatscaledwidth = layer_scale * this.width;
+		var floatscaledheight = layer_scale * this.height;
+		var scaledwidth = Math.ceil(floatscaledwidth);
+		var scaledheight = Math.ceil(floatscaledheight);
+		
+		var halfw = this.runtime.draw_width / 2;
+		var halfh = this.runtime.draw_height / 2;
+		
+		// Create 2D context for this instance if not already
+		if (!this.myctx)
+		{
+			this.mycanvas = document.createElement("canvas");
+			this.mycanvas.width = scaledwidth;
+			this.mycanvas.height = scaledheight;
+			this.lastwidth = scaledwidth;
+			this.lastheight = scaledheight;
+			need_redraw = true;
+			this.myctx = this.mycanvas.getContext("2d");
+		}
+		
+		// Update size if changed
+		if (scaledwidth !== this.lastwidth || scaledheight !== this.lastheight)
+		{
+			this.mycanvas.width = scaledwidth;
+			this.mycanvas.height = scaledheight;
+			
+			if (this.mytex)
+			{
+				glw.deleteTexture(this.mytex);
+				this.mytex = null;
+			}
+			
+			need_redraw = true;
+		}
+		
+		// Need to update the GL texture
+		if (need_redraw)
+		{
+			// Draw to my context
+			this.myctx.clearRect(0, 0, scaledwidth, scaledheight);
+			this.draw(this.myctx, true);
+			
+			// Create GL texture if none exists
+			// Create 16-bit textures (RGBA4) on mobile to reduce memory usage - quality impact on desktop
+			// was almost imperceptible
+			if (!this.mytex)
+				this.mytex = glw.createEmptyTexture(scaledwidth, scaledheight, this.runtime.linearSampling, this.runtime.isMobile);
+				
+			// Copy context to GL texture
+			glw.videoToTexture(this.mycanvas, this.mytex, this.runtime.isMobile);
+		}
+		
+		this.lastwidth = scaledwidth;
+		this.lastheight = scaledheight;
+		
+		// Draw GL texture
+		glw.setTexture(this.mytex);
+		glw.setOpacity(this.opacity);
+		
+		glw.resetModelView();
+		glw.translate(-halfw, -halfh);
+		glw.updateModelView();
+		
+		var q = this.bquad;
+		
+		var tlx = this.layer.layerToCanvas(q.tlx, q.tly, true, true);
+		var tly = this.layer.layerToCanvas(q.tlx, q.tly, false, true);
+		var trx = this.layer.layerToCanvas(q.trx, q.try_, true, true);
+		var try_ = this.layer.layerToCanvas(q.trx, q.try_, false, true);
+		var brx = this.layer.layerToCanvas(q.brx, q.bry, true, true);
+		var bry = this.layer.layerToCanvas(q.brx, q.bry, false, true);
+		var blx = this.layer.layerToCanvas(q.blx, q.bly, true, true);
+		var bly = this.layer.layerToCanvas(q.blx, q.bly, false, true);
+		
+		if (this.runtime.pixel_rounding || (this.angle === 0 && layer_angle === 0))
+		{
+			var ox = ((tlx + 0.5) | 0) - tlx;
+			var oy = ((tly + 0.5) | 0) - tly
+			
+			tlx += ox;
+			tly += oy;
+			trx += ox;
+			try_ += oy;
+			brx += ox;
+			bry += oy;
+			blx += ox;
+			bly += oy;
+		}
+		
+		if (this.angle === 0 && layer_angle === 0)
+		{
+			trx = tlx + scaledwidth;
+			try_ = tly;
+			brx = trx;
+			bry = tly + scaledheight;
+			blx = tlx;
+			bly = bry;
+			rcTex.right = 1;
+			rcTex.bottom = 1;
+		}
+		else
+		{
+			rcTex.right = floatscaledwidth / scaledwidth;
+			rcTex.bottom = floatscaledheight / scaledheight;
+		}
+		
+		glw.quadTex(tlx, tly, trx, try_, brx, bry, blx, bly, rcTex);
+		
+		glw.resetModelView();
+		glw.scale(layer_scale, layer_scale);
+		glw.rotateZ(-this.layer.getAngle());
+		glw.translate((this.layer.viewLeft + this.layer.viewRight) / -2, (this.layer.viewTop + this.layer.viewBottom) / -2);
+		glw.updateModelView();
+		
+		this.last_render_tick = this.runtime.tickcount;
+	};
+	
+	var wordsCache = [];
+
+	pluginProto.TokeniseWords = function (text)
+	{
+		cr.clearArray(wordsCache);
+		var cur_word = "";
+		var ch;
+		
+		// Loop every char
+		var i = 0;
+		
+		while (i < text.length)
+		{
+			ch = text.charAt(i);
+			
+			if (ch === "\n")
+			{
+				// Dump current word if any
+				if (cur_word.length)
+				{
+					wordsCache.push(cur_word);
+					cur_word = "";
+				}
+				
+				// Add newline word
+				wordsCache.push("\n");
+				
+				++i;
+			}
+			// Whitespace or hyphen: swallow rest of whitespace and include in word
+			else if (ch === " " || ch === "\t" || ch === "-")
+			{
+				do {
+					cur_word += text.charAt(i);
+					i++;
+				}
+				while (i < text.length && (text.charAt(i) === " " || text.charAt(i) === "\t"));
+				
+				wordsCache.push(cur_word);
+				cur_word = "";
+			}
+			else if (i < text.length)
+			{
+				cur_word += ch;
+				i++;
+			}
+		}
+		
+		// Append leftover word if any
+		if (cur_word.length)
+			wordsCache.push(cur_word);
+	};
+	
+	var linesCache = [];
+	
+	function allocLine()
+	{
+		if (linesCache.length)
+			return linesCache.pop();
+		else
+			return {};
+	};
+	
+	function freeLine(l)
+	{
+		linesCache.push(l);
+	};
+	
+	function freeAllLines(arr)
+	{
+		var i, len;
+		for (i = 0, len = arr.length; i < len; i++)
+		{
+			freeLine(arr[i]);
+		}
+		
+		cr.clearArray(arr);
+	};
+
+	pluginProto.WordWrap = function (text, lines, ctx, width, wrapbyword)
+	{
+		if (!text || !text.length)
+		{
+			freeAllLines(lines);
+			return;
+		}
+			
+		if (width <= 2.0)
+		{
+			freeAllLines(lines);
+			return;
+		}
+		
+		// If under 100 characters (i.e. a fairly short string), try a short string optimisation: just measure the text
+		// and see if it fits on one line, without going through the tokenise/wrap.
+		// Text musn't contain a linebreak!
+		if (text.length <= 100 && text.indexOf("\n") === -1)
+		{
+			var all_width = ctx.measureText(text).width;
+			
+			if (all_width <= width)
+			{
+				// fits on one line
+				freeAllLines(lines);
+				lines.push(allocLine());
+				lines[0].text = text;
+				lines[0].width = all_width;
+				return;
+			}
+		}
+			
+		this.WrapText(text, lines, ctx, width, wrapbyword);
+	};
+	
+	function trimSingleSpaceRight(str)
+	{
+		if (!str.length || str.charAt(str.length - 1) !== " ")
+			return str;
+		
+		return str.substring(0, str.length - 1);
+	};
+
+	pluginProto.WrapText = function (text, lines, ctx, width, wrapbyword)
+	{
+		var wordArray;
+		
+		if (wrapbyword)
+		{
+			this.TokeniseWords(text);	// writes to wordsCache
+			wordArray = wordsCache;
+		}
+		else
+			wordArray = text;
+			
+		var cur_line = "";
+		var prev_line;
+		var line_width;
+		var i;
+		var lineIndex = 0;
+		var line;
+		
+		for (i = 0; i < wordArray.length; i++)
+		{
+			// Look for newline
+			if (wordArray[i] === "\n")
+			{
+				// Flush line.  Recycle a line if possible
+				if (lineIndex >= lines.length)
+					lines.push(allocLine());
+				
+				cur_line = trimSingleSpaceRight(cur_line);		// for correct center/right alignment
+				line = lines[lineIndex];
+				line.text = cur_line;
+				line.width = ctx.measureText(cur_line).width;
+					
+				lineIndex++;
+				cur_line = "";
+				continue;
+			}
+			
+			// Otherwise add to line
+			prev_line = cur_line;
+			cur_line += wordArray[i];
+			
+			// Measure line
+			line_width = ctx.measureText(cur_line).width;
+			
+			// Line too long: wrap the line before this word was added
+			if (line_width >= width)
+			{
+				// Append the last line's width to the string object
+				if (lineIndex >= lines.length)
+					lines.push(allocLine());
+				
+				prev_line = trimSingleSpaceRight(prev_line);
+				line = lines[lineIndex];
+				line.text = prev_line;
+				line.width = ctx.measureText(prev_line).width;
+					
+				lineIndex++;
+				cur_line = wordArray[i];
+				
+				// Wrapping by character: avoid lines starting with spaces
+				if (!wrapbyword && cur_line === " ")
+					cur_line = "";
+			}
+		}
+		
+		// Add any leftover line
+		if (cur_line.length)
+		{
+			if (lineIndex >= lines.length)
+				lines.push(allocLine());
+			
+			cur_line = trimSingleSpaceRight(cur_line);
+			line = lines[lineIndex];
+			line.text = cur_line;
+			line.width = ctx.measureText(cur_line).width;
+				
+			lineIndex++;
+		}
+		
+		// truncate lines to the number that were used. recycle any spare line objects
+		for (i = lineIndex; i < lines.length; i++)
+			freeLine(lines[i]);
+		
+		lines.length = lineIndex;
+	};
+	
+
+	//////////////////////////////////////
+	// Conditions
+	function Cnds() {};
+
+	Cnds.prototype.CompareText = function(text_to_compare, case_sensitive)
+	{
+		if (case_sensitive)
+			return this.text == text_to_compare;
+		else
+			return cr.equals_nocase(this.text, text_to_compare);
+	};
+	
+	pluginProto.cnds = new Cnds();
+
+	//////////////////////////////////////
+	// Actions
+	function Acts() {};
+
+	Acts.prototype.SetText = function(param)
+	{
+		if (cr.is_number(param) && param < 1e9)
+			param = Math.round(param * 1e10) / 1e10;	// round to nearest ten billionth - hides floating point errors
+		
+		var text_to_set = param.toString();
+		
+		if (this.text !== text_to_set)
+		{
+			this.text = text_to_set;
+			this.text_changed = true;
+			this.runtime.redraw = true;
+		}
+	};
+	
+	Acts.prototype.AppendText = function(param)
+	{
+		if (cr.is_number(param))
+			param = Math.round(param * 1e10) / 1e10;	// round to nearest ten billionth - hides floating point errors
+			
+		var text_to_append = param.toString();
+		
+		if (text_to_append)	// not empty
+		{
+			this.text += text_to_append;
+			this.text_changed = true;
+			this.runtime.redraw = true;
+		}
+	};
+	
+	Acts.prototype.SetFontFace = function (face_, style_)
+	{
+		var newstyle = "";
+		var newbold = false;
+		var newitalic = false;
+		
+		switch (style_) {
+		case 1: newbold = true; break;
+		case 2: newitalic = true; break;
+		case 3: newbold = true; newitalic = true; break;
+		}
+		
+		if (face_ === this.facename && this.isBold === newbold && this.isItalic === newitalic)
+			return;		// no change
+			
+		this.facename = face_;
+		this.isBold = newbold;
+		this.isItalic = newitalic;
+		this.updateFont();
+	};
+	
+	Acts.prototype.SetFontSize = function (size_)
+	{
+		if (this.ptSize === size_)
+			return;
+
+		this.ptSize = size_;
+		this.updateFont();
+	};
+	
+	Acts.prototype.SetFontColor = function (rgb)
+	{
+		var r = cr.clamp(Math.floor(cr.GetRValue(rgb) * 255), 0, 255);
+		var g = cr.clamp(Math.floor(cr.GetGValue(rgb) * 255), 0, 255);
+		var b = cr.clamp(Math.floor(cr.GetBValue(rgb) * 255), 0, 255);
+
+		var newcolor = "rgb(" + r + "," + g + "," + b + ")";
+		
+		if (newcolor === this.color)
+			return;
+
+		this.color = newcolor;
+		this.need_text_redraw = true;
+		this.runtime.redraw = true;
+	};
+	
+	Acts.prototype.SetWebFont = function (familyname_, cssurl_)
+	{
+		var self = this;
+		var refreshFunc = (function () {
+							self.runtime.redraw = true;
+							self.text_changed = true;
+						});
+
+		// Already requested this web font?
+		if (requestedWebFonts.hasOwnProperty(cssurl_))
+		{
+			// Use it immediately without requesting again.  Whichever object
+			// made the original request will refresh the canvas when it finishes
+			// loading.
+			var newfacename = "'" + familyname_ + "'";
+			
+			if (this.facename === newfacename)
+				return;	// no change
+				
+			this.facename = newfacename;
+			this.updateFont();
+			
+			// There doesn't seem to be a good way to test if the font has loaded,
+			// so just fire a refresh every 100ms for the first 1 second, then
+			// every 1 second after that up to 10 sec - hopefully will have loaded by then!
+			for (var i = 1; i < 10; i++)
+			{
+				setTimeout(refreshFunc, i * 100);
+				setTimeout(refreshFunc, i * 1000);
+			}
+		
+			return;
+		}
+		
+		// Otherwise start loading the web font now
+		var wf = document.createElement("link");
+		wf.href = cssurl_;
+		wf.rel = "stylesheet";
+		wf.type = "text/css";
+		wf.onload = refreshFunc;
+					
+		document.getElementsByTagName('head')[0].appendChild(wf);
+		requestedWebFonts[cssurl_] = true;
+		
+		this.facename = "'" + familyname_ + "'";
+		this.updateFont();
+					
+		// Another refresh hack
+		for (var i = 1; i < 10; i++)
+		{
+			setTimeout(refreshFunc, i * 100);
+			setTimeout(refreshFunc, i * 1000);
+		}
+		
+;
+	};
+	
+	Acts.prototype.SetEffect = function (effect)
+	{
+		this.blend_mode = effect;
+		this.compositeOp = cr.effectToCompositeOp(effect);
+		cr.setGLBlend(this, effect, this.runtime.gl);
+		this.runtime.redraw = true;
+	};
+
+	pluginProto.acts = new Acts();
+	
+	//////////////////////////////////////
+	// Expressions
+	function Exps() {};
+
+	Exps.prototype.Text = function(ret)
+	{
+		ret.set_string(this.text);
+	};
+	
+	Exps.prototype.FaceName = function (ret)
+	{
+		ret.set_string(this.facename);
+	};
+	
+	Exps.prototype.FaceSize = function (ret)
+	{
+		ret.set_int(this.ptSize);
+	};
+	
+	Exps.prototype.TextWidth = function (ret)
+	{
+		var w = 0;
+		var i, len, x;
+		for (i = 0, len = this.lines.length; i < len; i++)
+		{
+			x = this.lines[i].width;
+			
+			if (w < x)
+				w = x;
+		}
+		
+		ret.set_int(w);
+	};
+	
+	Exps.prototype.TextHeight = function (ret)
+	{
+		ret.set_int(this.lines.length * (this.pxHeight + this.line_height_offset) - this.line_height_offset);
+	};
+	
+	pluginProto.exps = new Exps();
+		
+}());
+
+// Sprite
+// ECMAScript 5 strict mode
+
+;
+;
+
+/////////////////////////////////////
+// Plugin class
+cr.plugins_.Sprite = function(runtime)
+{
+	this.runtime = runtime;
+};
+
+(function ()
+{
+	var pluginProto = cr.plugins_.Sprite.prototype;
+		
+	/////////////////////////////////////
+	// Object type class
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+
+	var typeProto = pluginProto.Type.prototype;
+	
+	function frame_getDataUri()
+	{
+		if (this.datauri.length === 0)
+		{		
+			// Get Sprite image as data URI
+			var tmpcanvas = document.createElement("canvas");
+			tmpcanvas.width = this.width;
+			tmpcanvas.height = this.height;
+			var tmpctx = tmpcanvas.getContext("2d");
+			
+			if (this.spritesheeted)
+			{
+				tmpctx.drawImage(this.texture_img, this.offx, this.offy, this.width, this.height,
+										 0, 0, this.width, this.height);
+			}
+			else
+			{
+				tmpctx.drawImage(this.texture_img, 0, 0, this.width, this.height);
+			}
+			
+			this.datauri = tmpcanvas.toDataURL("image/png");
+		}
+		
+		return this.datauri;
+	};
+
+	typeProto.onCreate = function()
+	{
+		if (this.is_family)
+			return;
+			
+		var i, leni, j, lenj;
+		var anim, frame, animobj, frameobj, wt, uv;
+		
+		this.all_frames = [];
+		this.has_loaded_textures = false;
+		
+		// Load all animation frames
+		for (i = 0, leni = this.animations.length; i < leni; i++)
+		{
+			anim = this.animations[i];
+			animobj = {};
+			animobj.name = anim[0];
+			animobj.speed = anim[1];
+			animobj.loop = anim[2];
+			animobj.repeatcount = anim[3];
+			animobj.repeatto = anim[4];
+			animobj.pingpong = anim[5];
+			animobj.sid = anim[6];
+			animobj.frames = [];
+			
+			for (j = 0, lenj = anim[7].length; j < lenj; j++)
+			{
+				frame = anim[7][j];
+				frameobj = {};
+				frameobj.texture_file = frame[0];
+				frameobj.texture_filesize = frame[1];
+				frameobj.offx = frame[2];
+				frameobj.offy = frame[3];
+				frameobj.width = frame[4];
+				frameobj.height = frame[5];
+				frameobj.duration = frame[6];
+				frameobj.hotspotX = frame[7];
+				frameobj.hotspotY = frame[8];
+				frameobj.image_points = frame[9];
+				frameobj.poly_pts = frame[10];
+				frameobj.pixelformat = frame[11];
+				frameobj.spritesheeted = (frameobj.width !== 0);
+				frameobj.datauri = "";		// generated on demand and cached
+				frameobj.getDataUri = frame_getDataUri;
+				
+				uv = {};
+				uv.left = 0;
+				uv.top = 0;
+				uv.right = 1;
+				uv.bottom = 1;
+				frameobj.sheetTex = uv;
+				
+				frameobj.webGL_texture = null;
+				
+				// Sprite sheets may mean multiple frames reference one image
+				// Ensure image is not created in duplicate
+				wt = this.runtime.findWaitingTexture(frame[0]);
+				
+				if (wt)
+				{
+					frameobj.texture_img = wt;
+				}
+				else
+				{
+					frameobj.texture_img = new Image();
+					frameobj.texture_img.cr_src = frame[0];
+					frameobj.texture_img.cr_filesize = frame[1];
+					frameobj.texture_img.c2webGL_texture = null;
+					
+					// Tell runtime to wait on this texture
+					this.runtime.waitForImageLoad(frameobj.texture_img, frame[0]);
+				}
+				
+				cr.seal(frameobj);
+				animobj.frames.push(frameobj);
+				this.all_frames.push(frameobj);
+			}
+			
+			cr.seal(animobj);
+			this.animations[i] = animobj;		// swap array data for object
+		}
+	};
+	
+	typeProto.updateAllCurrentTexture = function ()
+	{
+		var i, len, inst;
+		for (i = 0, len = this.instances.length; i < len; i++)
+		{
+			inst = this.instances[i];
+			inst.curWebGLTexture = inst.curFrame.webGL_texture;
+		}
+	};
+	
+	typeProto.onLostWebGLContext = function ()
+	{
+		if (this.is_family)
+			return;
+			
+		var i, len, frame;
+		
+		// Release all animation frames
+		for (i = 0, len = this.all_frames.length; i < len; ++i)
+		{
+			frame = this.all_frames[i];
+			frame.texture_img.c2webGL_texture = null;
+			frame.webGL_texture = null;
+		}
+		
+		this.has_loaded_textures = false;
+		
+		this.updateAllCurrentTexture();
+	};
+	
+	typeProto.onRestoreWebGLContext = function ()
+	{
+		// No need to create textures if no instances exist, will create on demand
+		if (this.is_family || !this.instances.length)
+			return;
+			
+		var i, len, frame;
+		
+		// Re-load all animation frames
+		for (i = 0, len = this.all_frames.length; i < len; ++i)
+		{
+			frame = this.all_frames[i];
+			
+			frame.webGL_texture = this.runtime.glwrap.loadTexture(frame.texture_img, false, this.runtime.linearSampling, frame.pixelformat);
+		}
+		
+		this.updateAllCurrentTexture();
+	};
+	
+	typeProto.loadTextures = function ()
+	{
+		if (this.is_family || this.has_loaded_textures || !this.runtime.glwrap)
+			return;
+			
+		var i, len, frame;
+		for (i = 0, len = this.all_frames.length; i < len; ++i)
+		{
+			frame = this.all_frames[i];
+			
+			frame.webGL_texture = this.runtime.glwrap.loadTexture(frame.texture_img, false, this.runtime.linearSampling, frame.pixelformat);
+		}
+		
+		this.has_loaded_textures = true;
+	};
+	
+	typeProto.unloadTextures = function ()
+	{
+		// Don't release textures if any instances still exist, they are probably using them
+		if (this.is_family || this.instances.length || !this.has_loaded_textures)
+			return;
+			
+		var i, len, frame;
+		for (i = 0, len = this.all_frames.length; i < len; ++i)
+		{
+			frame = this.all_frames[i];
+			
+			this.runtime.glwrap.deleteTexture(frame.webGL_texture);
+			frame.webGL_texture = null;
+		}
+		
+		this.has_loaded_textures = false;
+	};
+	
+	var already_drawn_images = [];
+	
+	typeProto.preloadCanvas2D = function (ctx)
+	{
+		var i, len, frameimg;
+		cr.clearArray(already_drawn_images);
+		
+		for (i = 0, len = this.all_frames.length; i < len; ++i)
+		{
+			frameimg = this.all_frames[i].texture_img;
+			
+			if (already_drawn_images.indexOf(frameimg) !== -1)
+					continue;
+				
+			// draw to preload, browser should lazy load the texture
+			ctx.drawImage(frameimg, 0, 0);
+			already_drawn_images.push(frameimg);
+		}
+	};
+
+	/////////////////////////////////////
+	// Instance class
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+		
+		// Physics needs to see the collision poly before onCreate
+		var poly_pts = this.type.animations[0].frames[0].poly_pts;
+		
+		if (this.recycled)
+			this.collision_poly.set_pts(poly_pts);
+		else
+			this.collision_poly = new cr.CollisionPoly(poly_pts);
+	};
+	
+	var instanceProto = pluginProto.Instance.prototype;
+
+	instanceProto.onCreate = function()
+	{
+		this.visible = this.properties[0];
+		this.isTicking = false;
+		this.inAnimTrigger = false;
+		this.collisionsEnabled = this.properties[3];
+		
+		this.cur_animation = this.getAnimationByName(this.properties[1]) || this.type.animations[0];
+		this.cur_frame = this.properties[2];
+		
+		if (this.cur_frame < 0)
+			this.cur_frame = 0;
+		if (this.cur_frame >= this.cur_animation.frames.length)
+			this.cur_frame = this.cur_animation.frames.length - 1;
+			
+		// Update poly and hotspot for the starting frame.
+		var curanimframe = this.cur_animation.frames[this.cur_frame];
+		this.collision_poly.set_pts(curanimframe.poly_pts);
+		this.hotspotX = curanimframe.hotspotX;
+		this.hotspotY = curanimframe.hotspotY;
+		
+		this.animForwards = (this.cur_animation.speed >= 0);
+		this.cur_anim_speed = Math.abs(this.cur_animation.speed);
+		this.cur_anim_repeatto = this.cur_animation.repeatto;
+		
+		// Tick this object to change animation frame, but never tick single-animation, single-frame objects.
+		// Also don't tick zero speed animations until the speed or animation is changed, which saves ticking
+		// on tile sprites.
+		if (!(this.type.animations.length === 1 && this.type.animations[0].frames.length === 1) && this.cur_anim_speed !== 0)
+		{
+			this.runtime.tickMe(this);
+			this.isTicking = true;
+		}
+		
+		if (this.recycled)
+			this.animTimer.reset();
+		else
+			this.animTimer = new cr.KahanAdder();
+		
+		this.frameStart = this.getNowTime();
+		this.animPlaying = true;
+		this.animRepeats = 0;
+		this.animTriggerName = "";
+		
+		this.changeAnimName = "";
+		this.changeAnimFrom = 0;
+		this.changeAnimFrame = -1;
+		
+		// Ensure type has textures loaded
+		this.type.loadTextures();
+		
+		// Iterate all animations and frames ensuring WebGL textures are loaded and sizes are set
+		var i, leni, j, lenj;
+		var anim, frame, uv, maintex;
+		
+		for (i = 0, leni = this.type.animations.length; i < leni; i++)
+		{
+			anim = this.type.animations[i];
+			
+			for (j = 0, lenj = anim.frames.length; j < lenj; j++)
+			{
+				frame = anim.frames[j];
+				
+				// If size is zero, image is not on a sprite sheet.  Determine size now.
+				if (frame.width === 0)
+				{
+					frame.width = frame.texture_img.width;
+					frame.height = frame.texture_img.height;
+				}
+				
+				// If frame is spritesheeted update its uv coords
+				if (frame.spritesheeted)
+				{
+					maintex = frame.texture_img;
+					uv = frame.sheetTex;
+					uv.left = frame.offx / maintex.width;
+					uv.top = frame.offy / maintex.height;
+					uv.right = (frame.offx + frame.width) / maintex.width;
+					uv.bottom = (frame.offy + frame.height) / maintex.height;
+
+					// Check if frame is in fact a complete-frame spritesheet
+					if (frame.offx === 0 && frame.offy === 0 && frame.width === maintex.width && frame.height === maintex.height)
+					{
+						frame.spritesheeted = false;
+					}
+				}
+			}
+		}
+		
+		this.curFrame = this.cur_animation.frames[this.cur_frame];
+		this.curWebGLTexture = this.curFrame.webGL_texture;
+	};
+	
+	instanceProto.saveToJSON = function ()
+	{
+		var o = {
+			"a": this.cur_animation.sid,
+			"f": this.cur_frame,
+			"cas": this.cur_anim_speed,
+			"fs": this.frameStart,
+			"ar": this.animRepeats,
+			"at": this.animTimer.sum,
+			"rt": this.cur_anim_repeatto
+		};
+		
+		if (!this.animPlaying)
+			o["ap"] = this.animPlaying;
+			
+		if (!this.animForwards)
+			o["af"] = this.animForwards;
+		
+		return o;
+	};
+	
+	instanceProto.loadFromJSON = function (o)
+	{
+		var anim = this.getAnimationBySid(o["a"]);
+		
+		if (anim)
+			this.cur_animation = anim;
+		
+		this.cur_frame = o["f"];
+		
+		if (this.cur_frame < 0)
+			this.cur_frame = 0;
+		if (this.cur_frame >= this.cur_animation.frames.length)
+			this.cur_frame = this.cur_animation.frames.length - 1;
+		
+		this.cur_anim_speed = o["cas"];
+		this.frameStart = o["fs"];
+		this.animRepeats = o["ar"];
+		this.animTimer.reset();
+		this.animTimer.sum = o["at"];
+		this.animPlaying = o.hasOwnProperty("ap") ? o["ap"] : true;
+		this.animForwards = o.hasOwnProperty("af") ? o["af"] : true;
+		
+		if (o.hasOwnProperty("rt"))
+			this.cur_anim_repeatto = o["rt"];
+		else
+			this.cur_anim_repeatto = this.cur_animation.repeatto;
+			
+		this.curFrame = this.cur_animation.frames[this.cur_frame];
+		this.curWebGLTexture = this.curFrame.webGL_texture;
+		this.collision_poly.set_pts(this.curFrame.poly_pts);
+		this.hotspotX = this.curFrame.hotspotX;
+		this.hotspotY = this.curFrame.hotspotY;
+	};
+	
+	instanceProto.animationFinish = function (reverse)
+	{
+		// stop
+		this.cur_frame = reverse ? 0 : this.cur_animation.frames.length - 1;
+		this.animPlaying = false;
+		
+		// trigger finish events
+		this.animTriggerName = this.cur_animation.name;
+		
+		this.inAnimTrigger = true;
+		this.runtime.trigger(cr.plugins_.Sprite.prototype.cnds.OnAnyAnimFinished, this);
+		this.runtime.trigger(cr.plugins_.Sprite.prototype.cnds.OnAnimFinished, this);
+		this.inAnimTrigger = false;
+			
+		this.animRepeats = 0;
+	};
+	
+	instanceProto.getNowTime = function()
+	{
+		return this.animTimer.sum;
+	};
+	
+	instanceProto.tick = function()
+	{
+		this.animTimer.add(this.runtime.getDt(this));
+		
+		// Change any animation or frame that was queued
+		if (this.changeAnimName.length)
+			this.doChangeAnim();
+		if (this.changeAnimFrame >= 0)
+			this.doChangeAnimFrame();
+		
+		var now = this.getNowTime();
+		var cur_animation = this.cur_animation;
+		var prev_frame = cur_animation.frames[this.cur_frame];
+		var next_frame;
+		var cur_frame_time = prev_frame.duration / this.cur_anim_speed;
+		
+		if (this.animPlaying && now >= this.frameStart + cur_frame_time)
+		{			
+			// Next frame
+			if (this.animForwards)
+			{
+				this.cur_frame++;
+				//log("Advancing animation frame forwards");
+			}
+			else
+			{
+				this.cur_frame--;
+				//log("Advancing animation frame backwards");
+			}
+				
+			this.frameStart += cur_frame_time;
+			
+			// Reached end of frames
+			if (this.cur_frame >= cur_animation.frames.length)
+			{
+				//log("At end of frames");
+				
+				if (cur_animation.pingpong)
+				{
+					this.animForwards = false;
+					this.cur_frame = cur_animation.frames.length - 2;
+					//log("Ping pong looping from end");
+				}
+				// Looping: wind back to repeat-to frame
+				else if (cur_animation.loop)
+				{
+					this.cur_frame = this.cur_anim_repeatto;
+				}
+				else
+				{					
+					this.animRepeats++;
+					
+					if (this.animRepeats >= cur_animation.repeatcount)
+					{
+						//log("Number of repeats reached; ending animation");
+						
+						this.animationFinish(false);
+					}
+					else
+					{
+						//log("Repeating");
+						this.cur_frame = this.cur_anim_repeatto;
+					}
+				}
+			}
+			// Ping-ponged back to start
+			if (this.cur_frame < 0)
+			{
+				if (cur_animation.pingpong)
+				{
+					this.cur_frame = 1;
+					this.animForwards = true;
+					//log("Ping ponging back forwards");
+					
+					if (!cur_animation.loop)
+					{
+						this.animRepeats++;
+							
+						if (this.animRepeats >= cur_animation.repeatcount)
+						{
+							//log("Number of repeats reached; ending animation");
+							
+							this.animationFinish(true);
+						}
+					}
+				}
+				// animation running backwards
+				else
+				{
+					if (cur_animation.loop)
+					{
+						this.cur_frame = this.cur_anim_repeatto;
+					}
+					else
+					{
+						this.animRepeats++;
+						
+						// Reached number of repeats
+						if (this.animRepeats >= cur_animation.repeatcount)
+						{
+							//log("Number of repeats reached; ending animation");
+							
+							this.animationFinish(true);
+						}
+						else
+						{
+							//log("Repeating");
+							this.cur_frame = this.cur_anim_repeatto;
+						}
+					}
+				}
+			}
+			
+			// Don't go out of bounds
+			if (this.cur_frame < 0)
+				this.cur_frame = 0;
+			else if (this.cur_frame >= cur_animation.frames.length)
+				this.cur_frame = cur_animation.frames.length - 1;
+				
+			// If frameStart is still more than a whole frame away, we must've fallen behind.  Instead of
+			// going catch-up (cycling one frame per tick), reset the frame timer to now.
+			if (now > this.frameStart + (cur_animation.frames[this.cur_frame].duration / this.cur_anim_speed))
+			{
+				//log("Animation can't keep up, resetting timer");
+				this.frameStart = now;
+			}
+				
+			next_frame = cur_animation.frames[this.cur_frame];
+			this.OnFrameChanged(prev_frame, next_frame);
+				
+			this.runtime.redraw = true;
+		}
+	};
+	
+	instanceProto.getAnimationByName = function (name_)
+	{
+		var i, len, a;
+		for (i = 0, len = this.type.animations.length; i < len; i++)
+		{
+			a = this.type.animations[i];
+			
+			if (cr.equals_nocase(a.name, name_))
+				return a;
+		}
+		
+		return null;
+	};
+	
+	instanceProto.getAnimationBySid = function (sid_)
+	{
+		var i, len, a;
+		for (i = 0, len = this.type.animations.length; i < len; i++)
+		{
+			a = this.type.animations[i];
+			
+			if (a.sid === sid_)
+				return a;
+		}
+		
+		return null;
+	};
+	
+	instanceProto.doChangeAnim = function ()
+	{
+		var prev_frame = this.cur_animation.frames[this.cur_frame];
+		
+		// Find the animation by name
+		var anim = this.getAnimationByName(this.changeAnimName);
+		
+		this.changeAnimName = "";
+		
+		// couldn't find by name
+		if (!anim)
+			return;
+			
+		// don't change if setting same animation and the animation is already playing
+		if (cr.equals_nocase(anim.name, this.cur_animation.name) && this.animPlaying)
+			return;
+			
+		this.cur_animation = anim;
+		this.animForwards = (anim.speed >= 0);
+		this.cur_anim_speed = Math.abs(anim.speed);
+		this.cur_anim_repeatto = anim.repeatto;
+		
+		if (this.cur_frame < 0)
+			this.cur_frame = 0;
+		if (this.cur_frame >= this.cur_animation.frames.length)
+			this.cur_frame = this.cur_animation.frames.length - 1;
+			
+		// from beginning
+		if (this.changeAnimFrom === 1)
+			this.cur_frame = 0;
+			
+		this.animPlaying = true;
+		this.frameStart = this.getNowTime();
+		
+		this.OnFrameChanged(prev_frame, this.cur_animation.frames[this.cur_frame]);
+		
+		this.runtime.redraw = true;
+	};
+	
+	instanceProto.doChangeAnimFrame = function ()
+	{
+		var prev_frame = this.cur_animation.frames[this.cur_frame];
+		var prev_frame_number = this.cur_frame;
+		
+		this.cur_frame = cr.floor(this.changeAnimFrame);
+		
+		if (this.cur_frame < 0)
+			this.cur_frame = 0;
+		if (this.cur_frame >= this.cur_animation.frames.length)
+			this.cur_frame = this.cur_animation.frames.length - 1;
+			
+		if (prev_frame_number !== this.cur_frame)
+		{
+			this.OnFrameChanged(prev_frame, this.cur_animation.frames[this.cur_frame]);
+			this.frameStart = this.getNowTime();
+			this.runtime.redraw = true;
+		}
+		
+		this.changeAnimFrame = -1;
+	};
+	
+	instanceProto.OnFrameChanged = function (prev_frame, next_frame)
+	{
+		// Has the frame size changed?  Resize the object proportionally
+		var oldw = prev_frame.width;
+		var oldh = prev_frame.height;
+		var neww = next_frame.width;
+		var newh = next_frame.height;
+		
+		if (oldw != neww)
+			this.width *= (neww / oldw);
+		if (oldh != newh)
+			this.height *= (newh / oldh);
+			
+		// Update hotspot, collision poly and bounding box
+		this.hotspotX = next_frame.hotspotX;
+		this.hotspotY = next_frame.hotspotY;
+		this.collision_poly.set_pts(next_frame.poly_pts);
+		this.set_bbox_changed();
+		
+		// Update webGL texture if any
+		this.curFrame = next_frame;
+		this.curWebGLTexture = next_frame.webGL_texture;
+		
+		// Notify behaviors
+		var i, len, b;
+		for (i = 0, len = this.behavior_insts.length; i < len; i++)
+		{
+			b = this.behavior_insts[i];
+			
+			if (b.onSpriteFrameChanged)
+				b.onSpriteFrameChanged(prev_frame, next_frame);
+		}
+		
+		// Trigger 'on frame changed'
+		this.runtime.trigger(cr.plugins_.Sprite.prototype.cnds.OnFrameChanged, this);
+	};
+
+	instanceProto.draw = function(ctx)
+	{
+		ctx.globalAlpha = this.opacity;
+			
+		// The current animation frame to draw
+		var cur_frame = this.curFrame;
+		var spritesheeted = cur_frame.spritesheeted;
+		var cur_image = cur_frame.texture_img;
+		
+		var myx = this.x;
+		var myy = this.y;
+		var w = this.width;
+		var h = this.height;
+		
+		// Object not rotated: can draw without transformation.
+		if (this.angle === 0 && w >= 0 && h >= 0)
+		{
+			myx -= this.hotspotX * w;
+			myy -= this.hotspotY * h;
+			
+			if (this.runtime.pixel_rounding)
+			{
+				myx = Math.round(myx);
+				myy = Math.round(myy);
+			}
+			
+			if (spritesheeted)
+			{
+				ctx.drawImage(cur_image, cur_frame.offx, cur_frame.offy, cur_frame.width, cur_frame.height,
+										 myx, myy, w, h);
+			}
+			else
+			{
+				ctx.drawImage(cur_image, myx, myy, w, h);
+			}
+		}
+		else
+		{
+			// Only pixel round the x/y position, otherwise objects don't rotate smoothly
+			if (this.runtime.pixel_rounding)
+			{
+				myx = Math.round(myx);
+				myy = Math.round(myy);
+			}
+			
+			// Angle applied; we need to transform the canvas.  Save state.
+			ctx.save();
+			
+			var widthfactor = w > 0 ? 1 : -1;
+			var heightfactor = h > 0 ? 1 : -1;
+			
+			// Translate to object's position, then rotate by its angle.
+			ctx.translate(myx, myy);
+			
+			if (widthfactor !== 1 || heightfactor !== 1)
+				ctx.scale(widthfactor, heightfactor);
+			
+			ctx.rotate(this.angle * widthfactor * heightfactor);
+			
+			var drawx = 0 - (this.hotspotX * cr.abs(w))
+			var drawy = 0 - (this.hotspotY * cr.abs(h));
+			
+			// Draw the object; canvas origin is at hot spot.
+			if (spritesheeted)
+			{
+				ctx.drawImage(cur_image, cur_frame.offx, cur_frame.offy, cur_frame.width, cur_frame.height,
+										 drawx, drawy, cr.abs(w), cr.abs(h));
+			}
+			else
+			{
+				ctx.drawImage(cur_image, drawx, drawy, cr.abs(w), cr.abs(h));
+			}
+			
+			// Restore previous state.
+			ctx.restore();
+		}
+			
+		//////////////////////////////////////////
+		// Draw collision poly (for debug)
+		/*
+		ctx.strokeStyle = "#f00";
+		ctx.lineWidth = 3;
+		ctx.beginPath();
+		this.collision_poly.cache_poly(this.width, this.height, this.angle);
+		var i, len, ax, ay, bx, by;
+		for (i = 0, len = this.collision_poly.pts_count; i < len; i++)
+		{
+			ax = this.collision_poly.pts_cache[i*2] + this.x;
+			ay = this.collision_poly.pts_cache[i*2+1] + this.y;
+			bx = this.collision_poly.pts_cache[((i+1)%len)*2] + this.x;
+			by = this.collision_poly.pts_cache[((i+1)%len)*2+1] + this.y;
+			
+			ctx.moveTo(ax, ay);
+			ctx.lineTo(bx, by);
+		}
+		
+		ctx.stroke();
+		ctx.closePath();
+		*/
+		// Draw physics polys (for debug)
+		/*
+		if (this.behavior_insts.length >= 1 && this.behavior_insts[0].draw)
+		{
+			this.behavior_insts[0].draw(ctx);
+		}
+		*/
+		//////////////////////////////////////////
+	};
+	
+	instanceProto.drawGL_earlyZPass = function(glw)
+	{
+		this.drawGL(glw);
+	};
+	
+	instanceProto.drawGL = function(glw)
+	{
+		glw.setTexture(this.curWebGLTexture);
+		glw.setOpacity(this.opacity);
+		var cur_frame = this.curFrame;
+		
+		var q = this.bquad;
+		
+		if (this.runtime.pixel_rounding)
+		{
+			var ox = Math.round(this.x) - this.x;
+			var oy = Math.round(this.y) - this.y;
+			
+			if (cur_frame.spritesheeted)
+				glw.quadTex(q.tlx + ox, q.tly + oy, q.trx + ox, q.try_ + oy, q.brx + ox, q.bry + oy, q.blx + ox, q.bly + oy, cur_frame.sheetTex);
+			else
+				glw.quad(q.tlx + ox, q.tly + oy, q.trx + ox, q.try_ + oy, q.brx + ox, q.bry + oy, q.blx + ox, q.bly + oy);
+		}
+		else
+		{
+			if (cur_frame.spritesheeted)
+				glw.quadTex(q.tlx, q.tly, q.trx, q.try_, q.brx, q.bry, q.blx, q.bly, cur_frame.sheetTex);
+			else
+				glw.quad(q.tlx, q.tly, q.trx, q.try_, q.brx, q.bry, q.blx, q.bly);
+		}
+	};
+	
+	instanceProto.getImagePointIndexByName = function(name_)
+	{
+		var cur_frame = this.curFrame;
+		
+		var i, len;
+		for (i = 0, len = cur_frame.image_points.length; i < len; i++)
+		{
+			if (cr.equals_nocase(name_, cur_frame.image_points[i][0]))
+				return i;
+		}
+		
+		return -1;
+	};
+	
+	instanceProto.getImagePoint = function(imgpt, getX)
+	{
+		var cur_frame = this.curFrame;
+		var image_points = cur_frame.image_points;
+		var index;
+		
+		if (cr.is_string(imgpt))
+			index = this.getImagePointIndexByName(imgpt);
+		else
+			index = imgpt - 1;	// 0 is origin
+			
+		index = cr.floor(index);
+		if (index < 0 || index >= image_points.length)
+			return getX ? this.x : this.y;	// return origin
+			
+		// get position scaled and relative to origin in pixels
+		var x = (image_points[index][1] - cur_frame.hotspotX) * this.width;
+		var y = image_points[index][2];
+		
+		y = (y - cur_frame.hotspotY) * this.height;
+		
+		// rotate by object angle
+		var cosa = Math.cos(this.angle);
+		var sina = Math.sin(this.angle);
+		var x_temp = (x * cosa) - (y * sina);
+		y = (y * cosa) + (x * sina);
+		x = x_temp;
+		x += this.x;
+		y += this.y;
+		return getX ? x : y;
+	};
+	
+
+	//////////////////////////////////////
+	// Conditions
+	function Cnds() {};
+
+	// For the collision memory in 'On collision'.
+	var arrCache = [];
+	
+	function allocArr()
+	{
+		if (arrCache.length)
+			return arrCache.pop();
+		else
+			return [0, 0, 0];
+	};
+	
+	function freeArr(a)
+	{
+		a[0] = 0;
+		a[1] = 0;
+		a[2] = 0;
+		arrCache.push(a);
+	};
+	
+	function makeCollKey(a, b)
+	{
+		// comma separated string with lowest value first
+		if (a < b)
+			return "" + a + "," + b;
+		else
+			return "" + b + "," + a;
+	};
+	
+	function collmemory_add(collmemory, a, b, tickcount)
+	{
+		var a_uid = a.uid;
+		var b_uid = b.uid;
+
+		var key = makeCollKey(a_uid, b_uid);
+		
+		if (collmemory.hasOwnProperty(key))
+		{
+			// added already; just update tickcount
+			collmemory[key][2] = tickcount;
+			return;
+		}
+		
+		var arr = allocArr();
+		arr[0] = a_uid;
+		arr[1] = b_uid;
+		arr[2] = tickcount;
+		collmemory[key] = arr;
+	};
+	
+	function collmemory_remove(collmemory, a, b)
+	{
+		var key = makeCollKey(a.uid, b.uid);
+		
+		if (collmemory.hasOwnProperty(key))
+		{
+			freeArr(collmemory[key]);
+			delete collmemory[key];
+		}
+	};
+	
+	function collmemory_removeInstance(collmemory, inst)
+	{
+		var uid = inst.uid;
+		var p, entry;
+		for (p in collmemory)
+		{
+			if (collmemory.hasOwnProperty(p))
+			{
+				entry = collmemory[p];
+				
+				// Referenced in either UID: must be removed
+				if (entry[0] === uid || entry[1] === uid)
+				{
+					freeArr(collmemory[p]);
+					delete collmemory[p];
+				}
+			}
+		}
+	};
+	
+	var last_coll_tickcount = -2;
+	
+	function collmemory_has(collmemory, a, b)
+	{
+		var key = makeCollKey(a.uid, b.uid);
+		
+		if (collmemory.hasOwnProperty(key))
+		{
+			last_coll_tickcount = collmemory[key][2];
+			return true;
+		}
+		else
+		{
+			last_coll_tickcount = -2;
+			return false;
+		}
+	};
+	
+	var candidates1 = [];
+	
+	Cnds.prototype.OnCollision = function (rtype)
+	{	
+		if (!rtype)
+			return false;
+			
+		var runtime = this.runtime;
+			
+		// Static condition: perform picking manually.
+		// Get the current condition.  This is like the 'is overlapping' condition
+		// but with a built in 'trigger once' for the l instances.
+		var cnd = runtime.getCurrentCondition();
+		var ltype = cnd.type;
+		var collmemory = null;
+		
+		// Create the collision memory, which remembers pairs of collisions that
+		// are already overlapping
+		if (cnd.extra["collmemory"])
+		{
+			collmemory = cnd.extra["collmemory"];
+		}
+		else
+		{
+			collmemory = {};
+			cnd.extra["collmemory"] = collmemory;
+		}
+		
+		// Once per condition, add a destroy callback to remove destroyed instances from collision memory
+		// which helps avoid a memory leak. Note the spriteCreatedDestroyCallback property is not saved
+		// to savegames, so loading a savegame will still cause a callback to be created, as intended.
+		if (!cnd.extra["spriteCreatedDestroyCallback"])
+		{
+			cnd.extra["spriteCreatedDestroyCallback"] = true;
+			
+			runtime.addDestroyCallback(function(inst) {
+				collmemory_removeInstance(cnd.extra["collmemory"], inst);
+			});
+		}
+		
+		// Get the currently active SOLs for both objects involved in the overlap test
+		var lsol = ltype.getCurrentSol();
+		var rsol = rtype.getCurrentSol();
+		var linstances = lsol.getObjects();
+		var rinstances;
+		
+		// Iterate each combination of instances
+		var l, linst, r, rinst;
+		var curlsol, currsol;
+		
+		var tickcount = this.runtime.tickcount;
+		var lasttickcount = tickcount - 1;
+		var exists, run;
+		
+		var current_event = runtime.getCurrentEventStack().current_event;
+		var orblock = current_event.orblock;
+		
+		// Note: don't cache lengths of linstances or rinstances. They can change if objects get destroyed in the event
+		// retriggering.
+		for (l = 0; l < linstances.length; l++)
+		{
+			linst = linstances[l];
+			
+			if (rsol.select_all)
+			{
+				linst.update_bbox();
+				this.runtime.getCollisionCandidates(linst.layer, rtype, linst.bbox, candidates1);
+				rinstances = candidates1;
+			}
+			else
+				rinstances = rsol.getObjects();
+			
+			for (r = 0; r < rinstances.length; r++)
+			{
+				rinst = rinstances[r];
+				
+				if (runtime.testOverlap(linst, rinst) || runtime.checkRegisteredCollision(linst, rinst))
+				{
+					exists = collmemory_has(collmemory, linst, rinst);
+					run = (!exists || (last_coll_tickcount < lasttickcount));
+					
+					// objects are still touching so update the tickcount
+					collmemory_add(collmemory, linst, rinst, tickcount);
+					
+					if (run)
+					{						
+						runtime.pushCopySol(current_event.solModifiers);
+						curlsol = ltype.getCurrentSol();
+						currsol = rtype.getCurrentSol();
+						curlsol.select_all = false;
+						currsol.select_all = false;
+						
+						// If ltype === rtype, it's the same object (e.g. Sprite collides with Sprite)
+						// In which case, pick both instances
+						if (ltype === rtype)
+						{
+							curlsol.instances.length = 2;	// just use lsol, is same reference as rsol
+							curlsol.instances[0] = linst;
+							curlsol.instances[1] = rinst;
+							ltype.applySolToContainer();
+						}
+						else
+						{
+							// Pick each instance in its respective SOL
+							curlsol.instances.length = 1;
+							currsol.instances.length = 1;
+							curlsol.instances[0] = linst;
+							currsol.instances[0] = rinst;
+							ltype.applySolToContainer();
+							rtype.applySolToContainer();
+						}
+						
+						current_event.retrigger();
+						runtime.popSol(current_event.solModifiers);
+					}
+				}
+				else
+				{
+					// Pair not overlapping: ensure any record removed (mainly to save memory)
+					collmemory_remove(collmemory, linst, rinst);
+				}
+			}
+			
+			cr.clearArray(candidates1);
+		}
+		
+		// We've aleady run the event by now.
+		return false;
+	};
+	
+	var rpicktype = null;
+	var rtopick = new cr.ObjectSet();
+	var needscollisionfinish = false;
+	
+	var candidates2 = [];
+	var temp_bbox = new cr.rect(0, 0, 0, 0);
+	
+	function DoOverlapCondition(rtype, offx, offy)
+	{
+		if (!rtype)
+			return false;
+			
+		var do_offset = (offx !== 0 || offy !== 0);
+		var oldx, oldy, ret = false, r, lenr, rinst;
+		var cnd = this.runtime.getCurrentCondition();
+		var ltype = cnd.type;
+		var inverted = cnd.inverted;
+		var rsol = rtype.getCurrentSol();
+		var orblock = this.runtime.getCurrentEventStack().current_event.orblock;
+		var rinstances;
+		
+		if (rsol.select_all)
+		{
+			this.update_bbox();
+			
+			// Make sure queried box is offset the same as the collision offset so we look in
+			// the right cells
+			temp_bbox.copy(this.bbox);
+			temp_bbox.offset(offx, offy);
+			this.runtime.getCollisionCandidates(this.layer, rtype, temp_bbox, candidates2);
+			rinstances = candidates2;
+		}
+		else if (orblock)
+		{
+			// Normally the instances to process are in the else_instances array. However if a parent normal block
+			// already picked from rtype, it will have select_all off, no else_instances, and just some content
+			// in 'instances'. Look for this case in the first condition only.
+			if (this.runtime.isCurrentConditionFirst() && !rsol.else_instances.length && rsol.instances.length)
+				rinstances = rsol.instances;
+			else
+				rinstances = rsol.else_instances;
+		}
+		else
+		{
+			rinstances = rsol.instances;
+		}
+		
+		rpicktype = rtype;
+		needscollisionfinish = (ltype !== rtype && !inverted);
+		
+		if (do_offset)
+		{
+			oldx = this.x;
+			oldy = this.y;
+			this.x += offx;
+			this.y += offy;
+			this.set_bbox_changed();
+		}
+		
+		for (r = 0, lenr = rinstances.length; r < lenr; r++)
+		{
+			rinst = rinstances[r];
+			
+			// objects overlap: true for this instance, ensure both are picked
+			// (if ltype and rtype are same, e.g. "Sprite overlaps Sprite", don't pick the other instance,
+			// it will be picked when it gets iterated to itself)
+			if (this.runtime.testOverlap(this, rinst))
+			{
+				ret = true;
+				
+				// Inverted condition: just bail out now, don't pick right hand instance -
+				// also note we still return true since the condition invert flag makes that false
+				if (inverted)
+					break;
+					
+				if (ltype !== rtype)
+					rtopick.add(rinst);
+			}
+		}
+		
+		if (do_offset)
+		{
+			this.x = oldx;
+			this.y = oldy;
+			this.set_bbox_changed();
+		}
+		
+		cr.clearArray(candidates2);
+		return ret;
+	};
+	
+	typeProto.finish = function (do_pick)
+	{
+		if (!needscollisionfinish)
+			return;
+		
+		if (do_pick)
+		{
+			var orblock = this.runtime.getCurrentEventStack().current_event.orblock;
+			var sol = rpicktype.getCurrentSol();
+			var topick = rtopick.valuesRef();
+			var i, len, inst;
+			
+			if (sol.select_all)
+			{
+				// All selected: filter down to just those in topick
+				sol.select_all = false;
+				cr.clearArray(sol.instances);
+			
+				for (i = 0, len = topick.length; i < len; ++i)
+				{
+					sol.instances[i] = topick[i];
+				}
+				
+				// In OR blocks, else_instances must also be filled with objects not in topick
+				if (orblock)
+				{
+					cr.clearArray(sol.else_instances);
+					
+					for (i = 0, len = rpicktype.instances.length; i < len; ++i)
+					{
+						inst = rpicktype.instances[i];
+						
+						if (!rtopick.contains(inst))
+							sol.else_instances.push(inst);
+					}
+				}
+			}
+			else
+			{
+				if (orblock)
+				{
+					var initsize = sol.instances.length;
+				
+					for (i = 0, len = topick.length; i < len; ++i)
+					{
+						sol.instances[initsize + i] = topick[i];
+						cr.arrayFindRemove(sol.else_instances, topick[i]);
+					}
+				}
+				else
+				{
+					cr.shallowAssignArray(sol.instances, topick);
+				}
+			}
+			
+			rpicktype.applySolToContainer();
+		}
+		
+		rtopick.clear();
+		needscollisionfinish = false;
+	};
+	
+	Cnds.prototype.IsOverlapping = function (rtype)
+	{
+		return DoOverlapCondition.call(this, rtype, 0, 0);
+	};
+	
+	Cnds.prototype.IsOverlappingOffset = function (rtype, offx, offy)
+	{
+		return DoOverlapCondition.call(this, rtype, offx, offy);
+	};
+	
+	Cnds.prototype.IsAnimPlaying = function (animname)
+	{
+		// If awaiting a change of animation to really happen next tick, compare to that now
+		if (this.changeAnimName.length)
+			return cr.equals_nocase(this.changeAnimName, animname);
+		else
+			return cr.equals_nocase(this.cur_animation.name, animname);
+	};
+	
+	Cnds.prototype.CompareFrame = function (cmp, framenum)
+	{
+		return cr.do_cmp(this.cur_frame, cmp, framenum);
+	};
+	
+	Cnds.prototype.CompareAnimSpeed = function (cmp, x)
+	{
+		var s = (this.animForwards ? this.cur_anim_speed : -this.cur_anim_speed);
+		return cr.do_cmp(s, cmp, x);
+	};
+	
+	Cnds.prototype.OnAnimFinished = function (animname)
+	{
+		return cr.equals_nocase(this.animTriggerName, animname);
+	};
+	
+	Cnds.prototype.OnAnyAnimFinished = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnFrameChanged = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.IsMirrored = function ()
+	{
+		return this.width < 0;
+	};
+	
+	Cnds.prototype.IsFlipped = function ()
+	{
+		return this.height < 0;
+	};
+	
+	Cnds.prototype.OnURLLoaded = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.IsCollisionEnabled = function ()
+	{
+		return this.collisionsEnabled;
+	};
+	
+	pluginProto.cnds = new Cnds();
+
+	//////////////////////////////////////
+	// Actions
+	function Acts() {};
+
+	Acts.prototype.Spawn = function (obj, layer, imgpt)
+	{
+		if (!obj || !layer)
+			return;
+			
+		var inst = this.runtime.createInstance(obj, layer, this.getImagePoint(imgpt, true), this.getImagePoint(imgpt, false));
+		
+		if (!inst)
+			return;
+		
+		if (typeof inst.angle !== "undefined")
+		{
+			inst.angle = this.angle;
+			inst.set_bbox_changed();
+		}
+		
+		this.runtime.isInOnDestroy++;
+		
+		var i, len, s;
+		this.runtime.trigger(Object.getPrototypeOf(obj.plugin).cnds.OnCreated, inst);
+		
+		if (inst.is_contained)
+		{
+			for (i = 0, len = inst.siblings.length; i < len; i++)
+			{
+				s = inst.siblings[i];
+				this.runtime.trigger(Object.getPrototypeOf(s.type.plugin).cnds.OnCreated, s);
+			}
+		}
+		
+		this.runtime.isInOnDestroy--;
+		
+		// This action repeats for all picked instances.  We want to set the current
+		// selection to all instances that are created by this action.  Therefore,
+		// reset the SOL only for the first instance.  Determine this by the last tick count run.
+		// HOWEVER loops and the 'on collision' event re-triggers events, re-running the action
+		// with the same tickcount.  To get around this, triggers and re-triggering events increment
+		// the 'execcount', so each execution of the action has a different execcount even if not
+		// the same tickcount.
+		var cur_act = this.runtime.getCurrentAction();
+		var reset_sol = false;
+		
+		if (cr.is_undefined(cur_act.extra["Spawn_LastExec"]) || cur_act.extra["Spawn_LastExec"] < this.runtime.execcount)
+		{
+			reset_sol = true;
+			cur_act.extra["Spawn_LastExec"] = this.runtime.execcount;
+		}
+		
+		var sol;
+		
+		// Pick just this instance, as long as it's a different type (else the SOL instances array is
+		// potentially modified while in use)
+		if (obj != this.type)
+		{
+			sol = obj.getCurrentSol();
+			sol.select_all = false;
+			
+			if (reset_sol)
+			{
+				cr.clearArray(sol.instances);
+				sol.instances[0] = inst;
+			}
+			else
+				sol.instances.push(inst);
+				
+			// Siblings aren't in instance lists yet, pick them manually
+			if (inst.is_contained)
+			{
+				for (i = 0, len = inst.siblings.length; i < len; i++)
+				{
+					s = inst.siblings[i];
+					sol = s.type.getCurrentSol();
+					sol.select_all = false;
+					
+					if (reset_sol)
+					{
+						cr.clearArray(sol.instances);
+						sol.instances[0] = s;
+					}
+					else
+						sol.instances.push(s);
+				}
+			}
+		}
+	};
+	
+	Acts.prototype.SetEffect = function (effect)
+	{
+		this.blend_mode = effect;
+		this.compositeOp = cr.effectToCompositeOp(effect);
+		cr.setGLBlend(this, effect, this.runtime.gl);
+		this.runtime.redraw = true;
+	};
+	
+	Acts.prototype.StopAnim = function ()
+	{
+		this.animPlaying = false;
+		//log("Stopping animation");
+	};
+	
+	Acts.prototype.StartAnim = function (from)
+	{
+		this.animPlaying = true;
+		this.frameStart = this.getNowTime();
+		//log("Starting animation");
+		
+		// from beginning
+		if (from === 1 && this.cur_frame !== 0)
+		{
+			this.changeAnimFrame = 0;
+			
+			if (!this.inAnimTrigger)
+				this.doChangeAnimFrame();
+		}
+		
+		// start ticking if not already
+		if (!this.isTicking)
+		{
+			this.runtime.tickMe(this);
+			this.isTicking = true;
+		}
+	};
+	
+	Acts.prototype.SetAnim = function (animname, from)
+	{
+		this.changeAnimName = animname;
+		this.changeAnimFrom = from;
+		
+		// start ticking if not already
+		if (!this.isTicking)
+		{
+			this.runtime.tickMe(this);
+			this.isTicking = true;
+		}
+		
+		// not in trigger: apply immediately
+		if (!this.inAnimTrigger)
+			this.doChangeAnim();
+	};
+	
+	Acts.prototype.SetAnimFrame = function (framenumber)
+	{
+		this.changeAnimFrame = framenumber;
+		
+		// start ticking if not already
+		if (!this.isTicking)
+		{
+			this.runtime.tickMe(this);
+			this.isTicking = true;
+		}
+		
+		// not in trigger: apply immediately
+		if (!this.inAnimTrigger)
+			this.doChangeAnimFrame();
+	};
+	
+	Acts.prototype.SetAnimSpeed = function (s)
+	{
+		this.cur_anim_speed = cr.abs(s);
+		this.animForwards = (s >= 0);
+		
+		//this.frameStart = this.runtime.kahanTime.sum;
+		
+		// start ticking if not already
+		if (!this.isTicking)
+		{
+			this.runtime.tickMe(this);
+			this.isTicking = true;
+		}
+	};
+	
+	Acts.prototype.SetAnimRepeatToFrame = function (s)
+	{
+		s = Math.floor(s);
+		
+		if (s < 0)
+			s = 0;
+		if (s >= this.cur_animation.frames.length)
+			s = this.cur_animation.frames.length - 1;
+		
+		this.cur_anim_repeatto = s;
+	};
+	
+	Acts.prototype.SetMirrored = function (m)
+	{
+		var neww = cr.abs(this.width) * (m === 0 ? -1 : 1);
+		
+		if (this.width === neww)
+			return;
+			
+		this.width = neww;
+		this.set_bbox_changed();
+	};
+	
+	Acts.prototype.SetFlipped = function (f)
+	{
+		var newh = cr.abs(this.height) * (f === 0 ? -1 : 1);
+		
+		if (this.height === newh)
+			return;
+			
+		this.height = newh;
+		this.set_bbox_changed();
+	};
+	
+	Acts.prototype.SetScale = function (s)
+	{
+		var cur_frame = this.curFrame;
+		var mirror_factor = (this.width < 0 ? -1 : 1);
+		var flip_factor = (this.height < 0 ? -1 : 1);
+		var new_width = cur_frame.width * s * mirror_factor;
+		var new_height = cur_frame.height * s * flip_factor;
+		
+		if (this.width !== new_width || this.height !== new_height)
+		{
+			this.width = new_width;
+			this.height = new_height;
+			this.set_bbox_changed();
+		}
+	};
+	
+	Acts.prototype.LoadURL = function (url_, resize_, crossOrigin_)
+	{
+		var img = new Image();
+		var self = this;
+		var curFrame_ = this.curFrame;
+		
+		img.onload = function ()
+		{
+			// If this action was used on multiple instances, they will each try to create a
+			// separate image or texture, which is a waste of memory. So if the same image has
+			// already been loaded, ignore this callback.
+			if (curFrame_.texture_img.src === img.src)
+			{
+				// Still may need to switch to using the image's texture in WebGL renderer
+				if (self.runtime.glwrap && self.curFrame === curFrame_)
+					self.curWebGLTexture = curFrame_.webGL_texture;
+				
+				// Still may need to update object size
+				if (resize_ === 0)		// resize to image size
+				{
+					self.width = img.width;
+					self.height = img.height;
+					self.set_bbox_changed();
+				}
+				
+				// Still need to trigger 'On loaded'
+				self.runtime.redraw = true;
+				self.runtime.trigger(cr.plugins_.Sprite.prototype.cnds.OnURLLoaded, self);
+			
+				return;
+			}
+			
+			curFrame_.texture_img = img;
+			curFrame_.offx = 0;
+			curFrame_.offy = 0;
+			curFrame_.width = img.width;
+			curFrame_.height = img.height;
+			curFrame_.spritesheeted = false;
+			curFrame_.datauri = "";
+			curFrame_.pixelformat = 0;	// reset to RGBA, since we don't know what type of image will have come in
+										// and it could be different to what the exporter set for the original image
+			
+			// WebGL renderer: need to create texture (canvas2D just draws with img directly)
+			if (self.runtime.glwrap)
+			{
+				if (curFrame_.webGL_texture)
+					self.runtime.glwrap.deleteTexture(curFrame_.webGL_texture);
+					
+				curFrame_.webGL_texture = self.runtime.glwrap.loadTexture(img, false, self.runtime.linearSampling);
+				
+				if (self.curFrame === curFrame_)
+					self.curWebGLTexture = curFrame_.webGL_texture;
+				
+				// Need to update other instance's curWebGLTexture
+				self.type.updateAllCurrentTexture();
+			}
+			
+			// Set size if necessary
+			if (resize_ === 0)		// resize to image size
+			{
+				self.width = img.width;
+				self.height = img.height;
+				self.set_bbox_changed();
+			}
+			
+			self.runtime.redraw = true;
+			self.runtime.trigger(cr.plugins_.Sprite.prototype.cnds.OnURLLoaded, self);
+		};
+		
+		if (url_.substr(0, 5) !== "data:" && crossOrigin_ === 0)
+			img["crossOrigin"] = "anonymous";
+		
+		// use runtime function to work around WKWebView permissions
+		this.runtime.setImageSrc(img, url_);
+	};
+	
+	Acts.prototype.SetCollisions = function (set_)
+	{
+		if (this.collisionsEnabled === (set_ !== 0))
+			return;		// no change
+		
+		this.collisionsEnabled = (set_ !== 0);
+		
+		if (this.collisionsEnabled)
+			this.set_bbox_changed();		// needs to be added back to cells
+		else
+		{
+			// remove from any current cells and restore to uninitialised state
+			if (this.collcells.right >= this.collcells.left)
+				this.type.collision_grid.update(this, this.collcells, null);
+			
+			this.collcells.set(0, 0, -1, -1);
+		}
+	};
+	
+	pluginProto.acts = new Acts();
+	
+	//////////////////////////////////////
+	// Expressions
+	function Exps() {};
+	
+	Exps.prototype.AnimationFrame = function (ret)
+	{
+		ret.set_int(this.cur_frame);
+	};
+	
+	Exps.prototype.AnimationFrameCount = function (ret)
+	{
+		ret.set_int(this.cur_animation.frames.length);
+	};
+	
+	Exps.prototype.AnimationName = function (ret)
+	{
+		ret.set_string(this.cur_animation.name);
+	};
+	
+	Exps.prototype.AnimationSpeed = function (ret)
+	{
+		ret.set_float(this.animForwards ? this.cur_anim_speed : -this.cur_anim_speed);
+	};
+	
+	Exps.prototype.ImagePointX = function (ret, imgpt)
+	{
+		ret.set_float(this.getImagePoint(imgpt, true));
+	};
+	
+	Exps.prototype.ImagePointY = function (ret, imgpt)
+	{
+		ret.set_float(this.getImagePoint(imgpt, false));
+	};
+	
+	Exps.prototype.ImagePointCount = function (ret)
+	{
+		ret.set_int(this.curFrame.image_points.length);
+	};
+	
+	Exps.prototype.ImageWidth = function (ret)
+	{
+		ret.set_float(this.curFrame.width);
+	};
+	
+	Exps.prototype.ImageHeight = function (ret)
+	{
+		ret.set_float(this.curFrame.height);
+	};
+	
+	pluginProto.exps = new Exps();
+
+}());
+
+// Mouse
+// ECMAScript 5 strict mode
+
+;
+;
+
+/////////////////////////////////////
+// Plugin class
+cr.plugins_.Mouse = function(runtime)
+{
+	this.runtime = runtime;
+};
+
+(function ()
+{
+	var pluginProto = cr.plugins_.Mouse.prototype;
+		
+	/////////////////////////////////////
+	// Object type class
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+
+	var typeProto = pluginProto.Type.prototype;
+
+	typeProto.onCreate = function()
+	{
+	};
+
+	/////////////////////////////////////
+	// Instance class
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+		
+		this.buttonMap = new Array(4);		// mouse down states
+		this.mouseXcanvas = 0;				// mouse position relative to canvas
+		this.mouseYcanvas = 0;
+		
+		this.triggerButton = 0;
+		this.triggerType = 0;
+		this.triggerDir = 0;
+		this.handled = false;
+	};
+
+	var instanceProto = pluginProto.Instance.prototype;
+
+	instanceProto.onCreate = function()
+	{
+		var self = this;
+		
+		// Bind mouse events.
+		document.addEventListener("mousemove", function(info) {
+			self.onMouseMove(info);
+		});
+		
+		document.addEventListener("mousedown", function(info) {
+			self.onMouseDown(info);
+		});
+		
+		document.addEventListener("mouseup", function(info) {
+			self.onMouseUp(info);
+		});
+		
+		document.addEventListener("dblclick", function(info) {
+			self.onDoubleClick(info);
+		});
+		
+		var wheelevent = function(info) {
+							self.onWheel(info);
+						};
+						
+		document.addEventListener("mousewheel", wheelevent, false);
+		document.addEventListener("DOMMouseScroll", wheelevent, false);
+	};
+	
+	instanceProto.onMouseMove = function(info)
+	{
+		this.mouseXcanvas = info.pageX - this.runtime.canvas.offsetLeft;
+		this.mouseYcanvas = info.pageY - this.runtime.canvas.offsetTop;
+	};
+	
+	instanceProto.mouseInGame = function ()
+	{
+		if (this.runtime.fullscreen_mode > 0)
+			return true;
+			
+		return this.mouseXcanvas >= 0 && this.mouseYcanvas >= 0
+		    && this.mouseXcanvas < this.runtime.width && this.mouseYcanvas < this.runtime.height;
+	};
+
+	instanceProto.onMouseDown = function(info)
+	{
+		// Ignore mousedowns outside the canvas
+		if (!this.mouseInGame())
+			return;
+		
+		// Update button state
+		this.buttonMap[info.which] = true;
+		
+		this.runtime.isInUserInputEvent = true;
+		
+		// Trigger OnAnyClick
+		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnAnyClick, this);
+		
+		// Trigger OnClick & OnObjectClicked
+		this.triggerButton = info.which - 1;	// 1-based
+		this.triggerType = 0;					// single click
+		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnClick, this);
+		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnObjectClicked, this);
+		
+		this.runtime.isInUserInputEvent = false;
+	};
+
+	instanceProto.onMouseUp = function(info)
+	{
+		// Ignore mouseup if didn't see a corresponding mousedown
+		if (!this.buttonMap[info.which])
+			return;
+		
+		if (this.runtime.had_a_click && !this.runtime.isMobile)
+			info.preventDefault();
+			
+		this.runtime.had_a_click = true;
+		
+		// Update button state
+		this.buttonMap[info.which] = false;
+		
+		this.runtime.isInUserInputEvent = true;
+		
+		// Trigger OnRelease
+		this.triggerButton = info.which - 1;	// 1-based
+		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnRelease, this);
+		
+		this.runtime.isInUserInputEvent = false;
+	};
+
+	instanceProto.onDoubleClick = function(info)
+	{
+		// Ignore doubleclicks outside the canvas
+		if (!this.mouseInGame())
+			return;
+			
+		info.preventDefault();
+		
+		this.runtime.isInUserInputEvent = true;
+		
+		// Trigger OnClick & OnObjectClicked
+		this.triggerButton = info.which - 1;	// 1-based
+		this.triggerType = 1;					// double click
+		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnClick, this);
+		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnObjectClicked, this);
+		
+		this.runtime.isInUserInputEvent = false;
+	};
+	
+	instanceProto.onWheel = function (info)
+	{
+		var delta = info.wheelDelta ? info.wheelDelta : info.detail ? -info.detail : 0;
+		
+		this.triggerDir = (delta < 0 ? 0 : 1);
+		this.handled = false;
+		
+		this.runtime.isInUserInputEvent = true;
+		
+		this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnWheel, this);
+		
+		this.runtime.isInUserInputEvent = false;
+		
+		if (this.handled && cr.isCanvasInputEvent(info))
+			info.preventDefault();
+	};
+	
+	instanceProto.onWindowBlur = function ()
+	{
+		// Fire "On button up" for any buttons held down, to prevent stuck buttons
+		var i, len;
+		for (i = 0, len = this.buttonMap.length; i < len; ++i)
+		{
+			// Not down
+			if (!this.buttonMap[i])
+				continue;
+			
+			// Update button state
+			this.buttonMap[i] = false;
+			
+			// Trigger OnRelease
+			this.triggerButton = i - 1;
+			this.runtime.trigger(cr.plugins_.Mouse.prototype.cnds.OnRelease, this);
+		}
+	};
+	
+
+	//////////////////////////////////////
+	// Conditions
+	function Cnds() {};
+
+	Cnds.prototype.OnClick = function (button, type)
+	{
+		return button === this.triggerButton && type === this.triggerType;
+	};
+	
+	Cnds.prototype.OnAnyClick = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.IsButtonDown = function (button)
+	{
+		return this.buttonMap[button + 1];
+	};
+	
+	Cnds.prototype.OnRelease = function (button)
+	{
+		return button === this.triggerButton;
+	};
+	
+	Cnds.prototype.IsOverObject = function (obj)
+	{
+		// We need to handle invert manually.  If inverted, turn invert off on the condition,
+		// and instead pass it to testAndSelectCanvasPointOverlap() which does SOL picking
+		// based on the invert status.
+		var cnd = this.runtime.getCurrentCondition();
+
+		var mx = this.mouseXcanvas;
+		var my = this.mouseYcanvas;
+		
+		return cr.xor(this.runtime.testAndSelectCanvasPointOverlap(obj, mx, my, cnd.inverted), cnd.inverted);
+	};
+	
+	Cnds.prototype.OnObjectClicked = function (button, type, obj)
+	{
+		if (button !== this.triggerButton || type !== this.triggerType)
+			return false;	// wrong click type
+		
+		return this.runtime.testAndSelectCanvasPointOverlap(obj, this.mouseXcanvas, this.mouseYcanvas, false);
+	};
+	
+	Cnds.prototype.OnWheel = function (dir)
+	{
+		this.handled = true;
+		return dir === this.triggerDir;
+	};
+	
+	pluginProto.cnds = new Cnds();
+	
+	//////////////////////////////////////
+	// Actions
+	function Acts() {};
+	
+	// Either string or sprite animation frame of last set cursor, to skip redundant settings
+	var lastSetCursor = null;
+	
+	Acts.prototype.SetCursor = function (c)
+	{
+		var cursor_style = ["auto", "pointer", "text", "crosshair", "move", "help", "wait", "none"][c];
+		
+		if (lastSetCursor === cursor_style)
+			return;		// redundant
+		
+		lastSetCursor = cursor_style;
+		document.body.style.cursor = cursor_style;
+	};
+	
+	Acts.prototype.SetCursorSprite = function (obj)
+	{
+		if (this.runtime.isMobile || !obj)
+			return;
+			
+		var inst = obj.getFirstPicked();
+		
+		if (!inst || !inst.curFrame)
+			return;
+			
+		var frame = inst.curFrame;
+		
+		if (lastSetCursor === frame)
+			return;		// already set this frame
+		
+		lastSetCursor = frame;
+		var datauri = frame.getDataUri();
+		
+		var cursor_style = "url(" + datauri + ") " + Math.round(frame.hotspotX * frame.width) + " " + Math.round(frame.hotspotY * frame.height) + ", auto";
+		
+		// Work around a bug in Blink: changing the cursor between different data URLs does not have any effect.
+		// First clearing the cursor then setting it again causes the cursor to take effect.
+		document.body.style.cursor = "";
+		document.body.style.cursor = cursor_style;
+	};
+	
+	pluginProto.acts = new Acts();
+
+	//////////////////////////////////////
+	// Expressions
+	function Exps() {};
+
+	Exps.prototype.X = function (ret, layerparam)
+	{
+		var layer, oldScale, oldZoomRate, oldParallaxX, oldAngle;
+		
+		if (cr.is_undefined(layerparam))
+		{
+			// calculate X position on bottom layer as if its scale were 1.0
+			layer = this.runtime.getLayerByNumber(0);
+			oldScale = layer.scale;
+			oldZoomRate = layer.zoomRate;
+			oldParallaxX = layer.parallaxX;
+			oldAngle = layer.angle;
+			layer.scale = 1;
+			layer.zoomRate = 1.0;
+			layer.parallaxX = 1.0;
+			layer.angle = 0;
+			ret.set_float(layer.canvasToLayer(this.mouseXcanvas, this.mouseYcanvas, true));
+			layer.scale = oldScale;
+			layer.zoomRate = oldZoomRate;
+			layer.parallaxX = oldParallaxX;
+			layer.angle = oldAngle;
+		}
+		else
+		{
+			// use given layer param
+			if (cr.is_number(layerparam))
+				layer = this.runtime.getLayerByNumber(layerparam);
+			else
+				layer = this.runtime.getLayerByName(layerparam);
+				
+			if (layer)
+				ret.set_float(layer.canvasToLayer(this.mouseXcanvas, this.mouseYcanvas, true));
+			else
+				ret.set_float(0);
+		}
+	};
+	
+	Exps.prototype.Y = function (ret, layerparam)
+	{
+		var layer, oldScale, oldZoomRate, oldParallaxY, oldAngle;
+		
+		if (cr.is_undefined(layerparam))
+		{
+			// calculate X position on bottom layer as if its scale were 1.0
+			layer = this.runtime.getLayerByNumber(0);
+			oldScale = layer.scale;
+			oldZoomRate = layer.zoomRate;
+			oldParallaxY = layer.parallaxY;
+			oldAngle = layer.angle;
+			layer.scale = 1;
+			layer.zoomRate = 1.0;
+			layer.parallaxY = 1.0;
+			layer.angle = 0;
+			ret.set_float(layer.canvasToLayer(this.mouseXcanvas, this.mouseYcanvas, false));
+			layer.scale = oldScale;
+			layer.zoomRate = oldZoomRate;
+			layer.parallaxY = oldParallaxY;
+			layer.angle = oldAngle;
+		}
+		else
+		{
+			// use given layer param
+			if (cr.is_number(layerparam))
+				layer = this.runtime.getLayerByNumber(layerparam);
+			else
+				layer = this.runtime.getLayerByName(layerparam);
+				
+			if (layer)
+				ret.set_float(layer.canvasToLayer(this.mouseXcanvas, this.mouseYcanvas, false));
+			else
+				ret.set_float(0);
+		}
+	};
+	
+	Exps.prototype.AbsoluteX = function (ret)
+	{
+		ret.set_float(this.mouseXcanvas);
+	};
+	
+	Exps.prototype.AbsoluteY = function (ret)
+	{
+		ret.set_float(this.mouseYcanvas);
+	};
+	
+	pluginProto.exps = new Exps();
+	
+}());
+
+
 cr.getObjectRefTable = function () {
 	return [
 		cr.plugins_.Facebook,
 		cr.plugins_.Browser,
 		cr.plugins_.Button,
+		cr.plugins_.Text,
+		cr.plugins_.Sprite,
+		cr.plugins_.Mouse,
 		cr.system_object.prototype.cnds.OnLayoutStart,
-		cr.plugins_.Facebook.prototype.cnds.OnReady,
+		cr.plugins_.Mouse.prototype.acts.SetCursor,
+		cr.plugins_.Mouse.prototype.cnds.OnAnyClick,
+		cr.plugins_.Facebook.prototype.cnds.IsReady,
 		cr.plugins_.Facebook.prototype.acts.LogIn2,
 		cr.plugins_.Facebook.prototype.cnds.OnLogIn,
-		cr.plugins_.Browser.prototype.acts.ConsoleLog,
+		cr.system_object.prototype.acts.SetVar,
 		cr.plugins_.Facebook.prototype.exps.UserIDStr,
+		cr.plugins_.Browser.prototype.acts.ConsoleLog,
 		cr.system_object.prototype.acts.Wait,
 		cr.plugins_.Facebook.prototype.acts.PublishScore
 	];
