@@ -1,0 +1,42 @@
+{
+    "c2array": true,
+    "size": [
+        4,
+        2,
+        1
+    ],
+    "data": [
+        [
+            [
+                "RoundClassic"
+            ],
+            [
+                0
+            ]
+        ],
+        [
+            [
+                "Tennis"
+            ],
+            [
+                0
+            ]
+        ],
+        [
+            [
+                "SemiClassic"
+            ],
+            [
+                0
+            ]
+        ],
+        [
+            [
+                "Classic"
+            ],
+            [
+                0
+            ]
+        ]
+    ]
+}
