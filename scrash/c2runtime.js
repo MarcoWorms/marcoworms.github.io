@@ -35830,6 +35830,7 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.cnds.OnLayoutStart,
 		cr.system_object.prototype.cnds.CompareBoolVar,
 		cr.system_object.prototype.cnds.Else,
+		cr.plugins_.Sprite.prototype.acts.SetVisible,
 		cr.plugins_.AJAX.prototype.acts.Request,
 		cr.plugins_.Function.prototype.cnds.OnFunction,
 		cr.plugins_.Arr.prototype.cnds.ArrForEach,
