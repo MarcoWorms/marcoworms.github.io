@@ -35900,6 +35900,8 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Tilemap.prototype.exps.TileToPositionY,
 		cr.system_object.prototype.cnds.CompareVar,
 		cr.plugins_.Tilemap.prototype.acts.SetTile,
+		cr.plugins_.Tilemap.prototype.cnds.CompareTileStateAt,
+		cr.plugins_.Tilemap.prototype.acts.SetTileState,
 		cr.plugins_.Sprite.prototype.acts.SetAnim,
 		cr.system_object.prototype.acts.SetMinimumFramerate,
 		cr.plugins_.Mouse.prototype.acts.SetCursor,
