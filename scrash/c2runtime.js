@@ -35887,6 +35887,8 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Tilemap.prototype.cnds.CompareInstanceVar,
 		cr.system_object.prototype.acts.SubVar,
 		cr.plugins_.Function.prototype.exps.Param,
+		cr.system_object.prototype.cnds.PickAll,
+		cr.plugins_.Browser.prototype.acts.ConsoleLog,
 		cr.plugins_.Function.prototype.cnds.CompareParam,
 		cr.plugins_.Text.prototype.acts.SetVisible,
 		cr.plugins_.Text.prototype.acts.SetFontColor,
