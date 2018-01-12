@@ -21508,15 +21508,6 @@ cr.shaders["glowvertical"] = {
 	animated: false,
 	parameters: [["intensity",0,1]]
 };
-cr.shaders["dodge"] = {
-	src: "varying mediump vec2 vTex;\nuniform lowp sampler2D samplerFront;\nuniform mediump vec2 srcStart;\nuniform mediump vec2 srcEnd;\nuniform lowp sampler2D samplerBack;\nuniform mediump vec2 destStart;\nuniform mediump vec2 destEnd;\nvoid main(void)\n{\nlowp vec4 front = texture2D(samplerFront, vTex);\nmediump vec2 tex = (vTex - srcStart) / (srcEnd - srcStart);\nlowp vec4 back = texture2D(samplerBack, mix(destStart, destEnd, tex));\nfront.rgb = (back.rgb * front.a) / (1.0 - front.rgb);\ngl_FragColor = front * back.a;\n}",
-	extendBoxHorizontal: 0,
-	extendBoxVertical: 0,
-	crossSampling: false,
-	preservesOpaqueness: false,
-	animated: false,
-	parameters: []
-};
 cr.shaders["warpripple"] = {
 	src: "varying mediump vec2 vTex;\nuniform lowp sampler2D samplerFront;\nuniform mediump vec2 srcOriginStart;\nuniform mediump vec2 srcOriginEnd;\nuniform mediump float seconds;\nuniform mediump vec2 pixelSize;\nuniform mediump float freq;\nuniform mediump float amp;\nuniform mediump float speed;\nconst mediump float PI = 3.1415926;\nvoid main(void)\n{\nmediump vec2 srcOriginSize = srcOriginEnd - srcOriginStart;\nmediump vec2 tex = (vTex - srcOriginStart) / srcOriginSize;\ntex = tex * 2.0 - 1.0;\nmediump float d = length(tex);\nmediump float a = atan(tex.y, tex.x);\nd += sin((d * 2.0 * PI) * freq / (pixelSize.x * 750.0) + (seconds * speed)) * amp * (pixelSize.x * 750.0);\ntex.x = cos(a) * d;\ntex.y = sin(a) * d;\ntex = (tex + 1.0) / 2.0;\ntex = clamp(tex, 0.0, 1.0);\ntex = tex * srcOriginSize + srcOriginStart;\ngl_FragColor = texture2D(samplerFront, tex);\n}",
 	extendBoxHorizontal: 50,
@@ -21534,6 +21525,15 @@ cr.shaders["scanlines"] = {
 	preservesOpaqueness: true,
 	animated: false,
 	parameters: [["lineHeight",0,0]]
+};
+cr.shaders["glass"] = {
+	src: "varying mediump vec2 vTex;\nuniform lowp sampler2D samplerFront;\nuniform mediump vec2 srcStart;\nuniform mediump vec2 srcEnd;\nuniform lowp sampler2D samplerBack;\nuniform mediump vec2 destStart;\nuniform mediump vec2 destEnd;\nuniform mediump vec2 pixelSize;\nuniform mediump float magnification;\nvoid main(void)\n{\nlowp vec4 front = texture2D(samplerFront, vTex);\nmediump vec2 tex = (vTex - srcStart) / (srcEnd - srcStart);\nmediump float src = front.r * 0.299 + front.g * 0.587 + front.b * 0.114;\nmediump vec3 front2 = texture2D(samplerFront, vTex + vec2(pixelSize.x, 0.0)).rgb;\nmediump vec3 front3 = texture2D(samplerFront, vTex + vec2(0.0, pixelSize.y)).rgb;\nmediump vec2 diff = vec2(src - (front2.r * 0.299 + front2.g * 0.587 + front2.b * 0.114),\nsrc - (front3.r * 0.299 + front3.g * 0.587 + front3.b * 0.114));\nmediump vec2 p = tex + diff * pixelSize * magnification * 64.0 * front.a;\ngl_FragColor = texture2D(samplerBack, mix(destStart, destEnd, p));\n}",
+	extendBoxHorizontal: 0,
+	extendBoxVertical: 0,
+	crossSampling: true,
+	preservesOpaqueness: false,
+	animated: false,
+	parameters: [["magnification",0,1]]
 };
 
 
@@ -36819,21 +36819,24 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Arr.prototype.acts.SetXY,
 		cr.plugins_.Arr.prototype.exps.CurValue,
 		cr.system_object.prototype.cnds.EveryTick,
-		cr.plugins_.Sprite.prototype.cnds.CompareInstanceVar,
-		cr.plugins_.Sprite.prototype.cnds.CompareFrame,
-		cr.plugins_.Sprite.prototype.acts.SetPosToObject,
-		cr.plugins_.Sprite.prototype.acts.SetPos,
 		cr.plugins_.Sprite.prototype.cnds.IsAnimPlaying,
+		cr.plugins_.Sprite.prototype.cnds.CompareFrame,
+		cr.plugins_.Sprite.prototype.acts.SetPos,
 		cr.plugins_.Sprite.prototype.exps.X,
 		cr.plugins_.Sprite.prototype.exps.Y,
 		cr.plugins_.Sprite.prototype.acts.SetAnim,
 		cr.plugins_.Text.prototype.acts.SetVisible,
 		cr.system_object.prototype.cnds.ForEach,
+		cr.plugins_.Sprite.prototype.exps.AnimationFrame,
 		cr.system_object.prototype.acts.CreateObject,
+		cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 		cr.plugins_.Sprite.prototype.acts.SetTowardPosition,
 		cr.plugins_.Sprite.prototype.acts.SetWidth,
 		cr.system_object.prototype.exps.distance,
 		cr.plugins_.Sprite.prototype.acts.SetInstanceVar,
+		cr.plugins_.Sprite.prototype.acts.SetPosToObject,
+		cr.plugins_.Sprite.prototype.cnds.CompareInstanceVar,
+		cr.plugins_.Sprite.prototype.exps.UID,
 		cr.plugins_.Sprite.prototype.cnds.IsBoolInstanceVarSet,
 		cr.plugins_.Sprite.prototype.acts.SetBoolInstanceVar,
 		cr.behaviors.Flash.prototype.acts.Flash,
@@ -36841,7 +36844,6 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.cnds.For,
 		cr.plugins_.gamepad.prototype.exps.GamepadCount,
 		cr.system_object.prototype.exps.loopindex,
-		cr.plugins_.Sprite.prototype.exps.UID,
 		cr.plugins_.gamepad.prototype.cnds.OnButtonDown,
 		cr.system_object.prototype.cnds.LayerVisible,
 		cr.system_object.prototype.exps.layerindex,
@@ -36853,10 +36855,6 @@ cr.getObjectRefTable = function () {
 		cr.behaviors.Flash.prototype.cnds.IsFlashing,
 		cr.plugins_.gamepad.prototype.cnds.CompareAxis,
 		cr.behaviors.Platform.prototype.acts.SetVectorX,
-		cr.system_object.prototype.exps.max,
-		cr.system_object.prototype.exps.abs,
-		cr.plugins_.gamepad.prototype.exps.Axis,
-		cr.system_object.prototype.exps.min,
 		cr.behaviors.Bullet.prototype.acts.SetAngleOfMotion,
 		cr.system_object.prototype.exps.angle,
 		cr.plugins_.gamepad.prototype.exps.RawAxis,
@@ -36868,8 +36866,7 @@ cr.getObjectRefTable = function () {
 		cr.behaviors.Physics.prototype.acts.SetVelocity,
 		cr.behaviors.Physics.prototype.acts.ApplyImpulseAtAngle,
 		cr.plugins_.Sprite.prototype.exps.Angle,
-		cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
-		cr.plugins_.Sprite.prototype.exps.AnimationFrame,
+		cr.plugins_.Sprite.prototype.acts.SetSize,
 		cr.behaviors.Physics.prototype.exps.VelocityX,
 		cr.behaviors.Physics.prototype.exps.VelocityY,
 		cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
@@ -36892,6 +36889,7 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Tilemap.prototype.exps.TileAt,
 		cr.plugins_.Tilemap.prototype.exps.TileToPositionX,
 		cr.plugins_.Tilemap.prototype.exps.TileToPositionY,
+		cr.plugins_.Sprite.prototype.acts.MoveToTop,
 		cr.plugins_.Tilemap.prototype.acts.SetTile,
 		cr.plugins_.Tilemap.prototype.cnds.CompareTileStateAt,
 		cr.plugins_.Tilemap.prototype.acts.SetTileState,
