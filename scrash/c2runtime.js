@@ -21508,6 +21508,15 @@ cr.shaders["glowvertical"] = {
 	animated: false,
 	parameters: [["intensity",0,1]]
 };
+cr.shaders["replacecolor"] = {
+	src: "varying mediump vec2 vTex;\nuniform lowp sampler2D samplerFront;\nuniform lowp vec3 sourceColor;\nuniform lowp vec3 destColor;\nuniform lowp float tolerance;\nvoid main(void)\n{\nlowp vec4 front = texture2D(samplerFront, vTex);\nlowp float a = front.a;\nif (a != 0.0)\nfront.rgb /= a;\nlowp float diff = length(front.rgb - sourceColor);\nif (diff <= tolerance)\n{\nfront.rgb = mix(front.rgb, destColor, 1.0 - diff / tolerance);\n}\nfront.rgb *= a;\ngl_FragColor = front;\n}",
+	extendBoxHorizontal: 0,
+	extendBoxVertical: 0,
+	crossSampling: false,
+	preservesOpaqueness: true,
+	animated: false,
+	parameters: [["sourceColor",0,2],["destColor",0,2],["tolerance",0,1]]
+};
 cr.shaders["warpripple"] = {
 	src: "varying mediump vec2 vTex;\nuniform lowp sampler2D samplerFront;\nuniform mediump vec2 srcOriginStart;\nuniform mediump vec2 srcOriginEnd;\nuniform mediump float seconds;\nuniform mediump vec2 pixelSize;\nuniform mediump float freq;\nuniform mediump float amp;\nuniform mediump float speed;\nconst mediump float PI = 3.1415926;\nvoid main(void)\n{\nmediump vec2 srcOriginSize = srcOriginEnd - srcOriginStart;\nmediump vec2 tex = (vTex - srcOriginStart) / srcOriginSize;\ntex = tex * 2.0 - 1.0;\nmediump float d = length(tex);\nmediump float a = atan(tex.y, tex.x);\nd += sin((d * 2.0 * PI) * freq / (pixelSize.x * 750.0) + (seconds * speed)) * amp * (pixelSize.x * 750.0);\ntex.x = cos(a) * d;\ntex.y = sin(a) * d;\ntex = (tex + 1.0) / 2.0;\ntex = clamp(tex, 0.0, 1.0);\ntex = tex * srcOriginSize + srcOriginStart;\ngl_FragColor = texture2D(samplerFront, tex);\n}",
 	extendBoxHorizontal: 50,
@@ -21534,6 +21543,15 @@ cr.shaders["glass"] = {
 	preservesOpaqueness: false,
 	animated: false,
 	parameters: [["magnification",0,1]]
+};
+cr.shaders["overlay"] = {
+	src: "precision mediump float;\nvarying mediump vec2 vTex;\nuniform lowp sampler2D samplerFront;\nuniform mediump vec2 srcStart;\nuniform mediump vec2 srcEnd;\nuniform lowp sampler2D samplerBack;\nuniform mediump vec2 destStart;\nuniform mediump vec2 destEnd;\nvoid main(void)\n{\nlowp vec4 front = texture2D(samplerFront, vTex);\nmediump vec2 tex = (vTex - srcStart) / (srcEnd - srcStart);\nlowp vec4 back = texture2D(samplerBack, mix(destStart, destEnd, tex));\nfront.r = back.r < 0.5 ? 2.0 * back.r * front.r : 2.0 * (front.r + back.r * front.a - back.r * front.r) - front.a;\nfront.g = back.g < 0.5 ? 2.0 * back.g * front.g : 2.0 * (front.g + back.g * front.a - back.g * front.g) - front.a;\nfront.b = back.b < 0.5 ? 2.0 * back.b * front.b : 2.0 * (front.b + back.b * front.a - back.b * front.b) - front.a;\nfront *= back.a;\ngl_FragColor = front;\n}",
+	extendBoxHorizontal: 0,
+	extendBoxVertical: 0,
+	crossSampling: false,
+	preservesOpaqueness: false,
+	animated: false,
+	parameters: []
 };
 
 
@@ -31935,6 +31953,1959 @@ cr.plugins_.sliderbar = function(runtime)
 
 }());
 
+// Particles
+// ECMAScript 5 strict mode
+
+;
+;
+
+/////////////////////////////////////
+// Plugin class
+cr.plugins_.Particles = function(runtime)
+{
+	this.runtime = runtime;
+};
+
+(function ()
+{
+	/////////////////////////////////////
+	var pluginProto = cr.plugins_.Particles.prototype;
+		
+	/////////////////////////////////////
+	// Object type class
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+
+	var typeProto = pluginProto.Type.prototype;
+
+	// called on startup for each object type
+	typeProto.onCreate = function()
+	{
+		if (this.is_family)
+			return;
+		
+		this.texture_img = this.runtime.findWaitingTexture(this.texture_file);
+		
+		if (!this.texture_img)
+		{
+			this.texture_img = new Image();
+			this.texture_img.cr_src = this.texture_file;
+			this.texture_img.cr_filesize = this.texture_filesize;
+			this.texture_img.c2webGL_texture = null;
+			this.runtime.waitForImageLoad(this.texture_img, this.texture_file);
+		}
+		
+		this.spriteX = this.texture_data[3];
+		this.spriteY = this.texture_data[4];
+		this.spriteWidth = this.texture_data[5];
+		this.spriteHeight = this.texture_data[6];
+	};
+	
+	typeProto.onLostWebGLContext = function ()
+	{
+		if (this.is_family)
+			return;
+			
+		this.webGL_texture = null;
+	};
+	
+	typeProto.createParticleTexture = function ()
+	{
+		// Shortcut to correctly render spritesheeted particle in WebGL: cut the image out of its spritesheet
+		// and create a texture from that. TODO: render directly from spritesheet texture via texture coords.
+		var tmpcanvas = document.createElement("canvas");
+		var w = this.spriteWidth;
+		var h = this.spriteHeight;
+		tmpcanvas.width = w;
+		tmpcanvas.height = h;
+		var tmpctx = tmpcanvas.getContext("2d");
+		tmpctx.drawImage(this.texture_img, this.spriteX, this.spriteY, w, h, 0, 0, w, h);
+		
+		this.webGL_texture = this.runtime.glwrap.loadTexture(tmpcanvas, true, this.runtime.linearSampling, this.texture_pixelformat);
+	};
+	
+	typeProto.onRestoreWebGLContext = function ()
+	{
+		// No need to create textures if no instances exist, will create on demand
+		if (this.is_family || !this.instances.length)
+			return;
+		
+		if (!this.webGL_texture)
+		{
+			this.createParticleTexture();
+		}
+	};
+	
+	typeProto.loadTextures = function ()
+	{
+		if (this.is_family || this.webGL_texture || !this.runtime.glwrap)
+			return;
+		
+		this.createParticleTexture();
+	};
+	
+	typeProto.unloadTextures = function ()
+	{
+		if (this.is_family || this.instances.length || !this.webGL_texture)
+			return;
+
+		this.runtime.glwrap.deleteTexture(this.webGL_texture);
+		this.webGL_texture = null;
+	};
+	
+	typeProto.preloadCanvas2D = function (ctx)
+	{
+		// draw to preload, browser should lazy load the texture
+		ctx.drawImage(this.texture_img, 0, 0);
+	};
+	
+	/////////////////////////////////////
+	// Particle class
+	function Particle(owner)
+	{
+		this.owner = owner;
+		this.active = false;
+		this.x = 0;
+		this.y = 0;
+		this.speed = 0;
+		this.angle = 0;
+		this.opacity = 1;
+		this.grow = 0;
+		this.size = 0;
+		this.gs = 0;			// gravity speed
+		this.age = 0;
+		cr.seal(this);
+	};
+	
+	Particle.prototype.init = function ()
+	{
+		var owner = this.owner;
+		this.x = owner.x - (owner.xrandom / 2) + (Math.random() * owner.xrandom);
+		this.y = owner.y - (owner.yrandom / 2) + (Math.random() * owner.yrandom);
+		
+		this.speed = owner.initspeed - (owner.speedrandom / 2) + (Math.random() * owner.speedrandom);
+		this.angle = owner.angle - (owner.spraycone / 2) + (Math.random() * owner.spraycone);
+		this.opacity = owner.initopacity;
+		this.size = owner.initsize - (owner.sizerandom / 2) + (Math.random() * owner.sizerandom);
+		this.grow = owner.growrate - (owner.growrandom / 2) + (Math.random() * owner.growrandom);
+		this.gs = 0;
+		this.age = 0;
+	};
+	
+	Particle.prototype.tick = function (dt)
+	{
+		var owner = this.owner;
+		
+		// Move
+		this.x += Math.cos(this.angle) * this.speed * dt;
+		this.y += Math.sin(this.angle) * this.speed * dt;
+		
+		// Apply gravity
+		this.y += this.gs * dt;
+		
+		// Adjust lifetime parameters
+		this.speed += owner.acc * dt;
+		this.size += this.grow * dt;
+		this.gs += owner.g * dt;
+		this.age += dt;
+		
+		// Destroy particle if shrunk to less than a pixel in size
+		if (this.size < 1)
+		{
+			this.active = false;
+			return;
+		}
+		
+		if (owner.lifeanglerandom !== 0)
+			this.angle += (Math.random() * owner.lifeanglerandom * dt) - (owner.lifeanglerandom * dt / 2);
+			
+		if (owner.lifespeedrandom !== 0)
+			this.speed += (Math.random() * owner.lifespeedrandom * dt) - (owner.lifespeedrandom * dt / 2);
+			
+		if (owner.lifeopacityrandom !== 0)
+		{
+			this.opacity += (Math.random() * owner.lifeopacityrandom * dt) - (owner.lifeopacityrandom * dt / 2);
+			
+			if (this.opacity < 0)
+				this.opacity = 0;
+			else if (this.opacity > 1)
+				this.opacity = 1;
+		}
+		
+		// Make inactive after timeout for both fade and timeout settings
+		if (owner.destroymode <= 1 && this.age >= owner.timeout)
+		{
+			this.active = false;
+		}
+		// Or make inactive when stopped
+		if (owner.destroymode === 2 && this.speed <= 0)
+		{
+			this.active = false;
+		}
+	};
+	
+	Particle.prototype.draw = function (ctx)
+	{
+		var curopacity = this.owner.opacity * this.opacity;
+		
+		if (curopacity === 0)
+			return;
+		
+		// Modify opacity for fade-out
+		if (this.owner.destroymode === 0)
+			curopacity *= 1 - (this.age / this.owner.timeout);
+			
+		ctx.globalAlpha = curopacity;
+			
+		var drawx = this.x - this.size / 2;
+		var drawy = this.y - this.size / 2;
+		
+		if (this.owner.runtime.pixel_rounding)
+		{
+			drawx = (drawx + 0.5) | 0;
+			drawy = (drawy + 0.5) | 0;
+		}
+		
+		var type = this.owner.type;
+		ctx.drawImage(type.texture_img, type.spriteX, type.spriteY, type.spriteWidth, type.spriteHeight, drawx, drawy, this.size, this.size);
+	};
+	
+	Particle.prototype.drawGL = function (glw)
+	{
+		var curopacity = this.owner.opacity * this.opacity;
+		
+		// Modify opacity for fade-out
+		if (this.owner.destroymode === 0)
+			curopacity *= 1 - (this.age / this.owner.timeout);
+		
+		var drawsize = this.size;
+		var scaleddrawsize = drawsize * this.owner.particlescale;
+		var drawx = this.x - drawsize / 2;
+		var drawy = this.y - drawsize / 2;
+		
+		if (this.owner.runtime.pixel_rounding)
+		{
+			drawx = (drawx + 0.5) | 0;
+			drawy = (drawy + 0.5) | 0;
+		}
+		
+		// Don't bother issuing a quad for a particle smaller than 1px, it probably won't be visible anyway.
+		if (scaleddrawsize < 1 || curopacity === 0)
+			return;
+			
+		// Quad if outside the allowed point range, otherwise issue a point.  Hopefully there won't be too much
+		// quad <-> point batch switching.  Note we have to manually scale particles which don't take in to account
+		// the layout zoom etc. otherwise.
+		if (scaleddrawsize < glw.minPointSize || scaleddrawsize > glw.maxPointSize)
+		{
+			glw.setOpacity(curopacity);
+			glw.quad(drawx, drawy, drawx + drawsize, drawy, drawx + drawsize, drawy + drawsize, drawx, drawy + drawsize);
+		}
+		else
+			glw.point(this.x, this.y, scaleddrawsize, curopacity);
+	};
+	
+	Particle.prototype.left = function ()
+	{
+		return this.x - this.size / 2;
+	};
+	
+	Particle.prototype.right = function ()
+	{
+		return this.x + this.size / 2;
+	};
+	
+	Particle.prototype.top = function ()
+	{
+		return this.y - this.size / 2;
+	};
+	
+	Particle.prototype.bottom = function ()
+	{
+		return this.y + this.size / 2;
+	};
+
+	/////////////////////////////////////
+	// Instance class
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+	};
+	
+	var instanceProto = pluginProto.Instance.prototype;
+	
+	// global array of particles to recycle
+	var deadparticles = [];
+
+	// called whenever an instance is created
+	instanceProto.onCreate = function()
+	{
+		var props = this.properties;
+		
+		this.rate = props[0];
+		this.spraycone = cr.to_radians(props[1]);
+		this.spraytype = props[2];			// 0 = continuous, 1 = one-shot
+		this.spraying = true;				// for continuous mode only
+		
+		this.initspeed = props[3];
+		this.initsize = props[4];
+		this.initopacity = props[5] / 100.0;
+		this.growrate = props[6];
+		this.xrandom = props[7];
+		this.yrandom = props[8];
+		this.speedrandom = props[9];
+		this.sizerandom = props[10];
+		this.growrandom = props[11];
+		this.acc = props[12];
+		this.g = props[13];
+		this.lifeanglerandom = props[14];
+		this.lifespeedrandom = props[15];
+		this.lifeopacityrandom = props[16];
+		this.destroymode = props[17];		// 0 = fade, 1 = timeout, 2 = stopped
+		this.timeout = props[18];
+		
+		this.particleCreateCounter = 0;
+		this.particlescale = 1;
+		
+		// Dynamically set the bounding box to surround all created particles
+		this.particleBoxLeft = this.x;
+		this.particleBoxTop = this.y;
+		this.particleBoxRight = this.x;
+		this.particleBoxBottom = this.y;
+		
+		this.add_bbox_changed_callback(function (self) {
+			self.bbox.set(self.particleBoxLeft, self.particleBoxTop, self.particleBoxRight, self.particleBoxBottom);
+			self.bquad.set_from_rect(self.bbox);
+			self.bbox_changed = false;
+			self.update_collision_cell();
+			self.update_render_cell();
+		});
+		
+		// Check for recycling
+		if (!this.recycled)
+			this.particles = [];
+		
+		this.runtime.tickMe(this);
+		
+		this.type.loadTextures();
+			
+		// If in one-shot mode, create all particles now
+		if (this.spraytype === 1)
+		{
+			for (var i = 0; i < this.rate; i++)
+				this.allocateParticle().opacity = 0;
+		}
+		
+		this.first_tick = true;		// for re-init'ing one-shot particles on first tick so they assume any new angle/position
+	};
+	
+	instanceProto.saveToJSON = function ()
+	{
+		var o = {
+			"r": this.rate,
+			"sc": this.spraycone,
+			"st": this.spraytype,
+			"s": this.spraying,
+			"isp": this.initspeed,
+			"isz": this.initsize,
+			"io": this.initopacity,
+			"gr": this.growrate,
+			"xr": this.xrandom,
+			"yr": this.yrandom,
+			"spr": this.speedrandom,
+			"szr": this.sizerandom,
+			"grnd": this.growrandom,
+			"acc": this.acc,
+			"g": this.g,
+			"lar": this.lifeanglerandom,
+			"lsr": this.lifespeedrandom,
+			"lor": this.lifeopacityrandom,
+			"dm": this.destroymode,
+			"to": this.timeout,
+			"pcc": this.particleCreateCounter,
+			"ft": this.first_tick,
+			"p": []
+		};
+		
+		var i, len, p;
+		var arr = o["p"];
+
+		for (i = 0, len = this.particles.length; i < len; i++)
+		{
+			p = this.particles[i];
+			arr.push([p.x, p.y, p.speed, p.angle, p.opacity, p.grow, p.size, p.gs, p.age]);
+		}
+		
+		return o;
+	};
+	
+	instanceProto.loadFromJSON = function (o)
+	{
+		this.rate = o["r"];
+		this.spraycone = o["sc"];
+		this.spraytype = o["st"];
+		this.spraying = o["s"];
+		this.initspeed = o["isp"];
+		this.initsize = o["isz"];
+		this.initopacity = o["io"];
+		this.growrate = o["gr"];
+		this.xrandom = o["xr"];
+		this.yrandom = o["yr"];
+		this.speedrandom = o["spr"];
+		this.sizerandom = o["szr"];
+		this.growrandom = o["grnd"];
+		this.acc = o["acc"];
+		this.g = o["g"];
+		this.lifeanglerandom = o["lar"];
+		this.lifespeedrandom = o["lsr"];
+		this.lifeopacityrandom = o["lor"];
+		this.destroymode = o["dm"];
+		this.timeout = o["to"];
+		this.particleCreateCounter = o["pcc"];
+		this.first_tick = o["ft"];
+		
+		// recycle all particles then load by reallocating them
+		deadparticles.push.apply(deadparticles, this.particles);
+		cr.clearArray(this.particles);
+		
+		var i, len, p, d;
+		var arr = o["p"];
+		
+		for (i = 0, len = arr.length; i < len; i++)
+		{
+			p = this.allocateParticle();
+			d = arr[i];
+			p.x = d[0];
+			p.y = d[1];
+			p.speed = d[2];
+			p.angle = d[3];
+			p.opacity = d[4];
+			p.grow = d[5];
+			p.size = d[6];
+			p.gs = d[7];
+			p.age = d[8];
+		}
+	};
+	
+	instanceProto.onDestroy = function ()
+	{
+		// recycle all particles
+		deadparticles.push.apply(deadparticles, this.particles);
+		cr.clearArray(this.particles);
+	};
+	
+	instanceProto.allocateParticle = function ()
+	{
+		var p;
+		
+		if (deadparticles.length)
+		{
+			p = deadparticles.pop();
+			p.owner = this;
+		}
+		else
+			p = new Particle(this);
+		
+		this.particles.push(p);
+		p.active = true;
+		return p;
+	};
+	
+	instanceProto.tick = function()
+	{
+		var dt = this.runtime.getDt(this);
+		
+		var i, len, p, n, j;
+		
+		// Create spray particles for this tick
+		if (this.spraytype === 0 && this.spraying)
+		{
+			this.particleCreateCounter += dt * this.rate;
+			
+			n = cr.floor(this.particleCreateCounter);
+			this.particleCreateCounter -= n;
+			
+			for (i = 0; i < n; i++)
+			{
+				p = this.allocateParticle();
+				p.init();
+			}
+		}
+		
+		this.particleBoxLeft = this.x;
+		this.particleBoxTop = this.y;
+		this.particleBoxRight = this.x;
+		this.particleBoxBottom = this.y;
+		
+		for (i = 0, j = 0, len = this.particles.length; i < len; i++)
+		{
+			p = this.particles[i];
+			this.particles[j] = p;
+			
+			this.runtime.redraw = true;
+			
+			// If the first tick for one-shot particles, call init() now so the particles
+			// assume any changed position or angle of the Particles object.
+			if (this.spraytype === 1 && this.first_tick)
+				p.init();
+			
+			p.tick(dt);
+			
+			// Particle is dead: move to deadparticles for later recycling
+			if (!p.active)
+			{
+				deadparticles.push(p);
+				continue;
+			}
+			
+			// measure bounding box
+			if (p.left() < this.particleBoxLeft)
+				this.particleBoxLeft = p.left();
+			if (p.right() > this.particleBoxRight)
+				this.particleBoxRight = p.right();
+			if (p.top() < this.particleBoxTop)
+				this.particleBoxTop = p.top();
+			if (p.bottom() > this.particleBoxBottom)
+				this.particleBoxBottom = p.bottom();
+			
+			j++;
+		}
+		
+		cr.truncateArray(this.particles, j);
+		
+		// Update the bounding box based on active particles
+		this.set_bbox_changed();
+		
+		this.first_tick = false;
+		
+		// If one-shot and all particles are dead, destroy the whole object
+		if (this.spraytype === 1 && this.particles.length === 0)
+			this.runtime.DestroyInstance(this);
+	};
+	
+	// only called if a layout object - draw to a canvas 2D context
+	instanceProto.draw = function (ctx)
+	{
+		var i, len, p, layer = this.layer;
+		
+		for (i = 0, len = this.particles.length; i < len; i++)
+		{
+			p = this.particles[i];
+			
+			// Only draw active and on-screen particles
+			if (p.right() >= layer.viewLeft && p.bottom() >= layer.viewTop && p.left() <= layer.viewRight && p.top() <= layer.viewBottom)
+			{
+				p.draw(ctx);
+			}
+		}
+	};
+	
+	// only called if a layout object in WebGL mode - draw to the WebGL context
+	// 'glw' is not a WebGL context, it's a wrapper - you can find its methods in GLWrap.js in the install
+	// directory or just copy what other plugins do.
+	instanceProto.drawGL = function (glw)
+	{
+		this.particlescale = this.layer.getScale();
+		glw.setTexture(this.type.webGL_texture);
+		
+		var i, len, p, layer = this.layer;
+		
+		for (i = 0, len = this.particles.length; i < len; i++)
+		{
+			p = this.particles[i];
+			
+			// Only draw active and on-screen particles
+			if (p.right() >= layer.viewLeft && p.bottom() >= layer.viewTop && p.left() <= layer.viewRight && p.top() <= layer.viewBottom)
+			{
+				p.drawGL(glw);
+			}
+		}
+	};
+	
+
+	//////////////////////////////////////
+	// Conditions
+	function Cnds() {};
+
+	// the example condition
+	Cnds.prototype.IsSpraying = function ()
+	{
+		return this.spraying;
+	};
+	
+	pluginProto.cnds = new Cnds();
+	
+	//////////////////////////////////////
+	// Actions
+	function Acts() {};
+
+	Acts.prototype.SetSpraying = function (set_)
+	{
+		this.spraying = (set_ !== 0);
+	};
+	
+	Acts.prototype.SetEffect = function (effect)
+	{
+		this.blend_mode = effect;
+		this.compositeOp = cr.effectToCompositeOp(effect);
+		cr.setGLBlend(this, effect, this.runtime.gl);
+		this.runtime.redraw = true;
+	};
+	
+	Acts.prototype.SetRate = function (x)
+	{
+		this.rate = x;
+		var diff, i;
+		
+		// In one-shot mode, if still in the first tick, adjust the number of particles created 
+		if (this.spraytype === 1 && this.first_tick)
+		{
+			// Reducing particle count
+			if (x < this.particles.length)
+			{
+				diff = this.particles.length - x;
+				
+				for (i = 0; i < diff; i++)
+					deadparticles.push(this.particles.pop());
+			}
+			// Increasing particle count
+			else if (x > this.particles.length)
+			{
+				diff = x - this.particles.length;
+				
+				for (i = 0; i < diff; i++)
+					this.allocateParticle().opacity = 0;
+			}
+		}
+	};
+	
+	Acts.prototype.SetSprayCone = function (x)
+	{
+		this.spraycone = cr.to_radians(x);
+	};
+	
+	Acts.prototype.SetInitSpeed = function (x)
+	{
+		this.initspeed = x;
+	};
+	
+	Acts.prototype.SetInitSize = function (x)
+	{
+		this.initsize = x;
+	};
+	
+	Acts.prototype.SetInitOpacity = function (x)
+	{
+		this.initopacity = x / 100;
+	};
+	
+	Acts.prototype.SetGrowRate = function (x)
+	{
+		this.growrate = x;
+	};
+	
+	Acts.prototype.SetXRandomiser = function (x)
+	{
+		this.xrandom = x;
+	};
+	
+	Acts.prototype.SetYRandomiser = function (x)
+	{
+		this.yrandom = x;
+	};
+	
+	Acts.prototype.SetSpeedRandomiser = function (x)
+	{
+		this.speedrandom = x;
+	};
+	
+	Acts.prototype.SetSizeRandomiser = function (x)
+	{
+		this.sizerandom = x;
+	};
+	
+	Acts.prototype.SetGrowRateRandomiser = function (x)
+	{
+		this.growrandom = x;
+	};
+	
+	Acts.prototype.SetParticleAcc = function (x)
+	{
+		this.acc = x;
+	};
+	
+	Acts.prototype.SetGravity = function (x)
+	{
+		this.g = x;
+	};
+	
+	Acts.prototype.SetAngleRandomiser = function (x)
+	{
+		this.lifeanglerandom = x;
+	};
+	
+	Acts.prototype.SetLifeSpeedRandomiser = function (x)
+	{
+		this.lifespeedrandom = x;
+	};
+	
+	Acts.prototype.SetOpacityRandomiser = function (x)
+	{
+		this.lifeopacityrandom = x;
+	};
+	
+	Acts.prototype.SetTimeout = function (x)
+	{
+		this.timeout = x;
+	};
+	
+	pluginProto.acts = new Acts();
+	
+	//////////////////////////////////////
+	// Expressions
+	function Exps() {};
+	
+	Exps.prototype.ParticleCount = function (ret)
+	{
+		ret.set_int(this.particles.length);
+	};
+	
+	Exps.prototype.Rate = function (ret)
+	{
+		ret.set_float(this.rate);
+	};
+	
+	Exps.prototype.SprayCone = function (ret)
+	{
+		ret.set_float(cr.to_degrees(this.spraycone));
+	};
+	
+	Exps.prototype.InitSpeed = function (ret)
+	{
+		ret.set_float(this.initspeed);
+	};
+	
+	Exps.prototype.InitSize = function (ret)
+	{
+		ret.set_float(this.initsize);
+	};
+	
+	Exps.prototype.InitOpacity = function (ret)
+	{
+		ret.set_float(this.initopacity * 100);
+	};
+	
+	Exps.prototype.InitGrowRate = function (ret)
+	{
+		ret.set_float(this.growrate);
+	};
+	
+	Exps.prototype.XRandom = function (ret)
+	{
+		ret.set_float(this.xrandom);
+	};
+	
+	Exps.prototype.YRandom = function (ret)
+	{
+		ret.set_float(this.yrandom);
+	};
+	
+	Exps.prototype.InitSpeedRandom = function (ret)
+	{
+		ret.set_float(this.speedrandom);
+	};
+	
+	Exps.prototype.InitSizeRandom = function (ret)
+	{
+		ret.set_float(this.sizerandom);
+	};
+	
+	Exps.prototype.InitGrowRandom = function (ret)
+	{
+		ret.set_float(this.growrandom);
+	};
+	
+	Exps.prototype.ParticleAcceleration = function (ret)
+	{
+		ret.set_float(this.acc);
+	};
+	
+	Exps.prototype.Gravity = function (ret)
+	{
+		ret.set_float(this.g);
+	};
+	
+	Exps.prototype.ParticleAngleRandom = function (ret)
+	{
+		ret.set_float(this.lifeanglerandom);
+	};
+	
+	Exps.prototype.ParticleSpeedRandom = function (ret)
+	{
+		ret.set_float(this.lifespeedrandom);
+	};
+	
+	Exps.prototype.ParticleOpacityRandom = function (ret)
+	{
+		ret.set_float(this.lifeopacityrandom);
+	};
+	
+	Exps.prototype.Timeout = function (ret)
+	{
+		ret.set_float(this.timeout);
+	};
+	
+	pluginProto.exps = new Exps();
+
+}());
+
+// Sprite font
+// ECMAScript 5 strict mode
+/* global cr,log,assert2 */
+/* jshint globalstrict: true */
+/* jshint strict: true */
+
+;
+;
+
+/////////////////////////////////////
+// Plugin class
+cr.plugins_.Spritefont2 = function(runtime)
+{
+	this.runtime = runtime;
+};
+
+(function ()
+{
+	var pluginProto = cr.plugins_.Spritefont2.prototype;
+
+	pluginProto.onCreate = function ()
+	{
+	};
+
+	/////////////////////////////////////
+	// Object type class
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+
+	var typeProto = pluginProto.Type.prototype;
+
+	typeProto.onCreate = function()
+	{
+		if (this.is_family)
+			return;
+
+		this.texture_img = this.runtime.findWaitingTexture(this.texture_file);
+		
+		if (!this.texture_img)
+		{
+			this.texture_img = new Image();
+			this.texture_img.cr_src = this.texture_file;
+			this.texture_img.cr_filesize = this.texture_filesize;
+			this.texture_img.c2webGL_texture = null;
+			this.runtime.waitForImageLoad(this.texture_img, this.texture_file);
+		}
+		
+		this.spriteX = this.texture_data[3];
+		this.spriteY = this.texture_data[4];
+		this.spriteWidth = this.texture_data[5];
+		this.spriteHeight = this.texture_data[6];
+		
+		this.webGL_texture = null;
+	};
+
+	typeProto.onLostWebGLContext = function ()
+	{
+		if (this.is_family)
+			return;
+
+		this.webGL_texture = null;
+	};
+
+	typeProto.onRestoreWebGLContext = function ()
+	{
+		// No need to create textures if no instances exist, will create on demand
+		if (this.is_family || !this.instances.length)
+			return;
+
+		if (!this.webGL_texture)
+		{
+			this.webGL_texture = this.runtime.glwrap.loadTexture(this.texture_img, false, this.runtime.linearSampling, this.texture_pixelformat);
+		}
+
+		var i, len;
+		for (i = 0, len = this.instances.length; i < len; i++)
+			this.instances[i].webGL_texture = this.webGL_texture;
+	};
+
+	typeProto.unloadTextures = function ()
+	{
+		// Don't release textures if any instances still exist, they are probably using them
+		if (this.is_family || this.instances.length || !this.webGL_texture)
+			return;
+
+		this.runtime.glwrap.deleteTexture(this.webGL_texture);
+		this.webGL_texture = null;
+	};
+
+	typeProto.preloadCanvas2D = function (ctx)
+	{
+		// draw to preload, browser should lazy load the texture
+		ctx.drawImage(this.texture_img, 0, 0);
+	};
+
+	/////////////////////////////////////
+	// Instance class
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+	};
+
+	var instanceProto = pluginProto.Instance.prototype;
+
+	instanceProto.onDestroy = function()
+	{
+		// recycle the instance's objects
+		freeAllLines (this.lines);
+		freeAllClip  (this.clipList);
+		freeAllClipUV(this.clipUV);
+		cr.wipe(this.characterWidthList);
+	};
+
+	instanceProto.onCreate = function()
+	{
+		this.texture_img      = this.type.texture_img;
+		this.text             = this.properties[0];
+		this.characterWidth   = this.properties[1];
+		this.characterHeight  = this.properties[2];
+		this.characterSet     = this.properties[3];
+		var spacingData = this.properties[4];
+		this.characterScale   = this.properties[5];
+		this.characterSpacing = this.properties[6];
+		this.lineHeight       = this.properties[7];
+		this.halign           = this.properties[8]/2.0;		// 0=left, 1=center, 2=right
+		this.valign           = this.properties[9]/2.0;		// 0=top, 1=center, 2=bottom
+		this.wrapbyword       = (this.properties[10] === 0);	// 0=word, 1=character
+		this.visible          = this.properties[11];
+		this.textWidth  = 0;
+		this.textHeight = 0;
+
+		// Use recycled properties to avoid garbage
+		if (this.recycled)
+		{
+			cr.clearArray(this.lines);
+			cr.wipe(this.clipList);
+			cr.wipe(this.clipUV);
+			cr.wipe(this.characterWidthList);
+		}
+		else
+		{
+			this.lines = [];
+			this.clipList = {};
+			this.clipUV = {};
+			this.characterWidthList = {};
+		}
+		
+		// only update text if it changes
+		this.text_changed = true;
+		
+		// only update line calculations if this change
+		this.lastwrapwidth = this.width;
+
+		if (this.runtime.glwrap)
+		{
+			// Create WebGL texture if type doesn't have it yet
+			if (!this.type.webGL_texture)
+			{
+				this.type.webGL_texture = this.runtime.glwrap.loadTexture(this.type.texture_img, false, this.runtime.linearSampling, this.type.texture_pixelformat);
+			}
+
+			this.webGL_texture = this.type.webGL_texture;
+		}
+		
+		this.LoadCharacterSpacingData(spacingData);
+
+		this.SplitSheet();
+	};
+
+	instanceProto.saveToJSON = function ()
+	{
+		var save = {
+			"t": this.text,
+			"csc": this.characterScale,
+			"csp": this.characterSpacing,
+			"lh": this.lineHeight,
+			"tw": this.textWidth,
+			"th": this.textHeight,
+			"lrt": this.last_render_tick,
+			"ha": this.halign,
+			"va": this.valign,
+			"cw": {}
+		};
+
+		for (var ch in this.characterWidthList)
+			save["cw"][ch] = this.characterWidthList[ch];
+
+		return save;
+	};
+
+	instanceProto.loadFromJSON = function (o)
+	{
+		this.text = o["t"];
+		this.characterScale = o["csc"];
+		this.characterSpacing = o["csp"];
+		this.lineHeight = o["lh"];
+		this.textWidth = o["tw"];
+		this.textHeight = o["th"];
+		this.last_render_tick = o["lrt"];
+		
+		// alignment properties added for r205
+		if (o.hasOwnProperty("ha"))
+			this.halign = o["ha"];
+		
+		if (o.hasOwnProperty("va"))
+			this.valign = o["va"];
+
+		for(var ch in o["cw"])
+			this.characterWidthList[ch] = o["cw"][ch];
+
+		this.text_changed = true;
+		this.lastwrapwidth = this.width;
+	};
+
+
+	function trimRight(text)
+	{
+		return text.replace(/\s\s*$/, '');
+	}
+
+	// return what's in the cache
+	// if the cache is empty, return a new object 
+	// based on the given Constructor
+	var MAX_CACHE_SIZE = 1000;
+	function alloc(cache,Constructor)
+	{
+		if (cache.length)
+			return cache.pop();
+		else
+			return new Constructor();
+	}
+
+	// store the data in the cache
+	function free(cache,data)
+	{
+		if (cache.length < MAX_CACHE_SIZE)
+		{
+			cache.push(data);
+		}
+	}
+
+	// store all the data from dataList in the cache
+	// and wipe dataList
+	function freeAll(cache,dataList,isArray)
+	{
+		if (isArray) {
+			var i, len;
+			for (i = 0, len = dataList.length; i < len; i++)
+			{
+				free(cache,dataList[i]);
+			}
+			cr.clearArray(dataList);
+		} else {
+			var prop;
+			for(prop in dataList) {
+				if(Object.prototype.hasOwnProperty.call(dataList,prop)) {
+					free(cache,dataList[prop]);
+					delete dataList[prop];
+				}
+			}
+		}
+	}
+
+	function addLine(inst,lineIndex,cur_line) {
+		var lines = inst.lines;
+		var line;
+		cur_line = trimRight(cur_line);
+		// Recycle a line if possible
+		if (lineIndex >= lines.length)
+			lines.push(allocLine());
+
+		line = lines[lineIndex];
+		line.text = cur_line;
+		line.width = inst.measureWidth(cur_line);
+		inst.textWidth = cr.max(inst.textWidth,line.width);
+	}
+
+	var linesCache = [];
+	function allocLine()       { return alloc(linesCache,Object); }
+	function freeLine(l)       { free(linesCache,l); }
+	function freeAllLines(arr) { freeAll(linesCache,arr,true); }
+
+
+	function addClip(obj,property,x,y,w,h) {
+		if (obj[property] === undefined) {
+			obj[property] = alloc(clipCache,Object);
+		}
+
+		obj[property].x = x;
+		obj[property].y = y;
+		obj[property].w = w;
+		obj[property].h = h;
+	}
+	var clipCache = [];
+	function allocClip()      { return alloc(clipCache,Object); }
+	function freeAllClip(obj) { freeAll(clipCache,obj,false);}
+
+	function addClipUV(obj,property,left,top,right,bottom) {
+		if (obj[property] === undefined) {
+			obj[property] = alloc(clipUVCache,cr.rect);
+		}
+
+		obj[property].left   = left;
+		obj[property].top    = top;
+		obj[property].right  = right;
+		obj[property].bottom = bottom;
+	}
+	var clipUVCache = [];
+	function allocClipUV()      { return alloc(clipUVCache,cr.rect);}
+	function freeAllClipUV(obj) { freeAll(clipUVCache,obj,false);}
+
+
+	instanceProto.SplitSheet = function() {
+		// Create Clipping regions for each letters of the spritefont sheet
+		var texture      = this.texture_img;
+		var texWidth	 = this.texture_img.width;
+		var texHeight    = this.texture_img.height;
+		var spriteWidth  = this.type.spriteWidth;
+		var spriteHeight = this.type.spriteHeight;
+		var offx		 = this.type.spriteX;
+		var offy		 = this.type.spriteY;
+		var charWidth    = this.characterWidth;
+		var charHeight   = this.characterHeight;
+		var offu         = offx / texWidth;
+		var offv         = offy / texHeight;
+		var charU        = charWidth / texWidth;
+		var charV        = charHeight / texHeight;
+		var charSet      = this.characterSet ;
+
+		var cols = Math.floor(spriteWidth/charWidth);
+		var rows = Math.floor(spriteHeight/charHeight);
+
+		for ( var c = 0; c < charSet.length; c++) {
+			// not enough texture space
+			if  (c >= cols * rows) break;
+
+			// create clipping coordinates for each characters
+			var x = c%cols;
+			var y = Math.floor(c/cols);
+			var letter = charSet.charAt(c);
+			if (this.runtime.glwrap) {
+				addClipUV(
+					this.clipUV, letter,
+					x * charU + offu,
+					y * charV + offv,
+					(x+1) * charU + offu,
+					(y+1) * charV + offv
+				);
+			} else {
+				addClip(
+					this.clipList, letter,
+					x * charWidth + offx,
+					y * charHeight + offy,
+					charWidth,
+					charHeight
+				);
+			}
+		}
+	};
+
+	/*
+     *	Word-Wrapping
+     */
+
+	var wordsCache = [];
+	pluginProto.TokeniseWords = function (text)
+	{
+		cr.clearArray(wordsCache);
+		var cur_word = "";
+		var ch;
+
+		// Loop every char
+		var i = 0;
+
+		while (i < text.length)
+		{
+			ch = text.charAt(i);
+
+			if (ch === "\n")
+			{
+				// Dump current word if any
+				if (cur_word.length)
+				{
+					wordsCache.push(cur_word);
+					cur_word = "";
+				}
+
+				// Add newline word
+				wordsCache.push("\n");
+
+				++i;
+			}
+			// Whitespace or hyphen: swallow rest of whitespace and include in word
+			else if (ch === " " || ch === "\t" || ch === "-")
+			{
+				do {
+					cur_word += text.charAt(i);
+					i++;
+				}
+				while (i < text.length && (text.charAt(i) === " " || text.charAt(i) === "\t"));
+
+				wordsCache.push(cur_word);
+				cur_word = "";
+			}
+			else if (i < text.length)
+			{
+				cur_word += ch;
+				i++;
+			}
+		}
+
+		// Append leftover word if any
+		if (cur_word.length)
+			wordsCache.push(cur_word);
+	};
+
+
+	pluginProto.WordWrap = function (inst)
+	{
+		var text = inst.text;
+		var lines = inst.lines;
+
+		if (!text || !text.length)
+		{
+			freeAllLines(lines);
+			return;
+		}
+
+		var width = inst.width;
+		if (width <= 2.0)
+		{
+			freeAllLines(lines);
+			return;
+		}
+
+
+		// If under 100 characters (i.e. a fairly short string), try a short string optimisation: just measure the text
+		// and see if it fits on one line, without going through the tokenise/wrap.
+		// Text musn't contain a linebreak!
+		var charWidth = inst.characterWidth;
+		var charScale = inst.characterScale;
+		var charSpacing = inst.characterSpacing;
+		if ( (text.length * (charWidth * charScale + charSpacing) - charSpacing) <= width && text.indexOf("\n") === -1)
+		{
+			var all_width = inst.measureWidth(text);
+
+			if (all_width <= width)
+			{
+				// fits on one line
+				freeAllLines(lines);
+				lines.push(allocLine());
+				lines[0].text = text;
+				lines[0].width = all_width;
+				inst.textWidth  = all_width;
+				inst.textHeight = inst.characterHeight * charScale + inst.lineHeight;
+				return;
+			}
+		}
+
+		var wrapbyword = inst.wrapbyword;
+
+		this.WrapText(inst);
+		inst.textHeight = lines.length * (inst.characterHeight * charScale + inst.lineHeight);
+	};
+
+	pluginProto.WrapText = function (inst)
+	{
+		var wrapbyword = inst.wrapbyword;
+		var text       = inst.text;
+		var lines      = inst.lines;
+		var width      = inst.width;
+
+		var wordArray;
+		if (wrapbyword) {
+			this.TokeniseWords(text);	// writes to wordsCache
+			wordArray = wordsCache;
+		} else {
+			wordArray = text;
+		}
+		var cur_line = "";
+		var prev_line;
+		var line_width;
+		var i;
+		var lineIndex = 0;
+		var line;
+		var ignore_newline = false;
+
+		for (i = 0; i < wordArray.length; i++)
+		{
+			// Look for newline
+			if (wordArray[i] === "\n")
+			{
+				if (ignore_newline === true) {
+					// if a newline as been added by the wrapping
+					// we ignore any happening just after
+					ignore_newline = false;
+				} else {
+					// Flush line.  
+					addLine(inst,lineIndex,cur_line);
+					lineIndex++;
+				}
+				cur_line = "";
+				continue;
+			}
+			ignore_newline = false;
+
+			// Otherwise add to line
+			prev_line = cur_line;
+			cur_line += wordArray[i];
+
+			// Measure line
+			line_width = inst.measureWidth(trimRight(cur_line));
+
+			// Line too long: wrap the line before this word was added
+			if (line_width > width)
+			{
+
+				if (prev_line === "") {
+					// if it's the first word, we push it on the line
+					// to avoid an unnecessary blank line
+					// and since we are wrapping, we ignore the next newline if any
+					addLine(inst,lineIndex,cur_line);
+					cur_line = "";
+					ignore_newline = true;
+				} else {
+					// else we push the previous line
+					addLine(inst,lineIndex,prev_line);
+					cur_line = wordArray[i];
+				}
+
+				lineIndex++;
+
+				// Wrapping by character: avoid lines starting with spaces
+				if (!wrapbyword && cur_line === " ")
+					cur_line = "";
+			}
+		}
+
+		// Add any leftover line
+		if (trimRight(cur_line).length)
+		{
+			addLine(inst,lineIndex,cur_line);
+
+			lineIndex++;
+		}
+
+		// truncate lines to the number that were used. recycle any spare line objects
+		for (i = lineIndex; i < lines.length; i++)
+			freeLine(lines[i]);
+
+		lines.length = lineIndex;
+	};
+
+	instanceProto.measureWidth = function(text) {
+		var spacing = this.characterSpacing;
+		var len     = text.length;
+		var width   = 0;
+		for (var i = 0; i < len; i++) {
+			width += this.getCharacterWidth(text.charAt(i)) * this.characterScale + spacing;
+		}
+		// we remove the trailing spacing
+		width -= (width > 0) ? spacing : 0;
+		return width;
+	};
+
+	/***/
+
+
+	instanceProto.getCharacterWidth = function(character) {
+		var widthList = this.characterWidthList;
+		if (widthList[character] !== undefined) {
+			// special width
+			return widthList[character];
+		} else {
+			// common width
+			return this.characterWidth;
+		}
+	};
+
+	instanceProto.rebuildText = function() {
+		// If text has changed, run the word wrap.
+		if (this.text_changed || this.width !== this.lastwrapwidth) {
+			this.textWidth = 0;
+			this.textHeight = 0;
+			this.type.plugin.WordWrap(this);
+			this.text_changed = false;
+			this.lastwrapwidth = this.width;
+		}
+	};
+    
+    // to handle floating point imprecision
+	var EPSILON = 0.00001;
+	instanceProto.draw = function(ctx, glmode)
+	{
+		var texture = this.texture_img;
+		if (this.text !== "" && texture != null) {
+
+			//console.log("draw");
+
+			this.rebuildText();
+
+			// textWidth and textHeight needs to be calculated here
+			// since we can early exit if bounding box is too tiny to draw anything
+			// be we would still like to know the dimension of the text according to current width
+			if (this.height < this.characterHeight*this.characterScale + this.lineHeight) {
+				return;
+			}
+
+			ctx.globalAlpha = this.opacity;
+
+
+			var myx = this.x;
+			var myy = this.y;
+
+			if (this.runtime.pixel_rounding)
+			{
+				myx = Math.round(myx);
+				myy = Math.round(myy);
+			}
+			
+			// Viewport dimensions
+			var viewLeft = this.layer.viewLeft;
+			var viewTop = this.layer.viewTop;
+			var viewRight = this.layer.viewRight;
+			var viewBottom = this.layer.viewBottom;
+
+			ctx.save();
+			ctx.translate(myx, myy);
+			ctx.rotate(this.angle);
+
+			// convert alignement properties to some usable values
+			// useful parameters
+			var angle      = this.angle;
+			var ha         = this.halign;
+			var va         = this.valign;
+			var scale      = this.characterScale;
+			var charHeight = this.characterHeight * scale;
+			var lineHeight = this.lineHeight;
+			var charSpace  = this.characterSpacing;
+			var lines = this.lines;
+			var textHeight = this.textHeight;
+			var letterWidth;
+
+			// we compute the offsets for vertical alignement in object-space
+			// but it can't be negative, else it would underflow the boundingbox
+			// horizontal alignement is evaluated for each line
+			var halign;
+			var valign = va * cr.max(0,(this.height - textHeight));
+
+			// we get the position of the top left corner of the bounding box
+			var offx = -(this.hotspotX * this.width);
+			var offy = -(this.hotspotY * this.height);
+			// we add to that any extra offset 
+			// for vertical alignement
+			offy += valign;
+
+			var drawX ;
+			var drawY = offy;
+			var roundX, roundY;
+
+			for(var i = 0; i < lines.length; i++) {
+				// for horizontal alignement, we need to work line by line
+				var line = lines[i].text;
+				var len  = lines[i].width;
+
+				// compute horizontal empty space
+				// offset drawX according to horizontal alignement
+				// indentation could be negative if long word in wrapbyword mode
+				halign = ha * cr.max(0,this.width - len);		
+				drawX = offx + halign;
+
+				// we round to avoid pixel blurring
+				drawY += lineHeight;
+				
+				// above viewport: skip rendering this line
+				if (angle === 0 && myy + drawY + charHeight < viewTop)
+				{
+					drawY += charHeight;
+					continue;
+				}
+			
+				for(var j = 0; j < line.length; j++) {
+
+					var letter = line.charAt(j);
+					letterWidth = this.getCharacterWidth(letter);
+					// we skip unrecognized characters (creates a space)
+					var clip = this.clipList[letter];
+					
+					// still off to the left of the viewport: skip drawing this character
+					if (angle === 0 && myx + drawX + letterWidth * scale + charSpace < viewLeft)
+					{
+						drawX += letterWidth * scale + charSpace;
+						continue;
+					}
+
+					// check if next letter fits in bounding box
+					if ( drawX + letterWidth * scale > this.width + EPSILON ) {
+						break;
+					}
+
+					if (clip !== undefined) {
+
+						roundX = drawX;
+						roundY = drawY;
+						
+						if (angle === 0 && scale === 1)
+						{
+							roundX = Math.round(roundX);
+							roundY = Math.round(roundY);
+						}
+						
+						ctx.drawImage( this.texture_img,
+									 clip.x, clip.y, clip.w, clip.h,
+									 roundX,roundY,clip.w*scale,clip.h*scale);
+					}
+
+					drawX += letterWidth * scale + charSpace;
+					
+					// Line extended off viewport to right: skip drawing rest of line
+					if (angle === 0 && myx + drawX > viewRight)
+						break;
+				}
+				drawY += charHeight;
+
+				// check if next row fits in bounding box and viewport and quit drawing if so
+				if (angle === 0 && (drawY + charHeight + lineHeight > this.height || myy + drawY > viewBottom))
+				{
+					break;
+				}
+			}
+			ctx.restore();
+		}
+
+	};
+
+	// drawingQuad
+	var dQuad = new cr.quad();
+
+	function rotateQuad(quad,cosa,sina) {
+		var x_temp;
+
+		x_temp   = (quad.tlx * cosa) - (quad.tly * sina);
+		quad.tly = (quad.tly * cosa) + (quad.tlx * sina);
+		quad.tlx = x_temp;
+
+		x_temp    = (quad.trx * cosa) - (quad.try_ * sina);
+		quad.try_ = (quad.try_ * cosa) + (quad.trx * sina);
+		quad.trx  = x_temp;
+
+		x_temp   = (quad.blx * cosa) - (quad.bly * sina);
+		quad.bly = (quad.bly * cosa) + (quad.blx * sina);
+		quad.blx = x_temp;
+
+		x_temp    = (quad.brx * cosa) - (quad.bry * sina);
+		quad.bry = (quad.bry * cosa) + (quad.brx * sina);
+		quad.brx  = x_temp;
+
+	}
+
+	instanceProto.drawGL = function(glw)
+	{
+		glw.setTexture(this.webGL_texture);
+		glw.setOpacity(this.opacity);
+
+		if (!this.text)
+			return;
+
+		// If text has changed, run the word wrap.
+		this.rebuildText();
+
+		// textWidth and textHeight needs to be calculated here
+		// since we can early exit if bounding box is too tiny to draw anything
+		// be we would still like to know the dimension of the text according to current width
+		if (this.height < this.characterHeight*this.characterScale + this.lineHeight) {
+			return;
+		}
+
+		this.update_bbox();
+		var q = this.bquad;
+		var ox = 0;
+		var oy = 0;
+		if (this.runtime.pixel_rounding)
+		{
+			ox = Math.round(this.x) - this.x;
+			oy = Math.round(this.y) - this.y;
+		}
+		
+		// Viewport dimensions
+		var viewLeft = this.layer.viewLeft;
+		var viewTop = this.layer.viewTop;
+		var viewRight = this.layer.viewRight;
+		var viewBottom = this.layer.viewBottom;
+
+		// convert alignement properties to some usable values
+		// useful parameters
+		var angle      = this.angle;
+		var ha         = this.halign;
+		var va         = this.valign;
+		var scale      = this.characterScale;
+		var charHeight = this.characterHeight * scale;   // to precalculate in onCreate or on change
+		var lineHeight = this.lineHeight;
+		var charSpace  = this.characterSpacing;
+		var lines = this.lines;
+		var textHeight = this.textHeight;
+		var letterWidth;
+
+		var cosa,sina;
+		if (angle !== 0) 
+		{
+			cosa = Math.cos(angle);
+			sina = Math.sin(angle);
+		}
+
+		// we compute the offsets for vertical alignement in object-space
+		// but it can't be negative, else it would underflow the boundingbox
+		var halign;
+		var valign = va * cr.max(0,(this.height - textHeight));
+
+		// we get the position of the top left corner of the bounding box
+		var offx = q.tlx + ox;
+		var offy = q.tly + oy;
+
+
+		var drawX ;
+		var drawY = valign;
+		var roundX, roundY;
+		
+		// TODO: this drawing algorithm iterates characters in their position relative to the text box,
+		// but possibly renders them at an angle. To optimise rendering it compares the text box relative position to the viewport
+		// to skip offscreen lines/characters, but this is only valid to do when the object is not rotated, so currently we have
+		// to turn off these optimisations for rotated text. A better algorithm would be to iterate the rendered positions so
+		// we can tell if the rendered location is offscreen or not, allowing the optimisations to work correctly with rotated text.
+
+		for(var i = 0; i < lines.length; i++) {
+			// for horizontal alignement, we need to work line by line
+			var line       = lines[i].text;
+			var lineWidth  = lines[i].width;
+
+			// compute horizontal empty space
+			// offset drawX according to horizontal alignement
+			// indentation could be negative if long word in wrapbyword mode
+			halign = ha * cr.max(0,this.width - lineWidth);
+			//halign = Math.floor(ha * cr.max(0,this.width - lineWidth));
+			drawX = halign;
+
+			// we round to avoid pixel blurring
+			drawY += lineHeight;
+			
+			// above viewport: skip rendering this line
+			if (angle === 0 && offy + drawY + charHeight < viewTop)
+			{
+				drawY += charHeight;
+				continue;
+			}
+			
+			for(var j = 0; j < line.length; j++) {
+
+				var letter = line.charAt(j);
+				letterWidth = this.getCharacterWidth(letter);
+				var clipUV = this.clipUV[letter];
+				
+				// still off to the left of the viewport: skip drawing this character
+				if (angle === 0 && offx + drawX + letterWidth * scale + charSpace < viewLeft)
+				{
+					drawX += letterWidth * scale + charSpace;
+					continue;
+				}
+
+				// check if next letter fits in bounding box
+				if (drawX + letterWidth * scale > this.width + EPSILON)
+				{
+					break;
+				}
+
+				// we skip unrecognized characters (creates a space)
+				if (clipUV !== undefined) {
+					var clipWidth  = this.characterWidth*scale;
+					var clipHeight = this.characterHeight*scale;
+
+					roundX = drawX;
+					roundY = drawY;
+					
+					if (angle === 0 && scale === 1)
+					{
+						roundX = Math.round(roundX);
+						roundY = Math.round(roundY);
+					}
+					
+					// we build the quad
+					dQuad.tlx  = roundX;
+					dQuad.tly  = roundY;
+					dQuad.trx  = roundX + clipWidth;
+					dQuad.try_ = roundY ;
+					dQuad.blx  = roundX;
+					dQuad.bly  = roundY + clipHeight;
+					dQuad.brx  = roundX + clipWidth;
+					dQuad.bry  = roundY + clipHeight;
+
+					// we then rotate the quad around 0,0
+					// if necessary
+					if(angle !== 0)
+					{
+						rotateQuad(dQuad,cosa,sina);
+					}
+					// we then apply the world space offset
+					dQuad.offset(offx,offy);
+
+					// and render
+					glw.quadTex(
+						dQuad.tlx, dQuad.tly,
+						dQuad.trx, dQuad.try_,
+						dQuad.brx, dQuad.bry,
+						dQuad.blx, dQuad.bly,
+						clipUV
+					);
+				}
+
+				drawX += letterWidth * scale + charSpace;
+				
+				// Line extended off viewport to right: skip drawing rest of line
+				if (angle === 0 && offx + drawX > viewRight)
+					break;
+			}
+			
+			drawY += charHeight;
+			
+			// check if next row fits in bounding box and viewport and quit drawing if so
+			if (angle === 0 && (drawY + charHeight + lineHeight > this.height || offy + drawY > viewBottom))
+			{
+				break;
+			}
+		}
+
+	};
+	
+
+	//////////////////////////////////////
+	// Conditions
+	function Cnds() {}
+
+	Cnds.prototype.CompareText = function(text_to_compare, case_sensitive)
+	{
+		if (case_sensitive)
+			return this.text == text_to_compare;
+		else
+			return cr.equals_nocase(this.text, text_to_compare);
+	};
+
+	pluginProto.cnds = new Cnds();
+
+	//////////////////////////////////////
+	// Actions
+	function Acts() {}
+
+	Acts.prototype.SetText = function(param)
+	{
+		if (cr.is_number(param) && param < 1e9)
+			param = Math.round(param * 1e10) / 1e10;	// round to nearest ten billionth - hides floating point errors
+
+		var text_to_set = param.toString();
+
+		if (this.text !== text_to_set)
+		{
+			this.text = text_to_set;
+			this.text_changed = true;
+			this.runtime.redraw = true;
+		}
+	};
+
+	Acts.prototype.AppendText = function(param)
+	{
+		if (cr.is_number(param))
+			param = Math.round(param * 1e10) / 1e10;	// round to nearest ten billionth - hides floating point errors
+
+		var text_to_append = param.toString();
+
+		if (text_to_append)	// not empty
+		{
+			this.text += text_to_append;
+			this.text_changed = true;
+			this.runtime.redraw = true;
+		}
+	};
+
+	Acts.prototype.SetScale = function(param)
+	{
+		if (param !== this.characterScale) {
+			this.characterScale = param;
+			this.text_changed = true;
+			this.runtime.redraw = true;
+		}
+	};
+
+	Acts.prototype.SetCharacterSpacing = function(param)
+	{
+		if (param !== this.CharacterSpacing) {
+			this.characterSpacing = param;
+			this.text_changed = true;
+			this.runtime.redraw = true;
+		}
+	};
+
+	Acts.prototype.SetLineHeight = function(param)
+	{
+		if (param !== this.lineHeight) {
+			this.lineHeight = param;
+			this.text_changed = true;
+			this.runtime.redraw = true;
+		}
+	};
+
+	// Utility method to set single character width
+	instanceProto.SetCharWidth = function(character,width) {
+		var w = parseInt(width,10);
+		if (this.characterWidthList[character] !== w) {
+			this.characterWidthList[character] = w;
+			this.text_changed = true;
+			this.runtime.redraw = true;
+		}
+	};
+	
+	// Called on startup to load the "Spacing data" property (which is passed as a string)
+	instanceProto.LoadCharacterSpacingData = function (dataStr)
+	{
+		var arr, i, len, entry, width, str, j, lenj;
+		
+		if (!dataStr)
+			return;
+		
+		try {
+			arr = JSON.parse(dataStr);
+		}
+		catch (e) {
+			return;		// invalid JSON data
+		}
+		
+		if (!Array.isArray(arr))
+			return;
+		
+		for (i = 0, len = arr.length; i < len; ++i)
+		{
+			entry = arr[i];
+			
+			if (!Array.isArray(entry) || entry.length !== 2 || typeof entry[0] !== "number" || typeof entry[1] !== "string")
+				continue;		// not a valid entry
+			
+			// Apply this entry's width for every character in the string
+			width = entry[0];
+			str = entry[1];
+			
+			// TODO: unicode support with spread
+			for (j = 0, lenj = str.length; j < lenj; ++j)
+				this.SetCharWidth(str.charAt(j), width);
+		}
+	};
+
+	// Action to modify spacing data at runtime
+	Acts.prototype.SetCharacterWidth = function(characterSet,width)
+	{
+		if (characterSet !== "") {
+			for(var c = 0; c < characterSet.length; c++) {
+				this.SetCharWidth(characterSet.charAt(c),width);
+			}
+		}
+	};
+	
+	Acts.prototype.SetEffect = function (effect)
+	{
+		this.blend_mode = effect;
+		this.compositeOp = cr.effectToCompositeOp(effect);
+		cr.setGLBlend(this, effect, this.runtime.gl);
+		this.runtime.redraw = true;
+	};
+	
+	Acts.prototype.SetHAlign = function (a)
+	{
+		this.halign = a / 2.0;
+		this.text_changed = true;
+		this.runtime.redraw = true;
+	};
+	
+	Acts.prototype.SetVAlign = function (a)
+	{
+		this.valign = a / 2.0;
+		this.text_changed = true;
+		this.runtime.redraw = true;
+	};
+
+	pluginProto.acts = new Acts();
+
+	//////////////////////////////////////
+	// Expressions
+	function Exps() {}
+
+	Exps.prototype.CharacterWidth = function(ret,character)
+	{
+		ret.set_int(this.getCharacterWidth(character));
+	};
+
+	Exps.prototype.CharacterHeight = function(ret)
+	{
+		ret.set_int(this.characterHeight);
+	};
+
+	Exps.prototype.CharacterScale = function(ret)
+	{
+		ret.set_float(this.characterScale);
+	};
+
+	Exps.prototype.CharacterSpacing = function(ret)
+	{
+		ret.set_int(this.characterSpacing);
+	};
+
+	Exps.prototype.LineHeight = function(ret)
+	{
+		ret.set_int(this.lineHeight);
+	};
+
+	Exps.prototype.Text = function(ret)
+	{
+		ret.set_string(this.text);
+	};
+	Exps.prototype.TextWidth = function (ret)
+	{
+		this.rebuildText();
+		ret.set_float(this.textWidth);
+	};
+
+	Exps.prototype.TextHeight = function (ret)
+	{
+		this.rebuildText();
+		ret.set_float(this.textHeight);
+	};
+
+	pluginProto.exps = new Exps();
+
+}());
+
 // Solid
 // ECMAScript 5 strict mode
 
@@ -35205,6 +37176,220 @@ cr.behaviors.destroy = function(runtime)
 	
 }());
 
+// Timer
+// ECMAScript 5 strict mode
+
+;
+;
+
+/////////////////////////////////////
+// Behavior class
+cr.behaviors.Timer = function(runtime)
+{
+	this.runtime = runtime;
+};
+
+(function ()
+{
+	var behaviorProto = cr.behaviors.Timer.prototype;
+		
+	/////////////////////////////////////
+	// Behavior type class
+	behaviorProto.Type = function(behavior, objtype)
+	{
+		this.behavior = behavior;
+		this.objtype = objtype;
+		this.runtime = behavior.runtime;
+	};
+	
+	var behtypeProto = behaviorProto.Type.prototype;
+
+	behtypeProto.onCreate = function()
+	{
+	};
+
+	/////////////////////////////////////
+	// Behavior instance class
+	behaviorProto.Instance = function(type, inst)
+	{
+		this.type = type;
+		this.behavior = type.behavior;
+		this.inst = inst;				// associated object instance to modify
+		this.runtime = type.runtime;
+	};
+	
+	var behinstProto = behaviorProto.Instance.prototype;
+
+	behinstProto.onCreate = function()
+	{
+		this.timers = {};
+	};
+	
+	behinstProto.onDestroy = function ()
+	{
+		cr.wipe(this.timers);
+	};
+	
+	// called when saving the full state of the game
+	behinstProto.saveToJSON = function ()
+	{
+		var o = {};
+		
+		var p, t;
+		for (p in this.timers)
+		{
+			if (this.timers.hasOwnProperty(p))
+			{
+				t = this.timers[p];
+				
+				o[p] = {
+					"c": t.current.sum,
+					"t": t.total.sum,
+					"d": t.duration,
+					"r": t.regular
+				};
+			}
+		}
+		
+		return o;
+	};
+	
+	// called when loading the full state of the game
+	behinstProto.loadFromJSON = function (o)
+	{
+		this.timers = {};
+		
+		var p;
+		for (p in o)
+		{
+			if (o.hasOwnProperty(p))
+			{
+				this.timers[p] = {
+					current: new cr.KahanAdder(),
+					total: new cr.KahanAdder(),
+					duration: o[p]["d"],
+					regular: o[p]["r"]
+				};
+				
+				this.timers[p].current.sum = o[p]["c"];
+				this.timers[p].total.sum = o[p]["t"];
+			}
+		}
+	};
+
+	behinstProto.tick = function ()
+	{
+		var dt = this.runtime.getDt(this.inst);
+		
+		var p, t;
+		
+		for (p in this.timers)
+		{
+			if (this.timers.hasOwnProperty(p))
+			{
+				t = this.timers[p];
+				t.current.add(dt);
+				t.total.add(dt);
+			}
+		}
+	};
+	
+	behinstProto.tick2 = function ()
+	{
+		// Reset any regular timers and remove any one-off timers
+		var p, t;
+		
+		for (p in this.timers)
+		{
+			if (this.timers.hasOwnProperty(p))
+			{
+				t = this.timers[p];
+				
+				if (t.current.sum >= t.duration)
+				{
+					if (t.regular)
+						t.current.sum -= t.duration;
+					else
+						delete this.timers[p];
+				}
+			}
+		}
+	};
+	
+
+	//////////////////////////////////////
+	// Conditions
+	function Cnds() {};
+
+	Cnds.prototype.OnTimer = function (tag_)
+	{
+		tag_ = tag_.toLowerCase();
+		
+		var t = this.timers[tag_];
+		
+		if (!t)
+			return false;
+		
+		return t.current.sum >= t.duration;
+	};
+	
+	Cnds.prototype.IsTimerRunning = function (tag_)
+	{
+		return this.timers.hasOwnProperty(tag_.toLowerCase());
+	};
+
+	behaviorProto.cnds = new Cnds();
+
+	//////////////////////////////////////
+	// Actions
+	function Acts() {};
+
+	Acts.prototype.StartTimer = function (duration_, type_, tag_)
+	{
+		this.timers[tag_.toLowerCase()] = {
+			current: new cr.KahanAdder(),
+			total: new cr.KahanAdder(),
+			duration: duration_,
+			regular: (type_ === 1)
+		};
+	};
+	
+	Acts.prototype.StopTimer = function (tag_)
+	{
+		tag_ = tag_.toLowerCase();
+		
+		if (this.timers.hasOwnProperty(tag_))
+			delete this.timers[tag_];
+	};
+	
+	behaviorProto.acts = new Acts();
+
+	//////////////////////////////////////
+	// Expressions
+	function Exps() {};
+
+	Exps.prototype.CurrentTime = function (ret, tag_)
+	{
+		var t = this.timers[tag_.toLowerCase()];
+		ret.set_float(t ? t.current.sum : 0);
+	};
+	
+	Exps.prototype.TotalTime = function (ret, tag_)
+	{
+		var t = this.timers[tag_.toLowerCase()];
+		ret.set_float(t ? t.total.sum : 0);
+	};
+	
+	Exps.prototype.Duration = function (ret, tag_)
+	{
+		var t = this.timers[tag_.toLowerCase()];
+		ret.set_float(t ? t.duration : 0);
+	};
+	
+	behaviorProto.exps = new Exps();
+	
+}());
+
 // Fade
 // ECMAScript 5 strict mode
 
@@ -36778,6 +38963,7 @@ cr.getObjectRefTable = function () {
 		cr.behaviors.Platform,
 		cr.behaviors.destroy,
 		cr.plugins_.Keyboard,
+		cr.behaviors.Timer,
 		cr.plugins_.gamepad,
 		cr.behaviors.Fade,
 		cr.behaviors.Bullet,
@@ -36793,6 +38979,8 @@ cr.getObjectRefTable = function () {
 		cr.behaviors.Flash,
 		cr.behaviors.Rotate,
 		cr.plugins_.sliderbar,
+		cr.plugins_.Particles,
+		cr.plugins_.Spritefont2,
 		cr.plugins_.Function.prototype.cnds.OnFunction,
 		cr.system_object.prototype.acts.SetBoolVar,
 		cr.system_object.prototype.acts.SetTimescale,
@@ -36800,19 +38988,22 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.acts.SetVar,
 		cr.system_object.prototype.acts.RestartLayout,
 		cr.system_object.prototype.acts.ToggleBoolVar,
-		cr.plugins_.Text.prototype.acts.SetText,
+		cr.plugins_.Spritefont2.prototype.acts.SetText,
+		cr.plugins_.Spritefont2.prototype.acts.SetOpacity,
 		cr.behaviors.Fade.prototype.acts.RestartFade,
-		cr.plugins_.Text.prototype.acts.SetOpacity,
 		cr.plugins_.Keyboard.prototype.cnds.OnKey,
 		cr.plugins_.Function.prototype.acts.CallFunction,
 		cr.system_object.prototype.cnds.OnLayoutStart,
+		cr.system_object.prototype.acts.CreateObject,
 		cr.plugins_.Sprite.prototype.acts.Destroy,
 		cr.system_object.prototype.acts.SetMinimumFramerate,
+		cr.plugins_.Tilemap.prototype.acts.SetEffectEnabled,
+		cr.plugins_.Sprite.prototype.acts.SetEffectEnabled,
 		cr.system_object.prototype.cnds.CompareBoolVar,
 		cr.system_object.prototype.cnds.Else,
 		cr.plugins_.Sprite.prototype.acts.SetVisible,
 		cr.system_object.prototype.cnds.CompareVar,
-		cr.plugins_.Text.prototype.cnds.CompareInstanceVar,
+		cr.plugins_.Spritefont2.prototype.cnds.CompareInstanceVar,
 		cr.plugins_.Arr.prototype.cnds.ArrForEach,
 		cr.plugins_.Arr.prototype.cnds.CompareXY,
 		cr.plugins_.Arr.prototype.exps.CurX,
@@ -36828,7 +39019,6 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Text.prototype.acts.SetVisible,
 		cr.system_object.prototype.cnds.ForEach,
 		cr.plugins_.Sprite.prototype.exps.AnimationFrame,
-		cr.system_object.prototype.acts.CreateObject,
 		cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 		cr.plugins_.Sprite.prototype.acts.SetTowardPosition,
 		cr.plugins_.Sprite.prototype.acts.SetWidth,
@@ -36849,12 +39039,15 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.exps.layerindex,
 		cr.system_object.prototype.acts.SetLayerVisible,
 		cr.behaviors.Fade.prototype.acts.SetWaitTime,
-		cr.behaviors.Fade.prototype.acts.SetFadeInTime,
 		cr.plugins_.gamepad.prototype.cnds.IsButtonDown,
 		cr.behaviors.Platform.prototype.acts.SetVectorY,
 		cr.behaviors.Flash.prototype.cnds.IsFlashing,
 		cr.plugins_.gamepad.prototype.cnds.CompareAxis,
 		cr.behaviors.Platform.prototype.acts.SetVectorX,
+		cr.system_object.prototype.exps.max,
+		cr.system_object.prototype.exps.abs,
+		cr.plugins_.gamepad.prototype.exps.Axis,
+		cr.system_object.prototype.exps.min,
 		cr.behaviors.Bullet.prototype.acts.SetAngleOfMotion,
 		cr.system_object.prototype.exps.angle,
 		cr.plugins_.gamepad.prototype.exps.RawAxis,
@@ -36867,6 +39060,7 @@ cr.getObjectRefTable = function () {
 		cr.behaviors.Physics.prototype.acts.ApplyImpulseAtAngle,
 		cr.plugins_.Sprite.prototype.exps.Angle,
 		cr.plugins_.Sprite.prototype.acts.SetSize,
+		cr.behaviors.Timer.prototype.acts.StartTimer,
 		cr.behaviors.Physics.prototype.exps.VelocityX,
 		cr.behaviors.Physics.prototype.exps.VelocityY,
 		cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
@@ -36877,25 +39071,26 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Function.prototype.exps.Param,
 		cr.system_object.prototype.cnds.PickAll,
 		cr.plugins_.Function.prototype.cnds.CompareParam,
-		cr.plugins_.Text.prototype.acts.SetFontColor,
-		cr.system_object.prototype.exps.rgb,
+		cr.behaviors.Fade.prototype.acts.SetFadeInTime,
 		cr.system_object.prototype.acts.AddVar,
 		cr.behaviors.scrollto.prototype.acts.Shake,
+		cr.plugins_.Sprite.prototype.acts.MoveToTop,
 		cr.behaviors.Fade.prototype.acts.StartFade,
 		cr.plugins_.Sprite.prototype.exps.Count,
+		cr.behaviors.Timer.prototype.cnds.OnTimer,
 		cr.system_object.prototype.exps.floor,
 		cr.plugins_.Tilemap.prototype.exps.Width,
 		cr.plugins_.Tilemap.prototype.exps.Height,
 		cr.plugins_.Tilemap.prototype.exps.TileAt,
 		cr.plugins_.Tilemap.prototype.exps.TileToPositionX,
 		cr.plugins_.Tilemap.prototype.exps.TileToPositionY,
-		cr.plugins_.Sprite.prototype.acts.MoveToTop,
 		cr.plugins_.Tilemap.prototype.acts.SetTile,
 		cr.plugins_.Tilemap.prototype.cnds.CompareTileStateAt,
 		cr.plugins_.Tilemap.prototype.acts.SetTileState,
 		cr.system_object.prototype.exps["int"],
 		cr.plugins_.Sprite.prototype.acts.MoveToBottom,
 		cr.plugins_.Mouse.prototype.acts.SetCursor,
+		cr.plugins_.Browser.prototype.acts.ExecJs,
 		cr.plugins_.AJAX.prototype.acts.RequestFile,
 		cr.system_object.prototype.acts.GoToLayout,
 		cr.plugins_.AJAX.prototype.cnds.OnComplete,
