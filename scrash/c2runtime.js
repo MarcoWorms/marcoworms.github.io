@@ -38442,6 +38442,13 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Keyboard.prototype.cnds.OnKey,
 		cr.plugins_.Function.prototype.acts.CallFunction,
 		cr.system_object.prototype.cnds.OnLayoutStart,
+		cr.plugins_.Arr.prototype.acts.SetSize,
+		cr.plugins_.Tilemap.prototype.exps.Count,
+		cr.system_object.prototype.cnds.ForEachOrdered,
+		cr.plugins_.Tilemap.prototype.exps.Y,
+		cr.plugins_.Tilemap.prototype.cnds.CompareInstanceVar,
+		cr.plugins_.Arr.prototype.acts.SetXY,
+		cr.system_object.prototype.exps.loopindex,
 		cr.system_object.prototype.acts.CreateObject,
 		cr.plugins_.Sprite.prototype.acts.Destroy,
 		cr.system_object.prototype.acts.SetMinimumFramerate,
@@ -38455,7 +38462,6 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Arr.prototype.cnds.ArrForEach,
 		cr.plugins_.Arr.prototype.cnds.CompareXY,
 		cr.plugins_.Arr.prototype.exps.CurX,
-		cr.plugins_.Arr.prototype.acts.SetXY,
 		cr.plugins_.Arr.prototype.exps.CurValue,
 		cr.system_object.prototype.cnds.EveryTick,
 		cr.plugins_.Sprite.prototype.cnds.IsAnimPlaying,
@@ -38488,7 +38494,6 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.acts.Wait,
 		cr.system_object.prototype.cnds.For,
 		cr.plugins_.gamepad.prototype.exps.GamepadCount,
-		cr.system_object.prototype.exps.loopindex,
 		cr.plugins_.gamepad.prototype.cnds.OnButtonDown,
 		cr.system_object.prototype.cnds.LayerVisible,
 		cr.system_object.prototype.exps.layerindex,
@@ -38518,7 +38523,6 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.acts.SetObjectTimescale,
 		cr.behaviors.Timer.prototype.acts.StartTimer,
 		cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
-		cr.plugins_.Tilemap.prototype.cnds.CompareInstanceVar,
 		cr.system_object.prototype.acts.SubVar,
 		cr.plugins_.Function.prototype.exps.Param,
 		cr.system_object.prototype.cnds.PickAll,
@@ -38550,11 +38554,8 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Sprite.prototype.acts.SetFlipped,
 		cr.plugins_.Sprite.prototype.acts.MoveToBottom,
 		cr.plugins_.Mouse.prototype.acts.SetCursor,
-		cr.plugins_.AJAX.prototype.acts.RequestFile,
 		cr.system_object.prototype.acts.GoToLayout,
-		cr.plugins_.AJAX.prototype.cnds.OnComplete,
-		cr.plugins_.Arr.prototype.acts.JSONLoad,
-		cr.plugins_.AJAX.prototype.exps.LastData
+		cr.plugins_.AJAX.prototype.cnds.OnComplete
 	];
 };
 
