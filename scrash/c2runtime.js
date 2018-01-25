@@ -38400,6 +38400,121 @@ cr.behaviors.Rotate = function(runtime)
 	
 }());
 
+// Bound to layout
+// ECMAScript 5 strict mode
+
+;
+;
+
+/////////////////////////////////////
+// Behavior class
+cr.behaviors.bound = function(runtime)
+{
+	this.runtime = runtime;
+};
+
+(function ()
+{
+	var behaviorProto = cr.behaviors.bound.prototype;
+		
+	/////////////////////////////////////
+	// Behavior type class
+	behaviorProto.Type = function(behavior, objtype)
+	{
+		this.behavior = behavior;
+		this.objtype = objtype;
+		this.runtime = behavior.runtime;
+	};
+
+	var behtypeProto = behaviorProto.Type.prototype;
+
+	behtypeProto.onCreate = function()
+	{
+	};
+
+	/////////////////////////////////////
+	// Behavior instance class
+	behaviorProto.Instance = function(type, inst)
+	{
+		this.type = type;
+		this.behavior = type.behavior;
+		this.inst = inst;				// associated object instance to modify
+		this.runtime = type.runtime;
+		this.mode = 0;
+	};
+	
+	var behinstProto = behaviorProto.Instance.prototype;
+
+	behinstProto.onCreate = function()
+	{
+		this.mode = this.properties[0];	// 0 = origin, 1 = edge
+	};
+	
+	behinstProto.tick = function ()
+	{
+	};
+
+	behinstProto.tick2 = function ()
+	{
+		this.inst.update_bbox();
+		var bbox = this.inst.bbox;
+		var layout = this.inst.layer.layout;
+		var changed = false;
+		
+		if (this.mode === 0)	// origin
+		{
+			if (this.inst.x < 0)
+			{
+				this.inst.x = 0;
+				changed = true;
+			}
+			if (this.inst.y < 0)
+			{
+				this.inst.y = 0;
+				changed = true;
+			}
+			if (this.inst.x > layout.width)
+			{
+				this.inst.x = layout.width;
+				changed = true;
+			}
+			if (this.inst.y > layout.height)
+			{
+				this.inst.y = layout.height;
+				changed = true;
+			}
+		}
+		// Bound by edge (bounding box) mode
+		else
+		{
+			if (bbox.left < 0)
+			{
+				this.inst.x -= bbox.left;
+				changed = true;
+			}
+			if (bbox.top < 0)
+			{
+				this.inst.y -= bbox.top;
+				changed = true;
+			}
+			if (bbox.right > layout.width)
+			{
+				this.inst.x -= (bbox.right - layout.width);
+				changed = true;
+			}
+			if (bbox.bottom > layout.height)
+			{
+				this.inst.y -= (bbox.bottom - layout.height);
+				changed = true;
+			}
+		}
+		
+		if (changed)
+			this.inst.set_bbox_changed();
+	};
+	
+}());
+
 cr.getObjectRefTable = function () {
 	return [
 		cr.plugins_.Tilemap,
@@ -38429,50 +38544,54 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.sliderbar,
 		cr.plugins_.Particles,
 		cr.plugins_.Spritefont2,
+		cr.behaviors.bound,
 		cr.plugins_.Function.prototype.cnds.OnFunction,
 		cr.system_object.prototype.acts.SetBoolVar,
 		cr.system_object.prototype.acts.SetTimescale,
 		cr.system_object.prototype.cnds.Compare,
 		cr.system_object.prototype.acts.SetVar,
 		cr.system_object.prototype.acts.RestartLayout,
+		cr.plugins_.Function.prototype.acts.CallFunction,
+		cr.system_object.prototype.cnds.Else,
+		cr.plugins_.Arr.prototype.cnds.ArrForEach,
+		cr.system_object.prototype.cnds.CompareBoolVar,
+		cr.plugins_.Arr.prototype.cnds.CompareXY,
+		cr.plugins_.Arr.prototype.exps.CurX,
+		cr.plugins_.Arr.prototype.acts.SetXY,
 		cr.system_object.prototype.acts.ToggleBoolVar,
+		cr.plugins_.Sprite.prototype.acts.SetBoolInstanceVar,
+		cr.plugins_.Sprite.prototype.acts.SetVisible,
 		cr.plugins_.Spritefont2.prototype.acts.SetText,
 		cr.plugins_.Spritefont2.prototype.acts.SetOpacity,
 		cr.behaviors.Fade.prototype.acts.RestartFade,
 		cr.plugins_.Keyboard.prototype.cnds.OnKey,
-		cr.plugins_.Function.prototype.acts.CallFunction,
 		cr.system_object.prototype.cnds.OnLayoutStart,
 		cr.plugins_.Arr.prototype.acts.SetSize,
 		cr.plugins_.Tilemap.prototype.exps.Count,
+		cr.plugins_.Sprite.prototype.acts.Destroy,
 		cr.system_object.prototype.cnds.ForEachOrdered,
 		cr.plugins_.Tilemap.prototype.exps.Y,
 		cr.plugins_.Tilemap.prototype.cnds.CompareInstanceVar,
-		cr.plugins_.Arr.prototype.acts.SetXY,
 		cr.system_object.prototype.exps.loopindex,
 		cr.system_object.prototype.acts.CreateObject,
-		cr.plugins_.Sprite.prototype.acts.Destroy,
+		cr.system_object.prototype.exps.layerindex,
+		cr.plugins_.Sprite.prototype.acts.SetPos,
 		cr.system_object.prototype.acts.SetMinimumFramerate,
 		cr.plugins_.Tilemap.prototype.acts.SetEffectEnabled,
 		cr.plugins_.Sprite.prototype.acts.SetEffectEnabled,
-		cr.system_object.prototype.cnds.CompareBoolVar,
-		cr.system_object.prototype.cnds.Else,
-		cr.plugins_.Sprite.prototype.acts.SetVisible,
 		cr.system_object.prototype.cnds.CompareVar,
 		cr.plugins_.Spritefont2.prototype.cnds.CompareInstanceVar,
-		cr.plugins_.Arr.prototype.cnds.ArrForEach,
-		cr.plugins_.Arr.prototype.cnds.CompareXY,
-		cr.plugins_.Arr.prototype.exps.CurX,
 		cr.plugins_.Arr.prototype.exps.CurValue,
 		cr.system_object.prototype.cnds.EveryTick,
 		cr.plugins_.Sprite.prototype.cnds.IsAnimPlaying,
 		cr.plugins_.Sprite.prototype.cnds.CompareFrame,
-		cr.plugins_.Sprite.prototype.acts.SetPos,
 		cr.plugins_.Sprite.prototype.exps.X,
 		cr.plugins_.Sprite.prototype.exps.Y,
 		cr.plugins_.Sprite.prototype.acts.SetAnim,
 		cr.plugins_.Sprite.prototype.cnds.IsBoolInstanceVarSet,
 		cr.plugins_.Sprite.prototype.acts.SetSize,
 		cr.plugins_.Text.prototype.acts.SetVisible,
+		cr.system_object.prototype.cnds.LayerVisible,
 		cr.system_object.prototype.cnds.ForEach,
 		cr.plugins_.Sprite.prototype.exps.AnimationFrame,
 		cr.plugins_.Sprite.prototype.acts.SetTowardPosition,
@@ -38489,25 +38608,25 @@ cr.getObjectRefTable = function () {
 		cr.behaviors.Physics.prototype.exps.VelocityX,
 		cr.behaviors.Physics.prototype.exps.VelocityY,
 		cr.system_object.prototype.exps.random,
-		cr.plugins_.Sprite.prototype.acts.SetBoolInstanceVar,
-		cr.behaviors.Flash.prototype.acts.Flash,
 		cr.system_object.prototype.acts.Wait,
+		cr.behaviors.Fade.prototype.acts.SetFadeInTime,
+		cr.behaviors.Fade.prototype.acts.SetWaitTime,
+		cr.behaviors.Fade.prototype.acts.SetFadeOutTime,
 		cr.system_object.prototype.cnds.For,
 		cr.plugins_.gamepad.prototype.exps.GamepadCount,
 		cr.plugins_.gamepad.prototype.cnds.OnButtonDown,
-		cr.system_object.prototype.cnds.LayerVisible,
-		cr.system_object.prototype.exps.layerindex,
 		cr.system_object.prototype.acts.SetLayerVisible,
-		cr.behaviors.Fade.prototype.acts.SetWaitTime,
 		cr.plugins_.gamepad.prototype.cnds.IsButtonDown,
 		cr.behaviors.Platform.prototype.acts.SetVectorY,
-		cr.behaviors.Flash.prototype.cnds.IsFlashing,
+		cr.plugins_.Sprite.prototype.acts.SetOpacity,
+		cr.system_object.prototype.cnds.PickAll,
 		cr.plugins_.gamepad.prototype.cnds.CompareAxis,
 		cr.behaviors.Platform.prototype.acts.SetVectorX,
 		cr.system_object.prototype.exps.max,
 		cr.system_object.prototype.exps.abs,
 		cr.plugins_.gamepad.prototype.exps.Axis,
 		cr.system_object.prototype.exps.min,
+		cr.plugins_.Sprite.prototype.acts.MoveAtAngle,
 		cr.plugins_.gamepad.prototype.exps.RawAxis,
 		cr.behaviors.Bullet.prototype.acts.SetAngleOfMotion,
 		cr.behaviors.Pin.prototype.acts.Pin,
@@ -38525,9 +38644,8 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
 		cr.system_object.prototype.acts.SubVar,
 		cr.plugins_.Function.prototype.exps.Param,
-		cr.system_object.prototype.cnds.PickAll,
+		cr.behaviors.Flash.prototype.acts.Flash,
 		cr.plugins_.Function.prototype.cnds.CompareParam,
-		cr.behaviors.Fade.prototype.acts.SetFadeInTime,
 		cr.system_object.prototype.acts.AddVar,
 		cr.behaviors.scrollto.prototype.acts.Shake,
 		cr.behaviors.Sin.prototype.acts.SetMagnitude,
@@ -38539,6 +38657,7 @@ cr.getObjectRefTable = function () {
 		cr.behaviors.Timer.prototype.cnds.OnTimer,
 		cr.behaviors.Flash.prototype.cnds.OnFlashEnded,
 		cr.plugins_.Tilemap.prototype.acts.Destroy,
+		cr.plugins_.Sprite.prototype.cnds.CompareOpacity,
 		cr.system_object.prototype.exps.floor,
 		cr.plugins_.Tilemap.prototype.exps.Width,
 		cr.plugins_.Tilemap.prototype.exps.Height,
