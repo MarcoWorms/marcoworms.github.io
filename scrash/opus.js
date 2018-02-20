@@ -10,10 +10,10 @@
 	var STATE_READY = 2;
 	var IDLE_TIMEOUT = 500;
 	var HARDWARE_CONCURRANCY = Math.min(MAX_CONCURRENCY, (navigator["hardwareConcurrency"] || DEFAULT_CONCURRENCY));
-	
+	var USE_WASM = window["WebAssembly"] && TestSafariWASM();		// test for iOS broken WebAssembly bug
 	// Note in Remote Preview (which assumes WebAssembly is supported), the WebAssembly files must be loaded from blob URLs sent over
 	// the DataChannel, since the relative URLs will not work on preview.construct.net.
-	var LIBRARY_URL = (window["WebAssembly"] ? (window["cr_opusWasmScriptUrl"] || "opus.wasm.js") : "opus.asm.js");
+	var LIBRARY_URL = USE_WASM ? (window["cr_opusWasmScriptUrl"] || "opus.wasm.js") : (window["cr_opusAsmScriptUrl"] || "opus.asm.js");
 	//var DEPENDENCY_URL = (window["WebAssembly"] ? (window["cr_opusWasmBinaryUrl"] || "opus.wasm.wasm") : "opus.asm.js.mem");		// not currently used
 
 	var _state = STATE_INIT;
@@ -91,6 +91,25 @@
 	}
 
 	// loader functions
+	
+	function TestSafariWASM() {
+  		var binary = new Uint8Array([
+			0, 97, 115, 109, 1, 0, 0, 0, 1, 6, 1, 96, 1, 127, 1, 127, 3, 2, 1,
+			0, 5, 3, 1, 0, 1, 7, 8, 1, 4, 116, 101, 115, 116, 0, 0, 10, 16, 1,
+			14, 0, 32, 0, 65, 1, 54, 2, 0, 32, 0, 40, 2, 0, 11
+		]);
+		
+		try {
+	  		var module = new WebAssembly.Module(binary);
+	  		var instance = new WebAssembly.Instance(module, {});
+	  		// test storing to and loading from a non-zero location via a parameter.
+	  		// Safari on iOS 11.2.5 returns 0 unexpectedly at non-zero locations
+	  		return instance.exports.test(4) !== 0;
+		} catch (e) {
+			console.error(e);
+			return false;
+		}
+	}
 
 	function IsWKWebView ()
 	{
@@ -229,8 +248,8 @@
 				});
 			}
 		}
-		// Remote Preview mode: fetch the worker script as text, prefix it with the wasm binary URL to load, and load the worker from a blob URL
-		else if (window["cr_opusWasmBinaryUrl"])
+		// Preview/Remote Preview mode: fetch the worker script as text, prefix it with the wasm binary URL to load, and load the worker from a blob URL
+		else if (window["cr_opusWasmBinaryUrl"] || window["cr_opusAsmBinaryUrl"])
 		{
 			if (_workerURL)
 			{
@@ -244,7 +263,14 @@
 					return response.text();
 				}).then(function (text)
 				{
-					_workerURL = URL.createObjectURL(new Blob([ "self[\"cr_opusWasmBinaryUrl\"] = \"" + window["cr_opusWasmBinaryUrl"] + "\";\n", text ]));
+					let prefixLine = "";
+					
+					if (USE_WASM)
+						prefixLine = "self[\"cr_opusWasmBinaryUrl\"] = \"" + window["cr_opusWasmBinaryUrl"] + "\";\n"
+					else
+						prefixLine = "self[\"cr_opusAsmBinaryUrl\"] = \"" + window["cr_opusAsmBinaryUrl"] + "\";\n"
+					
+					_workerURL = URL.createObjectURL(new Blob([ prefixLine, text ]));
 					cb(null, _workerURL);
 				}).catch (function (err)
 				{
