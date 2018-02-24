@@ -42598,7 +42598,6 @@ cr.getObjectRefTable = function () {
 		cr.behaviors.Physics.prototype.acts.SetVelocity,
 		cr.behaviors.Physics.prototype.acts.ApplyImpulseAtAngle,
 		cr.behaviors.Physics.prototype.acts.ApplyImpulseToward,
-		cr.behaviors.Bullet.prototype.exps.AngleOfMotion,
 		cr.behaviors.Timer.prototype.acts.StartTimer,
 		cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
 		cr.system_object.prototype.acts.SubVar,
