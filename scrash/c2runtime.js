@@ -5021,6 +5021,10 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		}
 		
 		this.isDebug = (this.isPreview && window.location.search.indexOf("debug") > -1);
+		
+		// Disable FB instant in preview mode because there seems to be a bug where the initialize promise never resolves/rejects
+		this.useFbInstant = (typeof FBInstant !== "undefined" && !this.isPreview);
+		this.hasInitialized = false;
 
 		// Renderer variables
 		this.canvas = canvas;
@@ -5037,6 +5041,7 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		// Prevent selections and context menu on the canvas
 		this.canvas.oncontextmenu = function (e) { if (e.preventDefault) e.preventDefault(); return false; };
 		this.canvas.onselectstart = function (e) { if (e.preventDefault) e.preventDefault(); return false; };
+		this.canvas.ontouchstart = function (e) { if(e.preventDefault) e.preventDefault(); return false; };
 			
 		// In NW.js, prevent a drag-drop navigating the browser window.
 		// Note if present the NW.js plugin will override ondrop.
@@ -5127,6 +5132,7 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		this.fps = 0;
 		this.last_fps_time = 0;
 		this.tickcount = 0;
+		this.tickcount_nosave = 0;
 		this.execcount = 0;
 		this.framecount = 0;        	// for fps
 		this.objectcount = 0;
@@ -5209,12 +5215,46 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 			alert("Exported games won't work until you upload them. (When running on the file: protocol, browsers block many features from working for security reasons.)");
 		}
 		
-		// kick off AJAX request for data.js
-		this.requestProjectData();
+		// HACK: if Facebook Instant Games in use, wait for it to initialize before loading runtime.
+		// We have to pass loading progress to the API, so we need to load it up front.
+		if (this.useFbInstant)
+		{
+			FBInstant["initializeAsync"]()
+			.then(function ()
+			{
+				self.requestProjectData();
+			})
+			.catch(function (err)
+			{
+				console.warn("[Instant Games] Unable to load: ", err);
+				self.requestProjectData();
+			});
+			
+			// initializeAsync() appears to never resolve if used outside of Instant Games. To avoid this causing the game
+			// to fail to load, race it with a 4 second timeout to continue without Instant Games.
+			window.setTimeout(function ()
+			{
+				if (self.hasInitialized)
+					return;
+				
+				console.warn("[Instant Games] Initialization timed out after 4 seconds. Continuing with Instant Games disabled.");
+				self.useFbInstant = false;
+				self.requestProjectData();
+			}, 4000);
+		}
+		else
+		{
+			// normal loading: kick off AJAX request for data.js
+			this.requestProjectData();
+		}
 	};
 	
 	Runtime.prototype.requestProjectData = function ()
 	{
+		if (this.hasInitialized)
+			return;		// ignore double initialization calls - can happen with FBInstant
+		
+		this.hasInitialized = true;
 		var self = this;
 		
 		// WKWebView in Cordova breaks AJAX to local files. However the Cordova file API works, so use that as a workaround.
@@ -6640,11 +6680,27 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		// Wait for any pending textures or audio to finish loading then forward to go_loading_finished
 		if (this.areAllTexturesAndSoundsLoaded() && (this.loaderstyle !== 4 || isC3SplashDone))
 		{
-			this.go_loading_finished();
+			// HACK: if Instant Games present, wait for startGameAsync() to resolve before kicking off game
+			if (this.useFbInstant)
+			{
+				FBInstant["startGameAsync"]()
+				.then(function ()
+				{
+					self.go_loading_finished();
+				});
+			}
+			else
+			{
+				this.go_loading_finished();
+			}
 		}
 		else
 		{
 			// Post progress to debugger if present
+			
+			// HACK: post progress to Instant Games if present
+			if (this.useFbInstant)
+				FBInstant["setLoadingProgress"](this.progress * 100);
 			
 			// Draw loading screen on canvas.  areAllTexturesAndSoundsLoaded set this.progress.
 			// Don't display anything for the first 500ms, so quick loads don't distractingly flash a progress message.
@@ -6766,8 +6822,14 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		if (isC3SplashDone)
 			return;
 		
-		var splashAfterFadeOutWait = (this.isPreview ? 0 : 200);
-		var splashMinDisplayTime = (this.isPreview ? 0 : 3000);
+		// Use a minimum splash duration to make sure the C3 logo is shown. However in preview mode,
+		// or when using Facebook Instant Games, ignore this limit. For preview mode this helps speed
+		// up testing, and in Instant Games there is an overlay showing which will obscure the logo,
+		// and the splash then needlessly delays completion of loading.
+		var allowQuickSplash = (this.isPreview || this.useFbInstant);
+		
+		var splashAfterFadeOutWait = (allowQuickSplash ? 0 : 200);
+		var splashMinDisplayTime = (allowQuickSplash ? 0 : 3000);
 		
 		var w = Math.ceil(this.width);
 		var h = Math.ceil(this.height);
@@ -6908,9 +6970,9 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		
 		// Note there are two ways we end the C3 splash:
 		// 1) normally, after the splash fade out and wait
-		// 2) in preview mode, if it loads quicker than 500ms, just skip straight to the game to avoid getting in the way
+		// 2) in preview/quick splash mode, if it loads quicker than 500ms, just skip straight to the game to avoid getting in the way
 		if ((splashIsFadeOut && nowTime - splashFadeOutStart >= splashFadeOutDuration + splashAfterFadeOutWait) ||
-			(this.isPreview && this.progress >= 1 && Date.now() - splashStartTime < 500))
+			(allowQuickSplash && this.progress >= 1 && Date.now() - splashStartTime < 500))
 		{
 			isC3SplashDone = true;
 			splashIsFadeIn = false;
@@ -7001,6 +7063,15 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 				this.aspect_scale = this.height / this.original_height;
 			else
 				this.aspect_scale = this.width / this.original_width;
+		}
+		
+		// Trigger onBeforeAppBegin for any plugins with a handler
+		for (i = 0, len = this.types_by_index.length; i < len; i++)
+		{
+			t = this.types_by_index[i];
+			
+			if (t.onBeforeAppBegin)
+				t.onBeforeAppBegin();
 		}
 		
 		// Find the first layout and start it running
@@ -7223,6 +7294,7 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		if (!this.hit_breakpoint)
 		{
 			this.tickcount++;
+			this.tickcount_nosave++;
 			this.execcount++;
 			this.framecount++;
 		}
@@ -19940,7 +20012,7 @@ cr.system_object.prototype.loadFromJSON = function (o)
 	SysExps.prototype.regexmatchcount = function (ret, str_, regex_, flags_)
 	{
 		var regex = getRegex(regex_, flags_);
-		updateRegexMatches(str_, regex_, flags_);
+		updateRegexMatches(str_.toString(), regex_, flags_);
 		ret.set_int(regexMatches ? regexMatches.length : 0);
 	};
 	
@@ -19948,7 +20020,7 @@ cr.system_object.prototype.loadFromJSON = function (o)
 	{
 		index_ = Math.floor(index_);
 		var regex = getRegex(regex_, flags_);
-		updateRegexMatches(str_, regex_, flags_);
+		updateRegexMatches(str_.toString(), regex_, flags_);
 		
 		if (!regexMatches || index_ < 0 || index_ >= regexMatches.length)
 			ret.set_string("");
@@ -24055,8 +24127,6 @@ cr.plugins_.Arr = function(runtime)
 				for (y = 0; y < this.cy; y++)
 					a[x][y].reverse();
 			
-			this.cz--;
-			
 			break;
 		}
 	};
@@ -27339,17 +27409,18 @@ cr.plugins_.Text = function(runtime)
 	instanceProto.onCreate = function()
 	{
 		this.text = this.properties[0];
-		this.facename = this.properties[1];
-		this.ptSize = this.properties[2];
-		this.line_height_offset = this.properties[3];
-		this.isBold = this.properties[4];
-		this.isItalic = this.properties[5];
-		var c = this.properties[6];
+		// note properties[1] corresponds to enable-bbcode, which is not supported in C2 runtime
+		this.facename = this.properties[2];
+		this.ptSize = this.properties[3];
+		this.line_height_offset = this.properties[4];
+		this.isBold = this.properties[5];
+		this.isItalic = this.properties[6];
+		var c = this.properties[7];
 		this.color = "rgb(" + Math.floor(c[0] * 255) + "," + Math.floor(c[1] * 255) + "," + Math.floor(c[2] * 255) + ")";
-		this.halign = this.properties[7];				// 0=left, 1=center, 2=right
-		this.valign = this.properties[8];				// 0=top, 1=center, 2=bottom
-		this.wrapbyword = (this.properties[9] === 0);	// 0=word, 1=character
-		this.visible = this.properties[10];
+		this.halign = this.properties[8];				// 0=left, 1=center, 2=right
+		this.valign = this.properties[9];				// 0=top, 1=center, 2=bottom
+		this.wrapbyword = (this.properties[10] === 0);	// 0=word, 1=character
+		this.visible = this.properties[11];
 		
 		this.lastwidth = this.width;
 		this.lastwrapwidth = this.width;
@@ -28745,7 +28816,7 @@ cr.plugins_.Browser = function(runtime)
 	
 	Cnds.prototype.SupportsFullscreen = function ()
 	{
-		if (this.runtime.isNodeWebkit)
+		if (this.runtime.isNWjs)
 			return true;
 		
 		var elem = this.runtime.canvas;
@@ -28793,9 +28864,9 @@ cr.plugins_.Browser = function(runtime)
 	
 	Acts.prototype.Focus = function ()
 	{
-		if (this.runtime.isNodeWebkit)
+		if (this.runtime.isNWjs)
 		{
-			var win = window["nwgui"]["Window"]["get"]();
+			var win = nw["Window"]["get"]();
 			win["focus"]();
 		}
 		else if (!this.is_arcade)
@@ -28804,9 +28875,9 @@ cr.plugins_.Browser = function(runtime)
 	
 	Acts.prototype.Blur = function ()
 	{
-		if (this.runtime.isNodeWebkit)
+		if (this.runtime.isNWjs)
 		{
-			var win = window["nwgui"]["Window"]["get"]();
+			var win = nw["Window"]["get"]();
 			win["blur"]();
 		}
 		else if (!this.is_arcade)
@@ -28901,9 +28972,9 @@ cr.plugins_.Browser = function(runtime)
 			{
 				DebuggerFullscreen(true);
 			}
-			else if (!this.runtime.isNodeFullscreen && window["nwgui"])
+			else if (!this.runtime.isNodeFullscreen)
 			{
-				window["nwgui"]["Window"]["get"]()["enterFullscreen"]();
+				nw["Window"]["get"]()["enterFullscreen"]();
 				
 				this.runtime.isNodeFullscreen = true;
 				this.runtime.fullscreen_scaling = (stretchmode >= 2 ? stretchmode : 0);
@@ -28953,16 +29024,16 @@ cr.plugins_.Browser = function(runtime)
 	
 	Acts.prototype.CancelFullScreen = function ()
 	{
-		if (this.runtime.isNodeWebkit)
+		if (this.runtime.isNWjs)
 		{
 			// In debug mode: forward to parent frame
 			if (this.runtime.isDebug)
 			{
 				DebuggerFullscreen(false);
 			}
-			else if (this.runtime.isNodeFullscreen && window["nwgui"])
+			else if (this.runtime.isNodeFullscreen)
 			{
-				window["nwgui"]["Window"]["get"]()["leaveFullscreen"]();
+				nw["Window"]["get"]()["leaveFullscreen"]();
 				
 				this.runtime.isNodeFullscreen = false;
 			}
@@ -32101,17 +32172,18 @@ cr.plugins_.Spritefont2 = function(runtime)
 	{
 		this.texture_img      = this.type.texture_img;
 		this.text             = this.properties[0];
-		this.characterWidth   = this.properties[1];
-		this.characterHeight  = this.properties[2];
-		this.characterSet     = this.properties[3];
-		var spacingData = this.properties[4];
-		this.characterScale   = this.properties[5];
-		this.characterSpacing = this.properties[6];
-		this.lineHeight       = this.properties[7];
-		this.halign           = this.properties[8]/2.0;		// 0=left, 1=center, 2=right
-		this.valign           = this.properties[9]/2.0;		// 0=top, 1=center, 2=bottom
-		this.wrapbyword       = (this.properties[10] === 0);	// 0=word, 1=character
-		this.visible          = this.properties[11];
+		// note properties[1] corresponds to enable-bbcode, which is not supported in C2 runtime
+		this.characterWidth   = this.properties[2];
+		this.characterHeight  = this.properties[3];
+		this.characterSet     = this.properties[4];
+		var spacingData = this.properties[5];
+		this.characterScale   = this.properties[6];
+		this.characterSpacing = this.properties[7];
+		this.lineHeight       = this.properties[8];
+		this.halign           = this.properties[9]/2.0;			// 0=left, 1=center, 2=right
+		this.valign           = this.properties[10]/2.0;		// 0=top, 1=center, 2=bottom
+		this.wrapbyword       = (this.properties[11] === 0);	// 0=word, 1=character
+		this.visible          = this.properties[12];
 		this.textWidth  = 0;
 		this.textHeight = 0;
 
@@ -37660,21 +37732,10 @@ cr.behaviors.Physics = function(runtime)
 	
 	behinstProto.onDestroy = function()
 	{
-		this.destroyMyJoints();
+		this.destroyBody();
+		
 		cr.clearArray(this.myCreatedJoints);	
 		this.joiningMe.clear();
-		
-		if (this.body)
-		{
-			if (this.fixture)
-			{
-				this.body["DestroyFixture"](this.fixture);
-				this.fixture = null;
-			}
-			
-			this.world["DestroyBody"](this.body);
-			this.body = null;
-		}
 		
 		this.runtime.removeDestroyCallback(this.myDestroyCallback);
 	};
@@ -37707,15 +37768,10 @@ cr.behaviors.Physics = function(runtime)
 	
 	behinstProto.loadFromJSON = function (o)
 	{
-		this.destroyMyJoints();
+		this.destroyBody();
+		
 		cr.clearArray(this.myCreatedJoints);
 		this.joiningMe.clear();
-		
-		if (this.body)
-		{
-			this.world["DestroyBody"](this.body);
-			this.body = null;
-		}
 		
 		this.enabled = o["e"];
 		this.immovable = o["im"];
@@ -37751,8 +37807,6 @@ cr.behaviors.Physics = function(runtime)
 	{
 		if (this.enabled)
 			this.recreateMyJoints();
-		
-		this.behavior.lastUpdateTick = this.runtime.tickcount - 1;
 	};
 	
 	behinstProto.onInstanceDestroyed = function (inst)
@@ -37845,30 +37899,39 @@ cr.behaviors.Physics = function(runtime)
 			return;
 		
 		var inst = this.inst;
-		var hadOldBody = false;
-		var oldVelocity = null;
-		var oldOmega = null;
+		inst.update_bbox();
 		var i, len, j, lenj, k, lenk, vec, arr, b, tv, c, rc, pts_cache, pts_count, convexpolys, cp, offx, offy, oldAngle;
 		
-		if (this.body)
+		// Create the physics body if we don't have one yet.
+		if (!this.body)
 		{
-			hadOldBody = true;
+			var bodyDef = new b2BodyDef();
+			bodyDef["set_type"](this.immovable ? 0 : 2);		// 0 = b2_staticBody, 2 = b2_dynamicBody
 			
-			// Save current body state.  Need to copy linear velocity since otherwise it takes by reference
-			tv = this.body["GetLinearVelocity"]();
-			oldVelocity = getTempVec2a(tv["get_x"](), tv["get_y"]());
-			oldOmega = this.body["GetAngularVelocity"]();
+			// Body expects position to be in center, but the object hotspot may not be centred.
+			// Determine the actual object center.  The easiest way to do this is take its bounding
+			// quad and get its mid point.
+			bodyDef["set_position"](getTempVec2b(inst.bquad.midX() * worldScale, inst.bquad.midY() * worldScale));
+			bodyDef["set_angle"](inst.angle);
 			
-			// For each instance with joints to me, also destroy their joints - will be recreated later
-			arr = this.joiningMe.valuesRef();
+			bodyDef["set_fixedRotation"](this.preventRotation);
+			bodyDef["set_linearDamping"](this.linearDamping);
+			bodyDef["set_angularDamping"](this.angularDamping);
+			bodyDef["set_bullet"](this.bullet);
 			
-			for (i = 0, len = arr.length; i < len; i++)
-			{
-				b = arr[i].extra.box2dbody.c2userdata;
-				b.destroyMyJoints();
-			}
+			// Create the body - no fixtures attached yet
+			this.body = this.world["CreateBody"](bodyDef);
+			this.body.c2userdata = this;
+			inst.extra.box2dbody = this.body;
 			
-			this.destroyBody();
+			Box2D["destroy"](bodyDef);
+		}
+		
+		// If we already have a fixture, destroy it. This method is also called to update the fixture on the body, e.g. when an object changes size.
+		if (this.fixture)
+		{
+			this.body["DestroyFixture"](this.fixture);
+			this.fixture = null;
 		}
 		
 		var fixDef = new b2FixtureDef();
@@ -37876,29 +37939,10 @@ cr.behaviors.Physics = function(runtime)
 		fixDef["set_friction"](this.friction);
 		fixDef["set_restitution"](this.restitution);
 		
-		var bodyDef = new b2BodyDef();
-		bodyDef["set_type"](this.immovable ? 0 : 2);		// 0 = b2_staticBody, 2 = b2_dynamicBody
-			
-		// Body expects position to be in center, but the object hotspot may not be centred.
-		// Determine the actual object center.  The easiest way to do this is take its bounding
-		// quad and get its mid point.
-		inst.update_bbox();
-		bodyDef["set_position"](getTempVec2b(inst.bquad.midX() * worldScale, inst.bquad.midY() * worldScale));
-		bodyDef["set_angle"](inst.angle);
-		
-		bodyDef["set_fixedRotation"](this.preventRotation);
-		bodyDef["set_linearDamping"](this.linearDamping);
-		bodyDef["set_angularDamping"](this.angularDamping);
-		bodyDef["set_bullet"](this.bullet);
+		// If 'use collision poly' set, but no collision poly present, switch to bounding box
 		var hasPoly = this.inst.collision_poly && !this.inst.collision_poly.is_empty();
-		
-		// Create the body - no fixtures attached yet
-		this.body = this.world["CreateBody"](bodyDef);
-		this.body.c2userdata = this;
-		
 		var usecollisionmask = this.collisionmask;
 		
-		// If 'use collision poly' set, but no collision poly present, switch to bounding box
 		if (!hasPoly && !this.inst.tilemap_exists && this.collisionmask === 0)
 			usecollisionmask = 1;
 			
@@ -38101,31 +38145,10 @@ cr.behaviors.Physics = function(runtime)
 			Box2D["destroy"](shape);
 		}
 		
-		inst.extra.box2dbody = this.body;
 		this.lastWidth = inst.width;
 		this.lastHeight = inst.height;
 		
-		Box2D["destroy"](bodyDef);
 		Box2D["destroy"](fixDef);
-		
-		// If recreating a body, set its old state back and re-attach any joints
-		if (hadOldBody)
-		{
-			this.body["SetLinearVelocity"](oldVelocity);
-			this.body["SetAngularVelocity"](oldOmega);
-			
-			// Recreate joints which will have been broken by recreating the body
-			this.recreateMyJoints();
-			
-			// For each instance with joints to me, also recreate their joints so they re-attach to my new body
-			arr = this.joiningMe.valuesRef();
-			
-			for (i = 0, len = arr.length; i < len; i++)
-			{
-				b = arr[i].extra.box2dbody.c2userdata;
-				b.recreateMyJoints();
-			}
-		}
 		
 		cr.clearArray(collrects);
 	};
@@ -38202,7 +38225,7 @@ cr.behaviors.Physics = function(runtime)
 		
 		// A new step is necessary.
 		// Don't step at all if the game is paused (timescale is zero).
-		if (this.runtime.tickcount > this.behavior.lastUpdateTick && this.runtime.timescale > 0)
+		if (this.runtime.tickcount_nosave > this.behavior.lastUpdateTick && this.runtime.timescale > 0)
 		{
 			
 			if (dt !== 0)
@@ -38213,7 +38236,7 @@ cr.behaviors.Physics = function(runtime)
 			this.world["ClearForces"]();
 			
 			
-			this.behavior.lastUpdateTick = this.runtime.tickcount;
+			this.behavior.lastUpdateTick = this.runtime.tickcount_nosave;
 		}
 		
 		// Size, body, animation frame or tilemap has has changed: recreate body
