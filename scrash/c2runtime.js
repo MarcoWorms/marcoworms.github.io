@@ -42658,7 +42658,6 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Sprite.prototype.acts.MoveToBottom,
 		cr.plugins_.Mouse.prototype.acts.SetCursor,
 		cr.system_object.prototype.acts.GoToLayout,
-		cr.plugins_.AJAX.prototype.cnds.OnComplete,
 		cr.plugins_.Browser.prototype.acts.CancelFullScreen,
 		cr.plugins_.Browser.prototype.acts.RequestFullScreen,
 		cr.system_object.prototype.acts.ResetPersisted,
