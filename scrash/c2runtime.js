@@ -5022,8 +5022,9 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		
 		this.isDebug = (this.isPreview && window.location.search.indexOf("debug") > -1);
 		
-		// Disable FB instant in preview mode because there seems to be a bug where the initialize promise never resolves/rejects
-		this.useFbInstant = (typeof FBInstant !== "undefined" && !this.isPreview);
+		// Disable FB instant in preview mode because there seems to be a bug where the initialize promise never resolves/rejects.
+		// To avoid the timeout delaying load for Cordova games, also disable Instant Games in Cordova apps.
+		this.useFbInstant = (typeof FBInstant !== "undefined" && !this.isPreview && !this.isCordova);
 		this.hasInitialized = false;
 
 		// Renderer variables
@@ -9305,6 +9306,58 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		return false;
 	};
 	
+	// As with pushOutSolid, but pushes out in either direction on a given axis.
+	Runtime.prototype.pushOutSolidAxis = function(inst, xdir, ydir, dist)
+	{
+		dist = dist || 50;
+		var oldX = inst.x;
+		var oldY = inst.y;
+		
+		var lastOverlapped = null;
+		var secondLastOverlapped = null;
+		var i, which, sign;
+		
+		for (i = 0; i < dist; ++i)
+		{
+			// Test both forwards and backwards directions at this distance
+			for (which = 0; which < 2; ++which)
+			{
+				sign = which * 2 - 1;		// -1 or 1
+				
+				inst.x = oldX + (xdir * i * sign);
+				inst.y = oldY + (ydir * i * sign);
+				inst.set_bbox_changed();
+				
+				// Test if we've cleared the last instance we were overlapping
+				if (!this.testOverlap(inst, lastOverlapped))
+				{
+					// See if we're still overlapping a different solid
+					lastOverlapped = this.testOverlapSolid(inst);
+					
+					if (lastOverlapped)
+					{
+						secondLastOverlapped = lastOverlapped;
+					}
+					else
+					{
+						// Clear of all solids - completed push out.
+						// Push in fractionally against the last overlapped instance if any.
+						if (secondLastOverlapped)
+							this.pushInFractional(inst, xdir * sign, ydir * sign, secondLastOverlapped, 16);
+						
+						return true;
+					}
+				}
+			}
+		}
+		
+		// Didn't get out of a solid: oops, we're stuck. Just restore the old position.
+		inst.x = oldX;
+		inst.y = oldY;
+		inst.set_bbox_changed();
+		return false;
+	};
+	
 	Runtime.prototype.pushOut = function (inst, xdir, ydir, dist, otherinst)
 	{
 		var push_dist = dist || 50;
@@ -9440,6 +9493,44 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		this.registered_collisions.push([a, b]);
 	};
 	
+	// Look through all registered collisions to see what 'inst' has registered a collision with.
+	// If any of those instances belong to 'otherType' (either directly or via family), add them
+	// to 'arr' if not already there. This helps 'On collision' correctly include registered
+	// collisions when using collision cells.
+	Runtime.prototype.addRegisteredCollisionCandidates = function (inst, otherType, arr)
+	{
+		var i, len, r, otherInst;
+		for (i = 0, len = this.registered_collisions.length; i < len; ++i)
+		{
+			r = this.registered_collisions[i];
+			
+			otherInst = null;
+			if (r[0] === inst)
+				otherInst = r[1];
+			else if (r[1] === inst)
+				otherInst = r[0];
+			else
+				continue;
+			
+			// Check otherInst belongs to otherType. If it's a family check it's a family member,
+			// otherwise just check it has the same type.
+			if (otherType.is_family)
+			{
+				if (otherType.members.indexOf(otherType) === -1)
+					continue;
+			}
+			else
+			{
+				if (otherInst.type !== otherType)
+					continue;
+			}
+			
+			// otherInst is a registered collision candidate. Add it to the array if not already in.
+			if (arr.indexOf(otherInst) === -1)
+				arr.push(otherInst);
+		}
+	};
+	
 	Runtime.prototype.checkRegisteredCollision = function (a, b)
 	{
 		var i, len, x;
@@ -9447,7 +9538,7 @@ quat4.str=function(a){return"["+a[0]+", "+a[1]+", "+a[2]+", "+a[3]+"]"};
 		{
 			x = this.registered_collisions[i];
 			
-			if ((x[0] == a && x[1] == b) || (x[0] == b && x[1] == a))
+			if ((x[0] === a && x[1] === b) || (x[0] === b && x[1] === a))
 				return true;
 		}
 		
@@ -25480,6 +25571,7 @@ cr.plugins_.Sprite = function(runtime)
 		var rsol = rtype.getCurrentSol();
 		var linstances = lsol.getObjects();
 		var rinstances;
+		var registeredInstances;
 		
 		// Iterate each combination of instances
 		var l, linst, r, rinst;
@@ -25503,9 +25595,17 @@ cr.plugins_.Sprite = function(runtime)
 				linst.update_bbox();
 				this.runtime.getCollisionCandidates(linst.layer, rtype, linst.bbox, candidates1);
 				rinstances = candidates1;
+				
+				// NOTE: some behaviors like Platform can register a collision, then push the instance back in to a different
+				// collision cell. This will cause the instance that registered a collision to not be in the collision
+				// candidates, and therefore fail to detect a collision. To avoid this, specifically search for a list of all
+				// instances that have registered a collision with linst, and ensure they are in the candidates.
+				this.runtime.addRegisteredCollisionCandidates(linst, rtype, rinstances);
 			}
 			else
+			{
 				rinstances = rsol.getObjects();
+			}
 			
 			for (r = 0; r < rinstances.length; r++)
 			{
@@ -28570,20 +28670,6 @@ cr.plugins_.Browser = function(runtime)
 			});
 		}
 		
-		// register for update ready event and progress events
-		if (typeof window.applicationCache !== "undefined")
-		{
-			window.applicationCache.addEventListener('updateready', function() {
-				self.runtime.loadingprogress = 1;
-				self.runtime.trigger(cr.plugins_.Browser.prototype.cnds.OnUpdateReady, self);
-			});
-			
-			window.applicationCache.addEventListener('progress', function(e) {
-				// note not supported on Firefox
-				self.runtime.loadingprogress = (e["loaded"] / e["total"]) || 0;
-			});
-		}
-		
 		// Listen for Cordova's button events
 		document.addEventListener("backbutton", function() {
 			self.runtime.trigger(cr.plugins_.Browser.prototype.cnds.OnBackButton, self);
@@ -28726,10 +28812,7 @@ cr.plugins_.Browser = function(runtime)
 	
 	Cnds.prototype.IsDownloadingUpdate = function ()
 	{
-		if (typeof window["applicationCache"] === "undefined")
-			return false;
-		else
-			return window["applicationCache"]["status"] === window["applicationCache"]["DOWNLOADING"];
+		return false;		// deprecated
 	};
 	
 	Cnds.prototype.PageVisible = function ()
@@ -33307,28 +33390,45 @@ cr.plugins_.Audio = function(runtime)
 	
 	function playQueuedAudio()
 	{
-		var i, len, m;
+		var i, len, m, playRet;
 		
 		// On first call, play a dummy buffer to unblock the Web Audio API
 		if (!hasPlayedDummyBuffer && !isContextSuspended && context)
 		{
 			playDummyBuffer();
-			hasPlayedDummyBuffer = true;
+			
+			// Only unflag this once the audio context state indicates it is running. This means we keep trying
+			// to unblock the audio context until it's successfully unblocked.
+			if (context["state"] === "running")
+				hasPlayedDummyBuffer = true;
 		}
+		
+		// play() calls can still fail in a user input event due to browser heuristics. Make sure any play calls
+		// that fail are added back in to the play queue.
+		var tryPlay = playOnNextInput.slice(0);
+		cr.clearArray(playOnNextInput);
 		
 		// If not in silent mode, make play() calls for any queued audio
 		if (!silent)
 		{
-			for (i = 0, len = playOnNextInput.length; i < len; ++i)
+			for (i = 0, len = tryPlay.length; i < len; ++i)
 			{
-				m = playOnNextInput[i];
+				m = tryPlay[i];
 				
 				if (!m.stopped && !m.is_paused)
-					m.instanceObject.play();
+				{
+					playRet = m.instanceObject.play();
+					
+					if (playRet)
+					{
+						playRet.catch(function (err)
+						{
+							addAudioToPlayOnNextInput(m);
+						});
+					}
+				}
 			}
 		}
-		
-		cr.clearArray(playOnNextInput);
 	};
 	
 	function playDummyBuffer()
@@ -33350,9 +33450,11 @@ cr.plugins_.Audio = function(runtime)
 	};
 	
 	// Listen for input events on both mobile and desktop to play any queued music in
+	document.addEventListener("pointerup", playQueuedAudio, true);
 	document.addEventListener("touchend", playQueuedAudio, true);
 	document.addEventListener("click", playQueuedAudio, true);
 	document.addEventListener("keydown", playQueuedAudio, true);
+	document.addEventListener("gamepadconnected", playQueuedAudio, true);
 	
 	function dbToLinear(x)
 	{
@@ -37124,6 +37226,679 @@ cr.plugins_.Audio = function(runtime)
 
 }());
 
+// NW.js
+// ECMAScript 5 strict mode
+
+;
+;
+
+/////////////////////////////////////
+// Plugin class
+cr.plugins_.NodeWebkit = function(runtime)
+{
+	this.runtime = runtime;
+};
+
+(function ()
+{
+	var isNWjs = false;
+	var path = null;
+	var fs = null;
+	var gui = null;
+	var child_process = null;
+	var process = null;
+	var nw_appfolder = "";
+	var nw_userfolder = "";
+	var nw_projectfilesfolder = "";
+	var slash = "\\";
+	var filelist = [];
+	var droppedfile = "";
+	var chosenpath = "";
+	
+	// Used to create the NW.js-specific file/folder picker elements.
+	function CreateNwjsInputElem(id, attrib)
+	{
+		var elem = document.createElement("input");
+		elem.type = "file";
+		elem.style.display = "none";
+		elem.id = id;
+		if (attrib)
+			elem.setAttribute(attrib, "");
+		document.body.appendChild(elem);
+		return elem;
+	}
+	
+	var pluginProto = cr.plugins_.NodeWebkit.prototype;
+		
+	/////////////////////////////////////
+	// Object type class
+	pluginProto.Type = function(plugin)
+	{
+		this.plugin = plugin;
+		this.runtime = plugin.runtime;
+	};
+
+	var typeProto = pluginProto.Type.prototype;
+
+	// called on startup for each object type
+	typeProto.onCreate = function()
+	{
+	};
+
+	/////////////////////////////////////
+	// Instance class
+	pluginProto.Instance = function(type)
+	{
+		this.type = type;
+		this.runtime = type.runtime;
+	};
+	
+	var instanceProto = pluginProto.Instance.prototype;
+
+	// called whenever an instance is created
+	instanceProto.onCreate = function()
+	{
+		isNWjs = this.runtime.isNWjs;
+		var self = this;
+		
+		if (isNWjs)
+		{
+			path = require("path");
+			fs = require("fs");
+			child_process = require("child_process");
+			process = window["process"] || nw["process"];
+			if (process["platform"] !== "win32")
+				slash = "/";
+			nw_appfolder = path["dirname"](process["execPath"]) + slash;
+			nw_userfolder = (process["env"]["HOME"] || process["env"]["HOMEPATH"] || process["env"]["USERPROFILE"]) + slash;
+			gui = window["nwgui"];
+			
+			// mainModule.filename gives full path to index.html. Strip it back to just the folder path, including the final slash.
+			nw_projectfilesfolder = process["mainModule"]["filename"];
+			var lastSlash = Math.max(nw_projectfilesfolder.lastIndexOf("/"), nw_projectfilesfolder.lastIndexOf("\\"));
+			if (lastSlash !== -1)
+				nw_projectfilesfolder = nw_projectfilesfolder.substr(0, lastSlash + 1);
+			
+			window["ondrop"] = function (e)
+			{
+				e.preventDefault();
+
+				for (var i = 0; i < e["dataTransfer"]["files"].length; ++i)
+				{
+					droppedfile = e["dataTransfer"]["files"][i]["path"];
+					self.runtime.trigger(cr.plugins_.NodeWebkit.prototype.cnds.OnFileDrop, self);
+				}
+				return false;
+			};
+			
+			// Create the NW.js-specific file/folder picker dialog elements.
+			var openFileDialogElem = CreateNwjsInputElem("c2nwOpenFileDialog");
+			
+			openFileDialogElem["onchange"] = function (e) {
+				chosenpath = openFileDialogElem.value;
+				self.runtime.trigger(cr.plugins_.NodeWebkit.prototype.cnds.OnOpenDlg, self);
+				
+				// reset the chosen file to empty so choosing the same file twice in a row still fires a change
+				try {
+					openFileDialogElem.value = null;
+				}
+				catch (e) {}
+			};
+			
+			openFileDialogElem["oncancel"] = function () {
+				self.runtime.trigger(cr.plugins_.NodeWebkit.prototype.cnds.OnOpenDlgCancel, self);
+			};
+			
+			var chooseFolderDialogElem = CreateNwjsInputElem("c2nwChooseFolderDialog", "nwdirectory");
+			
+			chooseFolderDialogElem["onchange"] = function (e) {
+				chosenpath = chooseFolderDialogElem.value;
+				self.runtime.trigger(cr.plugins_.NodeWebkit.prototype.cnds.OnFolderDlg, self);
+				
+				try {
+					chooseFolderDialogElem.value = null;
+				}
+				catch (e) {}
+			};
+			
+			chooseFolderDialogElem["oncancel"] = function () {
+				self.runtime.trigger(cr.plugins_.NodeWebkit.prototype.cnds.OnFolderDlgCancel, self);
+			};
+			
+			var saveDialogElem = CreateNwjsInputElem("c2nwSaveDialog", "nwsaveas");
+			
+			saveDialogElem["onchange"] = function (e) {
+				chosenpath = saveDialogElem.value;
+				self.runtime.trigger(cr.plugins_.NodeWebkit.prototype.cnds.OnSaveDlg, self);
+				
+				try {
+					saveDialogElem.value = null;
+				}
+				catch (e) {}
+			};
+			
+			saveDialogElem["oncancel"] = function () {
+				self.runtime.trigger(cr.plugins_.NodeWebkit.prototype.cnds.OnSaveDlgCancel, self);
+			};
+		}
+	};
+	
+	// called whenever an instance is destroyed
+	// note the runtime may keep the object after this call for recycling; be sure
+	// to release/recycle/reset any references to other objects in this function.
+	instanceProto.onDestroy = function ()
+	{
+	};
+	
+	// called when saving the full state of the game
+	instanceProto.saveToJSON = function ()
+	{
+		return {
+		};
+	};
+	
+	// called when loading the full state of the game
+	instanceProto.loadFromJSON = function (o)
+	{
+	};
+	
+
+	//////////////////////////////////////
+	// Conditions
+	function Cnds() {};
+
+	Cnds.prototype.PathExists = function (path_)
+	{
+		if (isNWjs)
+			return fs["existsSync"](path_);
+		else
+			return false;
+	};
+	
+	Cnds.prototype.OnFileDrop = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnOpenDlg = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnFolderDlg = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnSaveDlg = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnOpenDlgCancel = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnFolderDlgCancel = function ()
+	{
+		return true;
+	};
+	
+	Cnds.prototype.OnSaveDlgCancel = function ()
+	{
+		return true;
+	};
+	
+	pluginProto.cnds = new Cnds();
+	
+	//////////////////////////////////////
+	// Actions
+	function Acts() {};
+
+	Acts.prototype.WriteFile = function (path_, contents_)
+	{
+		if (!isNWjs)
+			return;
+		
+		try {
+			fs["writeFileSync"](path_, contents_, {"encoding": "utf8"});
+		}
+		catch (e)
+		{}
+	};
+	
+	Acts.prototype.RenameFile = function (old_, new_)
+	{
+		if (!isNWjs)
+			return;
+		
+		try {
+			fs["renameSync"](old_, new_);
+		}
+		catch (e)
+		{}
+	};
+	
+	Acts.prototype.DeleteFile = function (path_)
+	{
+		if (!isNWjs)
+			return;
+		
+		try {
+			fs["unlinkSync"](path_);
+		}
+		catch (e)
+		{}
+	};
+	
+	Acts.prototype.CopyFile = function (path_, dest_)
+	{
+		if (!isNWjs || path_ === dest_)
+			return;
+		
+		try {
+			// Copy using binary mode
+			var contents = fs["readFileSync"](path_, {"flags": "rb"});
+			fs["writeFileSync"](dest_, contents, {"flags": "wb"});
+		}
+		catch (e)
+		{}
+	};
+	
+	Acts.prototype.MoveFile = function (path_, dest_)
+	{
+		if (!isNWjs || path_ === dest_)
+			return;
+		
+		try {
+			// Copy using binary mode
+			var contents = fs["readFileSync"](path_, {"flags": "rb"});
+			fs["writeFileSync"](dest_, contents, {"flags": "wb"});
+			
+			// Only delete source if the destination now exists - otherwise if there was an error
+			// we might delete the only copy of the file!
+			if (fs["existsSync"](dest_))
+				fs["unlinkSync"](path_);
+		}
+		catch (e)
+		{}
+	};
+	
+	Acts.prototype.RunFile = function (path_)
+	{
+		if (!isNWjs)
+			return;
+		
+		child_process["exec"](path_, function() {});
+	};
+	
+	Acts.prototype.ShellOpen = function (path_)
+	{
+		if (!isNWjs)
+			return;
+		
+		nw["Shell"]["openItem"](path_);
+	};
+	
+	Acts.prototype.OpenBrowser = function (url_)
+	{
+		if (!isNWjs)
+			return;
+		
+		nw["Shell"]["openExternal"](url_);
+	};
+	
+	Acts.prototype.CreateFolder = function (path_)
+	{
+		if (!isNWjs)
+			return;
+		
+		try {
+			fs["mkdirSync"](path_);
+		}
+		catch (e)
+		{}
+	};
+	
+	Acts.prototype.AppendFile = function (path_, contents_)
+	{
+		if (!isNWjs)
+			return;
+		
+		try {
+			fs["appendFileSync"](path_, contents_, {"encoding": "utf8"});
+		}
+		catch (e)
+		{}
+	};
+	
+	Acts.prototype.ListFiles = function (path_)
+	{
+		if (!isNWjs)
+			return;
+		
+		try {
+			filelist = fs["readdirSync"](path_);
+		}
+		catch (e)
+		{}
+		
+		if (!filelist)
+			filelist = [];
+	};
+	
+	Acts.prototype.ShowOpenDlg = function (accept_)
+	{
+		if (!isNWjs)
+			return;
+			
+		var dlg = document.getElementById("c2nwOpenFileDialog");
+		dlg.setAttribute("accept", accept_);
+		dlg.click();
+	};
+	
+	Acts.prototype.ShowFolderDlg = function (accept_)
+	{
+		if (!isNWjs)
+			return;
+			
+		document.getElementById("c2nwChooseFolderDialog").click();
+	};
+	
+	Acts.prototype.ShowSaveDlg = function (accept_)
+	{
+		if (!isNWjs)
+			return;
+		
+		var dlg = document.getElementById("c2nwSaveDialog");
+		dlg.setAttribute("accept", accept_);
+		dlg.click();
+	};
+	
+	Acts.prototype.SetWindowX = function (x_)
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Window"]["get"]()["x"] = x_;
+	};
+	
+	Acts.prototype.SetWindowY = function (y_)
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Window"]["get"]()["y"] = y_;
+	};
+	
+	Acts.prototype.SetWindowWidth = function (w_)
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Window"]["get"]()["width"] = w_;
+	};
+	
+	Acts.prototype.SetWindowHeight = function (h_)
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Window"]["get"]()["height"] = h_;
+	};
+	
+	Acts.prototype.SetWindowTitle = function (str)
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Window"]["get"]()["title"] = str;
+		document.title = str;
+	};
+	
+	Acts.prototype.WindowMinimize = function ()
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		// Note: needs 100ms delay to work around some kind of race condition bug in NW.js
+		var win = gui["Window"]["get"]();
+		
+		setTimeout(function () {
+			win["minimize"]();
+		}, 100);
+	};
+	
+	Acts.prototype.WindowMaximize = function ()
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		var win = gui["Window"]["get"]();
+		
+		setTimeout(function () {
+			win["maximize"]();
+		}, 100);
+	};
+	
+	Acts.prototype.WindowUnmaximize = function ()
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		var win = gui["Window"]["get"]();
+		
+		setTimeout(function () {
+			win["unmaximize"]();
+		}, 100);
+	};
+	
+	Acts.prototype.WindowRestore = function ()
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		var win = gui["Window"]["get"]();
+		
+		setTimeout(function () {
+			win["restore"]();
+		}, 100);
+	};
+	
+	Acts.prototype.WindowRequestAttention = function (request_)
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Window"]["get"]()["requestAttention"](request_ ? 3 : 0);
+	};
+	
+	Acts.prototype.WindowSetMaxSize = function (w, h)
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Window"]["get"]()["setMaximumSize"](w, h);
+	};
+	
+	Acts.prototype.WindowSetMinSize = function (w, h)
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Window"]["get"]()["setMinimumSize"](w, h);
+	};
+	
+	Acts.prototype.WindowSetResizable = function (x)
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Window"]["get"]()["setResizable"](x !== 0);
+	};
+	
+	Acts.prototype.WindowSetAlwaysOnTop = function (x)
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Window"]["get"]()["setAlwaysOnTop"](x !== 0);
+	};
+	
+	Acts.prototype.ShowDevTools = function ()
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Window"]["get"]()["showDevTools"]();
+	};
+	
+	Acts.prototype.SetClipboardText = function (str)
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Clipboard"]["get"]()["set"](str);
+	};
+	
+	Acts.prototype.ClearClipboard = function ()
+	{
+		if (!isNWjs || !gui)
+			return;
+		
+		gui["Clipboard"]["get"]()["clear"]();
+	};
+	
+	pluginProto.acts = new Acts();
+	
+	//////////////////////////////////////
+	// Expressions
+	function Exps() {};
+	
+	Exps.prototype.AppFolder = function (ret)
+	{
+		ret.set_string(nw_appfolder);
+	};
+	
+	Exps.prototype.AppFolderURL = function (ret)
+	{
+		// Force local file resolution when treated as a URL, e.g. for AJAX requests.
+		ret.set_string("file://" + nw_appfolder);
+	};
+	
+	Exps.prototype.ProjectFilesFolder = function (ret)
+	{
+		ret.set_string(nw_projectfilesfolder);
+	};
+	
+	Exps.prototype.ProjectFilesFolderURL = function (ret)
+	{
+		ret.set_string("file://" + nw_projectfilesfolder);
+	};
+	
+	Exps.prototype.UserFolder = function (ret)
+	{
+		ret.set_string(nw_userfolder);
+	};
+	
+	Exps.prototype.ReadFile = function (ret, path_)
+	{
+		if (!isNWjs)
+		{
+			ret.set_string("");
+			return;
+		}
+		
+		var contents = "";
+		
+		try {
+			contents = fs["readFileSync"](path_, {"encoding": "utf8"});
+		}
+		catch (e) {}
+		
+		ret.set_string(contents);
+	};
+	
+	Exps.prototype.FileSize = function (ret, path_)
+	{
+		if (!isNWjs)
+		{
+			ret.set_int(0);
+			return;
+		}
+		
+		var size = 0;
+		
+		try {
+			var stat = fs["statSync"](path_);
+			if (stat)
+				size = stat["size"] || 0;
+		}
+		catch (e) {}
+		
+		ret.set_int(size);
+	};
+	
+	Exps.prototype.ListCount = function (ret)
+	{
+		ret.set_int(filelist.length);
+	};
+	
+	Exps.prototype.ListAt = function (ret, index)
+	{
+		index = Math.floor(index);
+		
+		if (index < 0 || index >= filelist.length)
+			ret.set_string("");
+		else
+			ret.set_string(filelist[index]);
+	};
+	
+	Exps.prototype.DroppedFile = function (ret)
+	{
+		ret.set_string(droppedfile);
+	};
+	
+	Exps.prototype.ChosenPath = function (ret)
+	{
+		ret.set_string(chosenpath);
+	};
+	
+	Exps.prototype.WindowX = function (ret)
+	{
+		ret.set_int((isNWjs && gui) ? gui["Window"]["get"]()["x"] : 0);
+	};
+	
+	Exps.prototype.WindowY = function (ret)
+	{
+		ret.set_int((isNWjs && gui) ? gui["Window"]["get"]()["y"] : 0);
+	};
+	
+	Exps.prototype.WindowWidth = function (ret)
+	{
+		ret.set_int((isNWjs && gui) ? gui["Window"]["get"]()["width"] : 0);
+	};
+	
+	Exps.prototype.WindowHeight = function (ret)
+	{
+		ret.set_int((isNWjs && gui) ? gui["Window"]["get"]()["height"] : 0);
+	};
+	
+	Exps.prototype.WindowTitle = function (ret)
+	{
+		ret.set_string((isNWjs && gui) ? (gui["Window"]["get"]()["title"] || "") : 0);
+	};
+	
+	Exps.prototype.ClipboardText = function (ret)
+	{
+		ret.set_string((isNWjs && gui) ? (gui["Clipboard"]["get"]()["get"]() || "") : 0);
+	};
+	
+	pluginProto.exps = new Exps();
+
+}());
+
 // Solid
 // ECMAScript 5 strict mode
 
@@ -37245,6 +38020,11 @@ b2Vec2.Get = function (x, y)
 b2Vec2.Free = function (v)
 {
 	b2Vec2._freeCache.push(v);
+};
+
+b2Vec2.Clone = function (v)
+{
+	return b2Vec2.Get(v["get_x"](), v["get_y"]());
 };
 
 // For where vec2s are only needed temporarily and we don't want to make garbage
@@ -37372,6 +38152,9 @@ cr.b2Separator.Separate = function(verticesVec /*array of b2Vec2*/, objarea)
 				b2Vec2.Free(poly[j]);
 		}
 	}
+	
+	// Since box2d has a limit on 8 points for a convex poly, split any polys with more points in to multiple polys.
+	ret = SplitConvexPolysOver8Points(ret);
 	
 ;
 	return ret;
@@ -37545,6 +38328,56 @@ cr.b2Separator.calcShapes = function(verticesVec /*array of b2Vec2*/)
 
 	return figsVec;
 };
+
+function SplitConvexPolysOver8Points(convexPolys)
+{
+	var ret = [];
+	var i, len, arr;
+	
+	for (i = 0, len = convexPolys.length; i < len; ++i)
+	{
+		arr = convexPolys[i];
+		
+		// <=8 points: can directly use this poly
+		if (arr.length <= 8)
+		{
+			ret.push(arr);
+		}
+		// >8 points: split up
+		else
+		{
+			ret.push.apply(ret, SplitConvexPoly(arr));
+		}
+	}
+	
+	return ret;
+}
+
+function SplitConvexPoly(arr)
+{
+	var poly, nextLast;
+	var ret = [];
+	
+	// At first, take 8 points to make a new poly. For every poly after that, take only 6 more points, and join it to
+	// the first and last points to make a new 8-point poly.
+	ret.push(arr.splice(0, 8));
+	var first = ret[0][0];
+	var last = ret[0][7];
+	
+	while (arr.length)
+	{
+		poly = arr.splice(0, Math.min(arr.length, 6));
+		nextLast = poly[poly.length - 1];
+		poly.push(b2Vec2.Clone(first));
+		poly.push(b2Vec2.Clone(last));
+		ret.push(poly);
+		
+		last = nextLast;
+	}
+	
+	return ret;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 ;
@@ -39441,6 +40274,11 @@ cr.behaviors.Platform = function(runtime)
 			{
 				this.runtime.pushOutSolid(this.inst, -this.downx, -this.downy, 10, false);
 			}
+			// Try to push out on horizontal axis first, else push out in any direction
+			else if (this.runtime.pushOutSolidAxis(this.inst, this.rightx, this.righty, this.inst.width / 2))
+			{
+				this.runtime.registerCollision(this.inst, collobj);
+			}
 			else if (this.runtime.pushOutSolidNearest(this.inst, Math.max(this.inst.width, this.inst.height) / 2))
 			{
 				this.runtime.registerCollision(this.inst, collobj);
@@ -41035,7 +41873,7 @@ cr.behaviors.Bullet = function(runtime)
 			
 			this.travelled += cr.distanceTo(this.lastx, this.lasty, this.inst.x, this.inst.y);
 			
-			if (this.setAngle)
+			if (this.setAngle && (mx !== 0 || my !== 0))			// skip if no movement (e.g. dt is 0) otherwise resets angle to right
 			{
 				this.inst.angle = cr.angleTo(0, 0, mx, my);
 				this.inst.set_bbox_changed();
@@ -42517,6 +43355,7 @@ cr.getObjectRefTable = function () {
 		cr.plugins_.Spritefont2,
 		cr.behaviors.bound,
 		cr.plugins_.Audio,
+		cr.plugins_.NodeWebkit,
 		cr.plugins_.Function.prototype.cnds.OnFunction,
 		cr.system_object.prototype.acts.SetBoolVar,
 		cr.system_object.prototype.acts.SetTimescale,
@@ -42660,8 +43499,11 @@ cr.getObjectRefTable = function () {
 		cr.system_object.prototype.acts.GoToLayout,
 		cr.plugins_.Browser.prototype.acts.CancelFullScreen,
 		cr.plugins_.Browser.prototype.acts.RequestFullScreen,
+		cr.plugins_.NodeWebkit.prototype.acts.OpenBrowser,
+		cr.plugins_.Browser.prototype.acts.GoToURLWindow,
 		cr.system_object.prototype.acts.ResetPersisted,
-		cr.system_object.prototype.acts.ResetGlobals
+		cr.system_object.prototype.acts.ResetGlobals,
+		cr.plugins_.Browser.prototype.acts.Close
 	];
 };
 

@@ -263,7 +263,7 @@
 					return response.text();
 				}).then(function (text)
 				{
-					let prefixLine = "";
+					var prefixLine = "";
 					
 					if (USE_WASM)
 						prefixLine = "self[\"cr_opusWasmBinaryUrl\"] = \"" + window["cr_opusWasmBinaryUrl"] + "\";\n"
