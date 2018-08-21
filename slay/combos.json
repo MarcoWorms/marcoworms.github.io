@@ -1,0 +1,10 @@
+{
+    "c2dictionary": true,
+    "data": {
+        "hop": "<",
+        "strike": ">",
+        "backflip": "<<",
+        "thrust": ">>",
+        "dagger hop": "<>"
+    }
+}
