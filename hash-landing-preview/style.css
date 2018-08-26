@@ -2,6 +2,9 @@
   box-sizing: border-box;
 }
 
+html {
+}
+
 body {
 	background-color: #f3f3f3;
 	padding: 0;
@@ -34,10 +37,6 @@ body {
 	font-family: MilliardExtraLight;
 	src: url(MilliardExtraLight.otf);
 }
-@font-face {
-	font-family: Gizmo;
-	src: url(Gizmo.ttf);
-}
 
 h1 {
   font-family: MilliardExtraLight;
@@ -65,12 +64,18 @@ h2 {
 }
 
 header {
-  display: flex;
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+}
+
+header div {
   font-family: MilliardLight;
   background-color: #232323;
   align-items: center;
+  display: flex;
 }
-header img {
+header div img {
   margin-left: 45px;
   margin-right: 10px;
 
@@ -102,6 +107,8 @@ header img {
   width: 100px;
   text-decoration: none;
   transition: all 100ms ease-out;
+  cursor: pointer;
+  user-select: none;
 }
 .header-link:hover {
   opacity: 0.5;
@@ -115,6 +122,9 @@ header img {
   word-wrap: normal;
   width: 200px;
   text-align: right;
+}
+.header-link.blue-color-only {
+  color: #c9ecff;
 }
 
 .container {
@@ -153,6 +163,11 @@ header img {
 .bg-squares-1 {
   background-image: url("./L1_BLACK.png");
   color: #7e7e7e;
+  padding-left: 50px;
+}
+.bg-squares-1 > * {
+  opacity: 0;
+  transition: all 0.2s ease-out;
 }
 .button {
 	font-family: MilliardLight;
@@ -180,19 +195,25 @@ header img {
 }
 .bg-squares-2 {
   background-image: url("./L2_BLUE.png");
+  padding-left: 50px;
+}
+.bg-squares-2 > * {
+  opacity: 0;
+  transition: all 0.2s ease-out;
 }
 .bg-squares-2 .span-header {
   color: #4e6e7d;
 }
 
 .three-texts {
-  flex-direction: column;
+  align-items: flex-start;
 }
 .three-texts > div {
   display: flex;
   justify-content: space-between;
   width: 90%;
 }
+
 .three-texts > div > div {
   width: 192px;
   font-size: 14px;
@@ -207,8 +228,22 @@ header img {
   line-height: 1.08;
 }
 
+.box1-3, .box2-3, .box3-3 {
+  transition: all 0.3s ease-out;
+  opacity: 0;
+}
+
 .bg-squares-3 {
   background-image: url("./L3_BLACK.png");
+  padding-left: 50px;
+}
+.bg-squares-3 > * {
+  opacity: 0;
+  transition: all 0.2s ease-out;
+}
+.six-texts > div > div > div {
+  opacity: 0;
+  transition: all 0.2s ease-out;
 }
 .bg-squares-3 h2{
   margin-top: 277px;
@@ -217,30 +252,41 @@ header img {
 
 .six-texts {
   flex-direction: column;
+  justify-content: flex-start;
+  width: 50%;
 }
 .six-texts > div {
+  margin-top: 30px;
   flex-direction: column;
   justify-content: space-between;
+  width: 100%;
 }
 
 .six-texts > div > div {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   width: 100%;
 }
 .six-texts > div > div > div {
-  width: 192px;
+  width: 100px;
   font-size: 14px;
   line-height: 1.21;
   color: #6f97aa;
   font-family: 'Noto Sans', sans-serif;
 }
-.six-texts > div > div > h3 {
+.six-texts > div > div > div > h3 {
   font-family: MilliardBold;
-  font-size: 26px;
   font-weight: bold;
   line-height: 1.08;
+  margin: 7px 0;
 }
+.six-texts > div > div > div > span {
+  font-style: italic;
+}
+.six-texts > div > div > div > img {
+  opacity: 0;
+}
+
 
 .bg-squares-4 {
   background-image: url("./L4_WHITE.png");
@@ -335,4 +381,16 @@ footer {
   display: flex;
   justify-content: flex-end;
   cursor: pointer;
+}
+
+.ilustra {
+  position: fixed;
+  transition: all 0.4s ease-out;
+  transform: translate(0, -70px);
+  z-index: -1;
+}
+
+.tower {
+  position: fixed;
+  z-index: -1;
 }
