@@ -283,12 +283,12 @@ function thirdAnimation (t1, t2, t3, t4) {
 }
 
 const towerMiddleXY = [
-  { x: -316, y: -324, },
-  { x: -316, y: -125, },
-  { x: -40, y: -125, },
-  { x: -40, y: -324, },
-  { x: 238, y: -324, },
-  { x: 238, y: -125, },
+  { x: -246, y: -324, },
+  { x: -246, y: -125, },
+  { x: -24, y: -125, },
+  { x: -24, y: -324, },
+  { x: 197, y: -324, },
+  { x: 197, y: -125, },
 ]
 function animateTowers (t1, t2, t3, t4) {
   towers.forEach((tower, index) => {

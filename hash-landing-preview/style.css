@@ -253,7 +253,6 @@ header div img {
 .six-texts {
   flex-direction: column;
   justify-content: flex-start;
-  width: 50%;
 }
 .six-texts > div {
   margin-top: 30px;
@@ -264,10 +263,11 @@ header div img {
 
 .six-texts > div > div {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   width: 100%;
 }
 .six-texts > div > div > div {
+  margin: 0 60px;
   width: 100px;
   font-size: 14px;
   line-height: 1.21;
