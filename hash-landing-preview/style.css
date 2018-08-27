@@ -84,6 +84,7 @@ header div img {
 .header-1 {
   width: 578px;
   margin-bottom: 30px;
+  margin-top: 112px;
 }
 
 .header-highlight {
@@ -131,7 +132,7 @@ header div img {
   display: flex;
   flex-wrap: wrap;
 }
-@media (max-width: 1475px) {
+@media (max-width: 1430px) {
   .container {
     height: 3705px;
   }
@@ -163,7 +164,7 @@ header div img {
   align-items: center;
   justify-content: center;
 }
-@media (max-width: 1475px) {
+@media (max-width: 1430px) {
   .left-box {
     opacity: 0.9;
   }
@@ -173,7 +174,7 @@ header div img {
 }
 
 
-@media (max-width: 1475px) {
+@media (max-width: 1430px) {
   .bg-squares-1 {
     position: absolute;
   }
@@ -211,7 +212,7 @@ header div img {
 .blue:hover {
   opacity: 0.5;
 }
-@media (max-width: 1475px) {
+@media (max-width: 1430px) {
   .bg-squares-2 {
     position: absolute;
     top: 900px;
@@ -232,7 +233,7 @@ header div img {
 .three-texts {
   align-items: flex-start;
 }
-@media (max-width: 1475px) {
+@media (max-width: 1430px) {
   .three-texts {
     display: none;
   }
@@ -240,7 +241,7 @@ header div img {
 .three-texts > div {
   display: flex;
   justify-content: space-between;
-  width: 90%;
+  width: 100%;
 }
 
 .three-texts > div > div {
@@ -262,7 +263,11 @@ header div img {
   opacity: 0;
 }
 
-@media (max-width: 1475px) {
+.box3-3 {
+  margin-right: 10px;
+}
+
+@media (max-width: 1430px) {
   .bg-squares-3 {
     position: absolute;
     top: 1800px;
@@ -289,7 +294,7 @@ header div img {
   flex-direction: column;
   justify-content: flex-start;
 }
-@media (max-width: 1475px) {
+@media (max-width: 1430px) {
   .six-texts {
     display: none;
   }
@@ -308,11 +313,13 @@ header div img {
 }
 .six-texts > div > div > div {
   margin: 0 60px;
-  width: 100px;
+  min-width: 130px;
+  max-width: 130px;
   font-size: 14px;
   line-height: 1.21;
   color: #6f97aa;
   font-family: 'Noto Sans', sans-serif;
+  text-align: center;
 }
 .six-texts > div > div > div > h3 {
   font-family: MilliardBold;
@@ -322,13 +329,19 @@ header div img {
 }
 .six-texts > div > div > div > span {
   font-style: italic;
+  opacity: 0.7;
 }
 .six-texts > div > div > div > img {
   opacity: 0;
 }
+.dashes {
+  background-color: #8dabba40;
+  font-size: 5px;
+  color: transparent;
+}
 
 
-@media (max-width: 1475px) {
+@media (max-width: 1430px) {
   .bg-squares-4 {
     position: absolute;
     top: 2700px;

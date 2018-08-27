@@ -54,20 +54,20 @@ const towers = [
 // })
 
 const towersInitialXY = [
-  { x: -202, y: -145, },
-  { x: -105, y: -109, },
-  { x: 2, y: -65, },
-  { x: -32, y: -214, },
-  { x: 68, y: -170, },
-  { x: 171, y: -124, },
+  { x: -189, y: -68, },
+  { x: -109, y: -111, },
+  { x: -24, y: -146, },
+  { x: 12, y: 50, },
+  { x: 98, y: 2, },
+  { x: 180, y: -45, },
 ]
 const towerMiddleXY = [
-  { x: -246, y: -324, },
-  { x: -246, y: -125, },
-  { x: -24, y: -125, },
-  { x: -24, y: -324, },
-  { x: 197, y: -324, },
-  { x: 197, y: -125, },
+  { x: -247, y: -137, },
+  { x: -252, y: -324, },
+  { x: -5, y: -318, },
+  { x: -5, y: -137, },
+  { x: 250, y: -137, },
+  { x: 250, y: -324, },
 ]
 
 const startY = 55
@@ -196,7 +196,7 @@ function scrollTriggered () {
     }
   }
   if (
-    scroll > scrollSteps[2] - 100 &&
+    scroll > scrollSteps[2] - 30 &&
     scroll < scrollSteps[2] + 100
   ) {
     if (!thirdSquareShown) {
@@ -276,7 +276,7 @@ function secondAnimation (t1, t2, t3, t4) {
     return
   }
   ilustras.secondBig.style.transform = `translate(0, ${
-    lerp(secondY, -1000, t2)
+    lerp(secondY, -1500, t2)
   }px)`
 }
 
@@ -286,15 +286,15 @@ function animateTowers (t1, t2, t3, t4) {
     const { x: x2, y: y2 } = towerMiddleXY[index]
     if (t1 <= 1) {
       tower.style.transform = `translate(${x}px, ${
-        lerp(y + 10, 300 + y, t1 - 0.2 * (1 - t1) + 0.15 * (t1))
+        lerp(y + 10, 250 + y, t1 - 0.2 * (1 - t1) + 0.15 * (t1))
       }px)`
       return
     }
     if (t2 <= 1) {
       tower.style.transform = `translate(${
-        lerp(x, x2, t2)
+        lerp(x, x2, t2 - ((1-t2) * 0.3))
       }px, ${
-        lerp(300 + y, y2, t2)
+        lerp(250 + y, y2, t2 - ((1-t2) * 0.13))
       }px)`
       return
     }
@@ -313,12 +313,12 @@ function thirdAnimation (t1, t2, t3, t4) {
   }
   if (t2 < 1) {
     ilustras.thirdBig.style.transform = `translate(0, ${
-      lerp(secondY, 200, t2 - 0.2 * (1 - t2) + 0.5 * (t2))
+      lerp(secondY, 250, t2 - 0.2 * (1 - t2) + 0.5 * (t2))
     }px)`
     return
   }
   ilustras.thirdBig.style.transform = `translate(0, ${
-    lerp(200, -1000, t3)
+    lerp(250, -1000, t3)
   }px)`
 }
 
@@ -331,12 +331,12 @@ function fourthAnimation (t1, t2, t3, t4) {
   }
   if (t2 < 1) {
     ilustras.fourthBig.style.transform = `translate(0, ${
-      lerp(secondY, 200, t2 - 0.3 * (1 - t2) + 0.05 * (t2))
+      lerp(secondY, 250, t2 - 0.3 * (1 - t2) + 0.05 * (t2))
     }px)`
     return
   }
   ilustras.fourthBig.style.transform = `translate(0, ${
-    lerp(200, -200, t3)
+    lerp(250, -200, t3)
   }px)`
 }
 if (window.scrollY !== 0) {
@@ -348,14 +348,14 @@ window.addEventListener('scroll', () => {
 	window.clearTimeout( scrollingTimer )
 	scrollingTimer = setTimeout(() => {
     const snap = scrollSteps.find(s =>
-      s - 150 < scrollY &&
-      s + 150 > scrollY &&
-      s <= 2650
+      s - 250 < scrollY &&
+      s + 250 > scrollY &&
+      s < 2650
     )
     if (snap) {
       window.scroll({ top: snap, behavior: 'smooth'})
     }
-	}, 500)
+	}, 250)
 }, false)
 
 const frame = document.createElement('iframe')
