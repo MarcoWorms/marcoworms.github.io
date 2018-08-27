@@ -65,13 +65,13 @@ const towerMiddleXY = [
   { x: -220, y: -149, },
   { x: -222, y: -324, },
   { x: 0, y: -318, },
-  { x: 3, y: -137, },
+  { x: 0, y: -137, },
   { x: 220, y: -137, },
-  { x: 229, y: -324, },
+  { x: 220, y: -320, },
 ]
 
 const startY = 55
-const secondY = 300
+const secondY = 400
 
 Promise.resolve()
 .then(wait(500))
