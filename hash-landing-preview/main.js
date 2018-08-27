@@ -17,7 +17,7 @@ const scrollSteps = [
   850,
   1750,
   2650,
-  3050,
+  3000,
 ]
 
 const ilustras = {
@@ -71,7 +71,7 @@ const towerMiddleXY = [
 ]
 
 const startY = 55
-const secondY = 400
+const secondY = 265
 
 Promise.resolve()
 .then(wait(500))
@@ -122,17 +122,17 @@ firstSquareTest(0, 1, 20)
 
 function secondSquareTest (scroll, opacity, translateY) {
   secondSquareShown = !!opacity
+
   Promise.resolve()
-    .then(wait(150))
+    .then(wait(150 * opacity))
     .then(() => { document.querySelector('.box1-3').style.opacity = opacity })
     .then(() => { document.querySelector('.box1-3').style.transform = `translate(0, ${translateY}px)` })
-    .then(wait(150))
+    .then(wait(150 * opacity))
     .then(() => { document.querySelector('.box2-3').style.opacity = opacity })
     .then(() => { document.querySelector('.box2-3').style.transform = `translate(0, ${translateY}px)` })
-    .then(wait(150))
+    .then(wait(150 * opacity))
     .then(() => { document.querySelector('.box3-3').style.opacity = opacity })
     .then(() => { document.querySelector('.box3-3').style.transform = `translate(0, ${translateY}px)` })
-
   Promise.resolve()
     .then(wait(100))
     .then(() => { document.querySelector('.bg2-1').style.opacity = 1 })
@@ -184,8 +184,8 @@ function scrollTriggered () {
   }
 
   if (
-    scroll > scrollSteps[1] - 30 &&
-    scroll < scrollSteps[1] + 100
+    scroll > scrollSteps[1] - 200 &&
+    scroll < scrollSteps[1] + 200
   ) {
     if (!secondSquareShown) {
       secondSquareTest(scroll, 1, 20)
@@ -196,8 +196,8 @@ function scrollTriggered () {
     }
   }
   if (
-    scroll > scrollSteps[2] - 30 &&
-    scroll < scrollSteps[2] + 100
+    scroll > scrollSteps[2] - 200 &&
+    scroll < scrollSteps[2] + 200
   ) {
     if (!thirdSquareShown) {
       thirdSquareTest(scroll, 1, 20)
@@ -347,15 +347,17 @@ var scrollingTimer;
 window.addEventListener('scroll', () => {
 	window.clearTimeout( scrollingTimer )
 	scrollingTimer = setTimeout(() => {
-    const snap = scrollSteps.find(s =>
-      s - 250 < scrollY &&
-      s + 250 > scrollY &&
-      s < 2650
+    const snap = scrollSteps.concat().reverse().find(s =>
+      scrollY > 10 &&
+      s - 150 < scrollY &&
+      s + 150 > scrollY &&
+      s <= 2650 &&
+      scrollY <= 2650
     )
     if (snap) {
       window.scroll({ top: snap, behavior: 'smooth'})
     }
-	}, 250)
+	}, 66)
 }, false)
 
 const frame = document.createElement('iframe')

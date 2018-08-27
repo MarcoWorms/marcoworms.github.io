@@ -123,6 +123,7 @@ header div img {
   word-wrap: normal;
   width: 200px;
   text-align: right;
+  padding-right: 30px;
 }
 .header-link.blue-color-only {
   color: #c9ecff;
@@ -142,7 +143,7 @@ header div img {
   /* border: solid 1px red; */
   width: 50vw;
   max-width: 798px;
-  min-width: 695px;
+  min-width: 700px;
   height: 900px;
   display: flex;
   flex-direction: column;
@@ -161,7 +162,7 @@ header div img {
 
 .right-box {
   /* border: solid 1px red; */
-  width: calc(100% - 798px);
+  width: calc(50vw - 100px);
   height: 900px;
   display: flex;
   align-items: center;
@@ -185,7 +186,7 @@ header div img {
 .bg-squares-1 {
   background-image: url("./L1_BLACK.png");
   color: #7e7e7e;
-  padding-left: 30px;
+  padding-left: 3%;
 }
 .bg-squares-1 > * {
   opacity: 0;
@@ -210,7 +211,7 @@ header div img {
 .button.blue {
   color: #c9ecff;
   border: solid 1px #c9ecff;
-  margin-left: 150px;
+  margin-left: 40px;
 }
 .blue:hover {
   opacity: 0.5;
@@ -223,8 +224,8 @@ header div img {
 }
 .bg-squares-2 {
   background-image: url("./L2_BLUE.png");
-  padding-left: 30px;
-  padding-top: 160px;
+  padding-left: 3%;
+  padding-top: 90px;
 }
 .bg-squares-2 > * {
   opacity: 0;
@@ -244,7 +245,7 @@ header div img {
 }
 .three-texts > div {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   width: 100%;
 }
 
@@ -279,7 +280,7 @@ header div img {
 }
 .bg-squares-3 {
   background-image: url("./L3_BLACK.png");
-  padding-left: 30px;
+  padding-left: 3%;
 }
 .bg-squares-3 > * {
   opacity: 0;
@@ -392,7 +393,7 @@ header div img {
 }
 
 .investors {
-  margin-top: 30px;
+  margin-top: 80px;
   height: 58px;
   display: flex;
   align-items: center;
@@ -412,7 +413,7 @@ footer {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 95px;
+  height: 55px;
 }
 
 .info > span {
@@ -435,15 +436,16 @@ footer {
   height: 95px;
 }
 
-.media > div > img {
+.media > a > img {
   margin-left: 10px;
   margin-right: 10px;
 }
 
-.media > div {
+.media > a {
   display: flex;
   justify-content: flex-end;
-  cursor: pointer;
+  text-decoration: none;
+  color: #b9b9b9;
 }
 
 .ilustra {
