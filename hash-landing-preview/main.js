@@ -36,24 +36,42 @@ const towers = [
   document.querySelector('.t6'),
 ]
 
-const towersInitialXY = towers.map(tower => {
-  return {
-    x: parseInt(
-      window
-        .getComputedStyle(tower)
-        .getPropertyValue('transform')
-        .split(',')[4]
-    ),
-    y: parseInt(
-      window
-        .getComputedStyle(tower)
-        .getPropertyValue('transform')
-        .split(',')[5]
-    ),
-  }
-})
+// const towersInitialXY = towers.map(tower => {
+//   return {
+//     x: parseInt(
+//       window
+//         .getComputedStyle(tower)
+//         .getPropertyValue('transform')
+//         .split(',')[4]
+//     ),
+//     y: parseInt(
+//       window
+//         .getComputedStyle(tower)
+//         .getPropertyValue('transform')
+//         .split(',')[5]
+//     ),
+//   }
+// })
 
-const startY = -50
+const towersInitialXY = [
+  { x: -202, y: -145, },
+  { x: -105, y: -109, },
+  { x: 2, y: -65, },
+  { x: -32, y: -214, },
+  { x: 68, y: -170, },
+  { x: 171, y: -124, },
+]
+const towerMiddleXY = [
+  { x: -246, y: -324, },
+  { x: -246, y: -125, },
+  { x: -24, y: -125, },
+  { x: -24, y: -324, },
+  { x: 197, y: -324, },
+  { x: 197, y: -125, },
+]
+
+const startY = 55
+const secondY = 300
 
 Promise.resolve()
 .then(wait(500))
@@ -166,7 +184,7 @@ function scrollTriggered () {
   }
 
   if (
-    scroll > scrollSteps[1] - 100 &&
+    scroll > scrollSteps[1] - 30 &&
     scroll < scrollSteps[1] + 100
   ) {
     if (!secondSquareShown) {
@@ -253,49 +271,22 @@ function firstAnimation (t1, t2, t3, t4) {
 function secondAnimation (t1, t2, t3, t4) {
   if (t1 < 1) {
     ilustras.secondBig.style.transform = `translate(0, ${
-      lerp(startY, 250, t1 - 0.3 * (1 - t1) + 0.1 * (t1))
+      lerp(startY, secondY, t1 - 0.3 * (1 - t1) + 0.1 * (t1))
     }px)`
     return
   }
   ilustras.secondBig.style.transform = `translate(0, ${
-    lerp(250, -1000, t2)
+    lerp(secondY, -1000, t2)
   }px)`
 }
 
-function thirdAnimation (t1, t2, t3, t4) {
-
-  if (t1 < 1) {
-    ilustras.thirdBig.style.transform = `translate(0, ${
-      lerp(startY, 250, t1 - 0.2 * (1 - t1) + 0.15 * (t1))
-    }px)`
-    return
-  }
-  if (t2 < 1) {
-    ilustras.thirdBig.style.transform = `translate(0, ${
-      lerp(250, 180, t2 - 0.2 * (1 - t2) + 0.5 * (t2))
-    }px)`
-    return
-  }
-  ilustras.thirdBig.style.transform = `translate(0, ${
-    lerp(180, -1000, t3)
-  }px)`
-}
-
-const towerMiddleXY = [
-  { x: -246, y: -324, },
-  { x: -246, y: -125, },
-  { x: -24, y: -125, },
-  { x: -24, y: -324, },
-  { x: 197, y: -324, },
-  { x: 197, y: -125, },
-]
 function animateTowers (t1, t2, t3, t4) {
   towers.forEach((tower, index) => {
     const { x, y } = towersInitialXY[index]
     const { x: x2, y: y2 } = towerMiddleXY[index]
     if (t1 <= 1) {
       tower.style.transform = `translate(${x}px, ${
-        lerp(y + 10, 318 + y, t1 - 0.2 * (1 - t1) + 0.15 * (t1))
+        lerp(y + 10, 300 + y, t1 - 0.2 * (1 - t1) + 0.15 * (t1))
       }px)`
       return
     }
@@ -303,7 +294,7 @@ function animateTowers (t1, t2, t3, t4) {
       tower.style.transform = `translate(${
         lerp(x, x2, t2)
       }px, ${
-        lerp(318 + y, y2, t2)
+        lerp(300 + y, y2, t2)
       }px)`
       return
     }
@@ -313,21 +304,39 @@ function animateTowers (t1, t2, t3, t4) {
   })
 }
 
+function thirdAnimation (t1, t2, t3, t4) {
+  if (t1 < 1) {
+    ilustras.thirdBig.style.transform = `translate(0, ${
+      lerp(startY, secondY, t1 - 0.2 * (1 - t1) + 0.15 * (t1))
+    }px)`
+    return
+  }
+  if (t2 < 1) {
+    ilustras.thirdBig.style.transform = `translate(0, ${
+      lerp(secondY, 200, t2 - 0.2 * (1 - t2) + 0.5 * (t2))
+    }px)`
+    return
+  }
+  ilustras.thirdBig.style.transform = `translate(0, ${
+    lerp(200, -1000, t3)
+  }px)`
+}
+
 function fourthAnimation (t1, t2, t3, t4) {
   if (t1 < 1) {
     ilustras.fourthBig.style.transform = `translate(0, ${
-      lerp(startY, 250, t1 - 0.1 * (1 - t1) + 0.2 * (t1))
+      lerp(startY, secondY, t1 - 0.1 * (1 - t1) + 0.2 * (t1))
     }px)`
     return
   }
   if (t2 < 1) {
     ilustras.fourthBig.style.transform = `translate(0, ${
-      lerp(250, 180, t2 - 0.3 * (1 - t2) + 0.05 * (t2))
+      lerp(secondY, 200, t2 - 0.3 * (1 - t2) + 0.05 * (t2))
     }px)`
     return
   }
   ilustras.fourthBig.style.transform = `translate(0, ${
-    lerp(180, -100, t3)
+    lerp(200, -200, t3)
   }px)`
 }
 if (window.scrollY !== 0) {
@@ -341,12 +350,12 @@ window.addEventListener('scroll', () => {
     const snap = scrollSteps.find(s =>
       s - 150 < scrollY &&
       s + 150 > scrollY &&
-      s < 2650
+      s <= 2650
     )
     if (snap) {
       window.scroll({ top: snap, behavior: 'smooth'})
     }
-	}, 66)
+	}, 500)
 }, false)
 
 const frame = document.createElement('iframe')
