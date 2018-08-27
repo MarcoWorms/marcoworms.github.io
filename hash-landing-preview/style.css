@@ -221,6 +221,7 @@ header div img {
 .bg-squares-2 {
   background-image: url("./L2_BLUE.png");
   padding-left: 50px;
+  padding-top: 160px;
 }
 .bg-squares-2 > * {
   opacity: 0;
@@ -286,7 +287,7 @@ header div img {
   transition: all 0.2s ease-out;
 }
 .bg-squares-3 h2{
-  margin-top: 277px;
+  margin-top: 200px;
   margin-bottom: 30px;
 }
 
@@ -313,8 +314,8 @@ header div img {
 }
 .six-texts > div > div > div {
   margin: 0 60px;
-  min-width: 130px;
-  max-width: 130px;
+  min-width: 100px;
+  max-width: 100px;
   font-size: 14px;
   line-height: 1.21;
   color: #6f97aa;
@@ -325,7 +326,8 @@ header div img {
   font-family: MilliardBold;
   font-weight: bold;
   line-height: 1.08;
-  margin: 7px 0;
+  margin-top: 7px;
+  margin-bottom: 0px;
 }
 .six-texts > div > div > div > span {
   font-style: italic;
@@ -338,6 +340,10 @@ header div img {
   background-color: #8dabba40;
   font-size: 5px;
   color: transparent;
+  margin-left: 15px;
+}
+.dashes.fornecedores {
+  margin-left: 30px;
 }
 
 
