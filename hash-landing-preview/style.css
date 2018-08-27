@@ -153,11 +153,16 @@ header div img {
 .right-box {
   /* border: solid 1px red; */
   width: calc(100% - 798px);
-  min-width: 30vw;
   height: 900px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (max-width: 1300px) {
+  .right-box {
+    display: none;
+  }
 }
 
 .bg-squares-1 {

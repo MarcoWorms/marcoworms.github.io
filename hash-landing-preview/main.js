@@ -129,7 +129,6 @@ function secondSquareTest (scroll, opacity, translateY) {
 
 function thirdSquareTest (scroll, opacity, translateY) {
   thirdSquareShown = !!opacity
-  console.log(opacity)
   Promise.resolve()
     .then(wait(75))
     .then(() => { document.querySelector('.box1-6').style.opacity = opacity })
