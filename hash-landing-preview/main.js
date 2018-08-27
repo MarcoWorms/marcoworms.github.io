@@ -196,8 +196,8 @@ function scrollTriggered () {
     }
   }
   if (
-    scroll > scrollSteps[2] - 200 &&
-    scroll < scrollSteps[2] + 200
+    scroll > scrollSteps[2] - 100 &&
+    scroll < scrollSteps[2] + 100
   ) {
     if (!thirdSquareShown) {
       thirdSquareTest(scroll, 1, 20)
