@@ -64,10 +64,10 @@ const towersInitialXY = [
 const towerMiddleXY = [
   { x: -220, y: -149, },
   { x: -222, y: -324, },
-  { x: -5, y: -318, },
-  { x: -5, y: -137, },
+  { x: 0, y: -318, },
+  { x: 3, y: -137, },
   { x: 220, y: -137, },
-  { x: 220, y: -324, },
+  { x: 229, y: -324, },
 ]
 
 const startY = 55
