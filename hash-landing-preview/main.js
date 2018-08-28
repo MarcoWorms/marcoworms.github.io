@@ -122,17 +122,6 @@ firstSquareTest(0, 1, 20)
 
 function secondSquareTest (scroll, opacity, translateY) {
   secondSquareShown = !!opacity
-
-  Promise.resolve()
-    .then(wait(150 * opacity))
-    .then(() => { document.querySelector('.box1-3').style.opacity = opacity })
-    .then(() => { document.querySelector('.box1-3').style.transform = `translate(0, ${translateY}px)` })
-    .then(wait(150 * opacity))
-    .then(() => { document.querySelector('.box2-3').style.opacity = opacity })
-    .then(() => { document.querySelector('.box2-3').style.transform = `translate(0, ${translateY}px)` })
-    .then(wait(150 * opacity))
-    .then(() => { document.querySelector('.box3-3').style.opacity = opacity })
-    .then(() => { document.querySelector('.box3-3').style.transform = `translate(0, ${translateY}px)` })
   Promise.resolve()
     .then(wait(100))
     .then(() => { document.querySelector('.bg2-1').style.opacity = 1 })
@@ -143,6 +132,19 @@ function secondSquareTest (scroll, opacity, translateY) {
     .then(wait(100))
     .then(() => { document.querySelector('.bg2-3').style.opacity = 1 })
     .then(() => { document.querySelector('.bg2-3').style.transform = `translate(20px, 0)` })
+}
+
+function secondSquareTestTexts (scroll, opacity, translateY) {
+  Promise.resolve()
+    .then(wait(150 * opacity))
+    .then(() => { document.querySelector('.box1-3').style.opacity = opacity })
+    .then(() => { document.querySelector('.box1-3').style.transform = `translate(0, ${translateY}px)` })
+    .then(wait(150 * opacity))
+    .then(() => { document.querySelector('.box2-3').style.opacity = opacity })
+    .then(() => { document.querySelector('.box2-3').style.transform = `translate(0, ${translateY}px)` })
+    .then(wait(150 * opacity))
+    .then(() => { document.querySelector('.box3-3').style.opacity = opacity })
+    .then(() => { document.querySelector('.box3-3').style.transform = `translate(0, ${translateY}px)` })
 }
 
 function thirdSquareTest (scroll, opacity, translateY) {
@@ -196,8 +198,16 @@ function scrollTriggered () {
     }
   }
   if (
-    scroll > scrollSteps[2] - 100 &&
-    scroll < scrollSteps[2] + 100
+    scroll > scrollSteps[1] - 70 &&
+    scroll < scrollSteps[1] + 70
+  ) {
+    secondSquareTestTexts(scroll, 1, 20)
+  } else {
+    secondSquareTestTexts(scroll, 0, 0)
+  }
+  if (
+    scroll > scrollSteps[2] - 85 &&
+    scroll < scrollSteps[2] + 85
   ) {
     if (!thirdSquareShown) {
       thirdSquareTest(scroll, 1, 20)
@@ -349,8 +359,8 @@ window.addEventListener('scroll', () => {
 	scrollingTimer = setTimeout(() => {
     const snap = scrollSteps.concat().reverse().find(s =>
       scrollY > 10 &&
-      s - 150 < scrollY &&
-      s + 150 > scrollY &&
+      s - 100 < scrollY &&
+      s + 100 > scrollY &&
       s <= 2650 &&
       scrollY <= 2650
     )
@@ -361,7 +371,7 @@ window.addEventListener('scroll', () => {
 }, false)
 
 const frame = document.createElement('iframe')
-frame.src = 'http://app.pipefy.com/public/form/Gp5ojRgJ?embedded=true'
+frame.src = 'https://app.pipefy.com/public/form/Gp5ojRgJ?embedded=true'
 frame.frameBorder = 0
 frame.classList = 'pipefy-form' 
 document.querySelector('.bg-squares-4').appendChild(frame)
