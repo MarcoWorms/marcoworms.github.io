@@ -637,6 +637,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.System.Acts.Wait,
 		C3.Plugins.Sprite.Cnds.IsOverlapping,
 		C3.Plugins.Sprite.Cnds.CompareOpacity,
+		C3.Plugins.System.Cnds.TriggerOnce,
 		C3.Plugins.System.Acts.NextPrevLayout,
 		C3.Plugins.System.Acts.RestartLayout,
 		C3.Plugins.TiledBg.Cnds.CompareInstanceVar,
