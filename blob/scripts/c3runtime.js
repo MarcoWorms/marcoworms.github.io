@@ -836,11 +836,6 @@ self.C3_JsPropNameTable = [
 		},
 		p => {
 			const n0 = p._GetNode(0);
-			const n1 = p._GetNode(1);
-			return () => (n0.ExpObject() - (n1.ExpObject() / 2));
-		},
-		p => {
-			const n0 = p._GetNode(0);
 			return () => (-n0.ExpBehavior());
 		},
 		() => 0.3,
