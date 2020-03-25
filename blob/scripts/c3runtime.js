@@ -822,17 +822,8 @@ self.C3_JsPropNameTable = [
 		p => {
 			const n0 = p._GetNode(0);
 			const n1 = p._GetNode(1);
-			return () => C3.lerp(n0.ExpObject(), (n1.ExpObject() + 16), 0.5);
-		},
-		p => {
-			const n0 = p._GetNode(0);
-			const n1 = p._GetNode(1);
 			const n2 = p._GetNode(2);
 			return () => C3.lerp(n0.ExpObject(), (n1.ExpObject() - (n2.ExpObject() / 2)), 0.5);
-		},
-		p => {
-			const n0 = p._GetNode(0);
-			return () => (n0.ExpObject() + 16);
 		},
 		p => {
 			const n0 = p._GetNode(0);
