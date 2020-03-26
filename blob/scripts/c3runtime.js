@@ -575,18 +575,6 @@ self["C3_Shaders"] = {};
 
 "use strict";C3.Plugins.InstantGames.Exps={Locale(){return this._locale},Platform(){return this._platform},SDKVersion(){return this._sdkVersion},ContextID(){return this._contextId},ContextType(){return this._contextType||"SOLO"},PlayerName(){return this._playerName},PlayerPhotoURL(){return this._playerPhoto},PlayerID(){return this._playerId},PlayerData(){return this._lastPlayerData},EntryPointData(){return this._entryPointData},ConnectedPlayerCount(){return this._connectedPlayers.length},ConnectedPlayerIDAt(a){const b=this._GetConnectedPlayerAt(a);return b?b["id"]:""},ConnectedPlayerNameAt(a){const b=this._GetConnectedPlayerAt(a);return b?b["name"]:""},ConnectedPlayerPhotoURLAt(a){const b=this._GetConnectedPlayerAt(a);return b?b["photo"]:""},PlayerScore(){return this._playerScore},PlayerRank(){return this._playerRank},LeaderboardResultCount(){return this._leaderboardEntries.length},LeaderboardScoreAt(a){const b=this._GetLeaderboardEntryAt(a);return b?b["score"]:0},LeaderboardRankAt(a){const b=this._GetLeaderboardEntryAt(a);return b?b["rank"]:0},LeaderboardPlayerNameAt(a){const b=this._GetLeaderboardEntryAt(a);return b?b["playerName"]:""},LeaderboardPlayerIDAt(a){const b=this._GetLeaderboardEntryAt(a);return b?b["playerId"]:""},LeaderboardPlayerPhotoURLAt(a){const b=this._GetLeaderboardEntryAt(a);return b?b["playerPhoto"]:""}};
 
-"use strict";C3.Behaviors.solid=class extends C3.SDKBehaviorBase{constructor(a){super(a)}Release(){super.Release()}};
-
-"use strict";C3.Behaviors.solid.Type=class extends C3.SDKBehaviorTypeBase{constructor(a){super(a)}Release(){super.Release()}OnCreate(){}};
-
-"use strict";{const a=new Set;C3.Behaviors.solid.Instance=class extends C3.SDKBehaviorInstanceBase{constructor(a,b){super(a),this.SetEnabled(!0),b&&(this.SetEnabled(b[0]),this.SetTags(b[1]))}Release(){super.Release()}SetEnabled(a){this._inst._SetSolidEnabled(!!a)}IsEnabled(){return this._inst._IsSolidEnabled()}SetTags(a){const b=this._inst.GetSavedDataMap();if(!a.trim())return void b.delete("solidTags");let c=b.get("solidTags");c||(c=new Set,b.set("solidTags",c)),c.clear();for(const b of a.split(" "))b&&c.add(b.toLowerCase())}GetTags(){return this._inst.GetSavedDataMap().get("solidTags")||a}SaveToJson(){return{"e":this.IsEnabled()}}LoadFromJson(a){this.SetEnabled(a["e"])}GetPropertyValueByIndex(a){return a===0?this.IsEnabled():void 0}SetPropertyValueByIndex(a,b){a===0?this.SetEnabled(b):void 0}GetDebuggerProperties(){return[{title:"$"+this.GetBehaviorType().GetName(),properties:[{name:"behaviors.solid.properties.enabled.name",value:this.IsEnabled(),onedit:(a)=>this.SetEnabled(a)}]}]}}}
-
-"use strict";C3.Behaviors.solid.Cnds={IsEnabled(){return this.IsEnabled()}};
-
-"use strict";C3.Behaviors.solid.Acts={SetEnabled(a){this.SetEnabled(a)},SetTags(a){this.SetTags(a)}};
-
-"use strict";C3.Behaviors.solid.Exps={};
-
 "use strict";C3.Behaviors.Platform=class extends C3.SDKBehaviorBase{constructor(a){super(a)}Release(){super.Release()}};
 
 "use strict";C3.Behaviors.Platform.Type=class extends C3.SDKBehaviorTypeBase{constructor(a){super(a)}Release(){super.Release()}OnCreate(){}};
@@ -611,11 +599,22 @@ self["C3_Shaders"] = {};
 
 "use strict";C3.Behaviors.Persist.Exps={};
 
+"use strict";C3.Behaviors.solid=class extends C3.SDKBehaviorBase{constructor(a){super(a)}Release(){super.Release()}};
+
+"use strict";C3.Behaviors.solid.Type=class extends C3.SDKBehaviorTypeBase{constructor(a){super(a)}Release(){super.Release()}OnCreate(){}};
+
+"use strict";{const a=new Set;C3.Behaviors.solid.Instance=class extends C3.SDKBehaviorInstanceBase{constructor(a,b){super(a),this.SetEnabled(!0),b&&(this.SetEnabled(b[0]),this.SetTags(b[1]))}Release(){super.Release()}SetEnabled(a){this._inst._SetSolidEnabled(!!a)}IsEnabled(){return this._inst._IsSolidEnabled()}SetTags(a){const b=this._inst.GetSavedDataMap();if(!a.trim())return void b.delete("solidTags");let c=b.get("solidTags");c||(c=new Set,b.set("solidTags",c)),c.clear();for(const b of a.split(" "))b&&c.add(b.toLowerCase())}GetTags(){return this._inst.GetSavedDataMap().get("solidTags")||a}SaveToJson(){return{"e":this.IsEnabled()}}LoadFromJson(a){this.SetEnabled(a["e"])}GetPropertyValueByIndex(a){return a===0?this.IsEnabled():void 0}SetPropertyValueByIndex(a,b){a===0?this.SetEnabled(b):void 0}GetDebuggerProperties(){return[{title:"$"+this.GetBehaviorType().GetName(),properties:[{name:"behaviors.solid.properties.enabled.name",value:this.IsEnabled(),onedit:(a)=>this.SetEnabled(a)}]}]}}}
+
+"use strict";C3.Behaviors.solid.Cnds={IsEnabled(){return this.IsEnabled()}};
+
+"use strict";C3.Behaviors.solid.Acts={SetEnabled(a){this.SetEnabled(a)},SetTags(a){this.SetTags(a)}};
+
+"use strict";C3.Behaviors.solid.Exps={};
+
 "use strict"
 self.C3_GetObjectRefTable = function () {
 	return [
 		C3.Plugins.Sprite,
-		C3.Behaviors.solid,
 		C3.Behaviors.Platform,
 		C3.Plugins.Keyboard,
 		C3.Plugins.Touch,
@@ -624,6 +623,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Text,
 		C3.Plugins.TiledBg,
 		C3.Plugins.Tilemap,
+		C3.Behaviors.solid,
 		C3.Plugins.InstantGames,
 		C3.Plugins.System.Cnds.OnLayoutStart,
 		C3.Plugins.Sprite.Acts.Destroy,
@@ -643,19 +643,22 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.System.Exps.dt,
 		C3.Plugins.Sprite.Cnds.OnCollision,
 		C3.Plugins.Sprite.Acts.SetAnim,
+		C3.Plugins.Sprite.Acts.SetBoolInstanceVar,
 		C3.Plugins.Sprite.Acts.SetPos,
 		C3.Plugins.Sprite.Exps.Height,
 		C3.Plugins.System.Acts.Wait,
-		C3.Behaviors.Platform.Acts.SetVectorY,
-		C3.Behaviors.Platform.Exps.JumpStrength,
 		C3.Plugins.Sprite.Cnds.IsOverlapping,
 		C3.Plugins.Sprite.Cnds.CompareOpacity,
 		C3.Plugins.System.Cnds.TriggerOnce,
+		C3.Behaviors.Platform.Acts.SetVectorY,
+		C3.Behaviors.Platform.Exps.JumpStrength,
 		C3.Plugins.Sprite.Acts.SetOpacity,
 		C3.Plugins.System.Acts.NextPrevLayout,
 		C3.Plugins.System.Acts.RestartLayout,
 		C3.Plugins.TiledBg.Cnds.CompareInstanceVar,
 		C3.Plugins.TiledBg.Acts.Destroy,
+		C3.Behaviors.Platform.Cnds.IsOnFloor,
+		C3.Plugins.Sprite.Cnds.IsBoolInstanceVarSet,
 		C3.Behaviors.Platform.Acts.SimulateControl,
 		C3.Plugins.Sprite.Acts.SetMirrored,
 		C3.Plugins.System.Cnds.IsGroupActive,
@@ -674,8 +677,8 @@ self.C3_GetObjectRefTable = function () {
 	];
 };
 self.C3_JsPropNameTable = [
-	{Solid: 0},
-	{Wall: 0},
+	{UsingBoots: 0},
+	{ableToJump: 0},
 	{Platform: 0},
 	{Player: 0},
 	{Objective: 0},
@@ -683,17 +686,14 @@ self.C3_JsPropNameTable = [
 	{Touch: 0},
 	{Gamepad: 0},
 	{Jump: 0},
-	{Die: 0},
 	{id: 0},
-	{GateOld: 0},
 	{Persist: 0},
 	{GateDestroyer: 0},
 	{Spawn: 0},
-	{Wall2: 0},
 	{Text: 0},
-	{JumpTmp: 0},
 	{RunTime: 0},
 	{Spike: 0},
+	{Solid: 0},
 	{Tilemap: 0},
 	{Gate: 0},
 	{TiledBackground2: 0},
@@ -701,8 +701,12 @@ self.C3_JsPropNameTable = [
 	{Gate2: 0},
 	{GateDestroyer2: 0},
 	{InstantGames: 0},
+	{PowerUp: 0},
+	{JumpTmp: 0},
 	{runTime: 0},
 	{countingTime: 0},
+	{leftPressed: 0},
+	{rightPressed: 0},
 	{deadzone: 0}
 ];
 
@@ -825,15 +829,16 @@ self.C3_JsPropNameTable = [
 			const n2 = p._GetNode(2);
 			return () => C3.lerp(n0.ExpObject(), (n1.ExpObject() - (n2.ExpObject() / 2)), 0.5);
 		},
+		() => 0.3,
+		() => 20,
 		p => {
 			const n0 = p._GetNode(0);
 			return () => (-n0.ExpBehavior());
 		},
-		() => 0.3,
-		() => 20,
 		() => 0.1,
 		() => 0.75,
 		() => 100,
+		() => "JumpBoots",
 		() => "closed",
 		p => {
 			const n0 = p._GetNode(0);
