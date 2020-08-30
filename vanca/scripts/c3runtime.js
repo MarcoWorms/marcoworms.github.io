@@ -3319,6 +3319,7 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		{Sprite2: 0},
 		{Pin: 0},
 		{Particles2: 0},
+		{TiledBackground: 0},
 		{startLayoutTIme: 0},
 		{rng: 0}
 	];
@@ -3544,7 +3545,7 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 			const n1 = p._GetNode(1);
 			return () => (and("You have reached [b]", Math.floor(((n0.ExpObject() / n1.ExpObject()) * 100))) + "%[/b] of the current stage.");
 		},
-		() => 2000,
+		() => 1500,
 		() => "JumpWithKick",
 		p => {
 			const n0 = p._GetNode(0);
