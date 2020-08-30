@@ -3245,6 +3245,8 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		C3.Plugins.Particles.Acts.Destroy,
 		C3.Plugins.Sprite.Acts.SetY,
 		C3.Behaviors.Platform.Acts.SimulateControl,
+		C3.Plugins.Sprite.Cnds.IsOverlappingOffset,
+		C3.Behaviors.Fade.Acts.StartFade,
 		C3.Plugins.Sprite.Acts.SetX,
 		C3.Behaviors.Platform.Cnds.IsFalling,
 		C3.Plugins.Sprite.Acts.SetAnimFrame,
@@ -3593,8 +3595,7 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			return () => ("Version: " + f0());
-		},
-		() => "kick"
+		}
 	];
 }
 
