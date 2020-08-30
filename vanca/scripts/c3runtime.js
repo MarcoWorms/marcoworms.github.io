@@ -3230,17 +3230,17 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		C3.Behaviors.Platform.Acts.SetGravity,
 		C3.Plugins.Sprite.Acts.SetAnimSpeed,
 		C3.Plugins.Touch.Cnds.OnNthTouchStart,
-		C3.Plugins.Sprite.Cnds.CompareFrame,
-		C3.Plugins.Sprite.Exps.AnimationFrameCount,
-		C3.Plugins.System.Acts.CreateObject,
-		C3.Plugins.Sprite.Acts.Spawn,
-		C3.Plugins.Particles.Acts.SetAngle,
-		C3.Behaviors.Platform.Acts.SetVectorY,
-		C3.Behaviors.Platform.Exps.JumpStrength,
 		C3.Plugins.Sprite.Acts.SetInstanceVar,
+		C3.Plugins.System.Acts.CreateObject,
 		C3.Plugins.Sprite.Exps.ImagePointX,
 		C3.Plugins.Sprite.Exps.ImagePointY,
+		C3.Plugins.Particles.Acts.SetAngle,
 		C3.Behaviors.Pin.Acts.PinByProperties,
+		C3.Plugins.Sprite.Cnds.CompareFrame,
+		C3.Plugins.Sprite.Exps.AnimationFrameCount,
+		C3.Plugins.Sprite.Acts.Spawn,
+		C3.Behaviors.Platform.Acts.SetVectorY,
+		C3.Behaviors.Platform.Exps.JumpStrength,
 		C3.Plugins.Sprite.Cnds.OnAnimFinished,
 		C3.Plugins.Particles.Acts.Destroy,
 		C3.Plugins.Sprite.Acts.SetY,
@@ -3545,6 +3545,12 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 			return () => (and("You have reached [b]", Math.floor(((n0.ExpObject() / n1.ExpObject()) * 100))) + "%[/b] of the current stage.");
 		},
 		() => 2000,
+		() => "JumpWithKick",
+		p => {
+			const n0 = p._GetNode(0);
+			return () => n0.ExpObject(1);
+		},
+		() => 180,
 		() => "JumpWithDouble",
 		p => {
 			const n0 = p._GetNode(0);
@@ -3555,13 +3561,7 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 			const n0 = p._GetNode(0);
 			return () => (-n0.ExpBehavior());
 		},
-		() => "JumpWithKick",
 		() => "Jump",
-		p => {
-			const n0 = p._GetNode(0);
-			return () => n0.ExpObject(1);
-		},
-		() => 180,
 		p => {
 			const n0 = p._GetNode(0);
 			return () => n0.ExpInstVar();
