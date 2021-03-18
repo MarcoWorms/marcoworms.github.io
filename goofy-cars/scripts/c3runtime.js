@@ -3048,16 +3048,23 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		C3.Plugins.filechooser,
 		C3.Plugins.System.Cnds.OnLayoutStart,
 		C3.Plugins.AJAX.Acts.RequestFile,
-		C3.Behaviors.Physics.Acts.SetWorldGravity,
 		C3.Behaviors.Physics.Acts.SetEnabled,
+		C3.Behaviors.Physics.Acts.SetWorldGravity,
+		C3.Behaviors.Physics.Acts.SetIterations,
 		C3.Plugins.System.Acts.Scroll,
 		C3.Plugins.Sprite.Exps.X,
 		C3.Plugins.Sprite.Exps.Y,
-		C3.Behaviors.Physics.Acts.SetIterations,
 		C3.Plugins.System.Acts.CreateObject,
 		C3.Plugins.AJAX.Cnds.OnComplete,
 		C3.Plugins.Arr.Acts.JSONLoad,
 		C3.Plugins.AJAX.Exps.LastData,
+		C3.Plugins.Arr.Cnds.CompareSize,
+		C3.Plugins.System.Acts.SetLayoutScale,
+		C3.Plugins.Arr.Acts.SetSize,
+		C3.Plugins.System.Cnds.Else,
+		C3.Plugins.Arr.Exps.AsJSON,
+		C3.Plugins.Arr.Cnds.ArrForEach,
+		C3.Plugins.Arr.Exps.CurValue,
 		C3.Plugins.System.Cnds.Every,
 		C3.Plugins.System.Cnds.CompareBoolVar,
 		C3.Plugins.System.Cnds.Compare,
@@ -3069,13 +3076,11 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		C3.Plugins.System.Exps.dt,
 		C3.Plugins.System.Exps.scrolly,
 		C3.Plugins.Mouse.Cnds.OnWheel,
-		C3.Plugins.System.Acts.SetLayoutScale,
 		C3.Plugins.System.Exps.layoutscale,
 		C3.Plugins.Mouse.Cnds.OnClick,
 		C3.Plugins.System.Acts.SetBoolVar,
 		C3.Plugins.Mouse.Cnds.IsOverObject,
 		C3.Plugins.System.Acts.SetVar,
-		C3.Plugins.System.Cnds.Else,
 		C3.Plugins.Sprite.Exps.UID,
 		C3.Plugins.Mouse.Exps.X,
 		C3.Plugins.Mouse.Exps.Y,
@@ -3086,6 +3091,7 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		C3.Plugins.AJAX.Acts.Request,
 		C3.Plugins.filechooser.Exps.FileURLAt,
 		C3.Plugins.Dictionary.Acts.JSONDownload,
+		C3.Plugins.Arr.Acts.JSONDownload,
 		C3.Plugins.Dictionary.Acts.AddKey,
 		C3.Plugins.Sprite.Exps.ImagePointX,
 		C3.Plugins.Sprite.Exps.ImagePointY,
@@ -3128,15 +3134,25 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		C3.Behaviors.Physics.Cnds.CompareAngularVelocity,
 		C3.Behaviors.Physics.Acts.ApplyTorque,
 		C3.Plugins.Sprite.Exps.Width,
+		C3.Plugins.Sprite.Exps.Height,
 		C3.Plugins.Text.Cnds.CompareInstanceVar,
 		C3.Plugins.System.Exps.max,
 		C3.Plugins.Sprite.Cnds.CompareX,
 		C3.Behaviors.Physics.Cnds.CompareVelocity,
 		C3.Plugins.Text.Acts.Destroy,
 		C3.Plugins.Sprite.Acts.Destroy,
-		C3.Plugins.System.Cnds.ForEachOrdered,
+		C3.Plugins.Sprite.Acts.AddInstanceVar,
+		C3.Plugins.Arr.Exps.Width,
+		C3.Plugins.Arr.Acts.Push,
+		C3.Plugins.Dictionary.Exps.AsJSON,
 		C3.Plugins.System.Acts.AddVar,
-		C3.Plugins.System.Cnds.CompareVar,
+		C3.Plugins.Text.Cnds.IsBoolInstanceVarSet,
+		C3.Plugins.Text.Cnds.PickInstVarHiLow,
+		C3.Plugins.Text.Acts.SetBoolInstanceVar,
+		C3.Plugins.System.Acts.RestartLayout,
+		C3.Plugins.System.Acts.ResetGlobals,
+		C3.Plugins.Sprite.Cnds.OnCollision,
+		C3.Plugins.System.Cnds.ForEachOrdered,
 		C3.Plugins.System.Acts.StopLoop,
 		C3.Plugins.System.Acts.GoToLayout
 		];
@@ -3196,7 +3212,7 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		{spawner: 0},
 		{Text: 0},
 		{Mouse: 0},
-		{Array: 0},
+		{Names: 0},
 		{AJAX: 0},
 		{Pin: 0},
 		{BodyName: 0},
@@ -3207,8 +3223,12 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		{death: 0},
 		{goToUid: 0},
 		{rank: 0},
+		{freeze: 0},
 		{Rank: 0},
 		{Sprite: 0},
+		{win: 0},
+		{SavedCars: 0},
+		{SavedCarsBKP: 0},
 		{bodyrng: 0},
 		{cameraUid: 0},
 		{firstX: 0},
@@ -3216,19 +3236,22 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		{autofirstcamera: 0},
 		{spawncars: 0},
 		{maxCars: 0},
-		{maxGrounds: 0},
-		{groundInclination: 0},
 		{wheelcolorconst: 0},
+		{carsWon: 0},
+		{maxCarWon: 0},
 		{mouseFixedCamera: 0},
 		{uid: 0},
 		{x: 0},
 		{y: 0},
+		{groundInclination: 0},
+		{maxGrounds: 0},
 		{imgPoint: 0},
 		{loadstring: 0},
 		{wheelsImgPoint: 0},
 		{wheelsSize: 0},
 		{wheelsWeight: 0},
 		{amount: 0},
+		{body: 0},
 		{rankcount: 0}
 	];
 }
@@ -3332,25 +3355,26 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 
 	self.C3_ExpressionFuncs = [
 		() => "names",
-		() => 500,
+		() => 20,
+		() => 600,
 		p => {
 			const n0 = p._GetNode(0);
 			return () => n0.ExpObject();
 		},
-		() => 20,
-		() => 8,
 		() => 0,
 		() => -9999,
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			return () => f0();
 		},
+		() => 1,
+		() => 0.3,
+		() => 30,
 		() => 0.1,
 		p => {
 			const v0 = p._GetNode(0).GetVar();
 			return () => v0.GetValue();
 		},
-		() => 1,
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			const n1 = p._GetNode(1);
@@ -3381,6 +3405,7 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 			const n0 = p._GetNode(0);
 			return () => (n0.ExpInstVar() + ".json");
 		},
+		() => "past top 10.json",
 		() => "name",
 		() => "w",
 		() => "h",
@@ -3416,7 +3441,7 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		},
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
-			return () => (64 * (1 + f0(5)));
+			return () => (32 * (1 + f0(25)));
 		},
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
@@ -3587,7 +3612,7 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		},
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
-			return () => Math.floor(f0(30, 220));
+			return () => Math.floor(f0(60, 220));
 		},
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
@@ -3602,13 +3627,6 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 			const v2 = p._GetNode(2).GetVar();
 			return () => (f0(v1.GetValue()) - (v2.GetValue() / 2));
 		},
-		p => {
-			const f0 = p._GetNode(0).GetBoundMethod();
-			return () => Math.floor(f0(0, 100));
-		},
-		() => "Jumper",
-		() => "Booster",
-		() => "Spinner",
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			const n1 = p._GetNode(1);
@@ -3638,6 +3656,7 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 			const n1 = p._GetNode(1);
 			return () => (n0.ExpBehavior() * n1.ExpInstVar());
 		},
+		() => "Jumper",
 		p => {
 			const n0 = p._GetNode(0);
 			return () => n0.ExpBehavior();
@@ -3647,11 +3666,13 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 			const f1 = p._GetNode(1).GetBoundMethod();
 			return () => ((-Math.abs(n0.ExpBehavior())) - f1(300, 1000));
 		},
+		() => "Booster",
 		p => {
 			const n0 = p._GetNode(0);
 			const f1 = p._GetNode(1).GetBoundMethod();
 			return () => (Math.abs(n0.ExpBehavior()) + f1(300, 1000));
 		},
+		() => "Spinner",
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			return () => f0(200, 900);
@@ -3660,8 +3681,9 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 			const n0 = p._GetNode(0);
 			const n1 = p._GetNode(1);
 			const n2 = p._GetNode(2);
-			const f3 = p._GetNode(3).GetBoundMethod();
-			return () => ((((n0.ExpObject() / 60) * n1.ExpInstVar()) + n2.ExpInstVar()) * f3());
+			const n3 = p._GetNode(3);
+			const f4 = p._GetNode(4).GetBoundMethod();
+			return () => ((((n0.ExpObject() * (n1.ExpObject() / 5)) * n2.ExpInstVar()) + n3.ExpInstVar()) * f4());
 		},
 		p => {
 			const n0 = p._GetNode(0);
@@ -3677,18 +3699,39 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 		() => 5,
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
-			return () => (f0() - 3);
+			return () => (f0() - 10);
 		},
+		() => -1,
 		p => {
 			const n0 = p._GetNode(0);
 			return () => (n0.ExpObject() - 500);
 		},
 		p => {
 			const n0 = p._GetNode(0);
-			const v1 = p._GetNode(1).GetVar();
-			return () => and((n0.ExpInstVar() + ": #"), v1.GetValue());
+			return () => (10 - n0.ExpObject());
 		},
-		() => 6
+		p => {
+			const n0 = p._GetNode(0);
+			const n1 = p._GetNode(1);
+			const n2 = p._GetNode(2);
+			const n3 = p._GetNode(3);
+			return () => (and((and((and((("[b]" + n0.ExpInstVar()) + " ("), n1.ExpInstVar()) + " tracks, "), n2.ExpInstVar()) + " rep) #"), n3.ExpObject()) + "[/b]");
+		},
+		p => {
+			const v0 = p._GetNode(0).GetVar();
+			const n1 = p._GetNode(1);
+			return () => (v0.GetValue() + n1.ExpObject());
+		},
+		p => {
+			const n0 = p._GetNode(0);
+			const n1 = p._GetNode(1);
+			const n2 = p._GetNode(2);
+			const v3 = p._GetNode(3).GetVar();
+			const n4 = p._GetNode(4);
+			const v5 = p._GetNode(5).GetVar();
+			return () => (and((and((and((and((n0.ExpInstVar() + " ("), n1.ExpInstVar()) + " tracks, "), n2.ExpInstVar()) + " rep) [b]#"), (v3.GetValue() + n4.ExpObject())) + " (+ "), (11 - v5.GetValue())) + " rep)[/b]");
+		},
+		() => 11
 	];
 }
 
