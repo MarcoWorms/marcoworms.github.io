@@ -3945,6 +3945,7 @@ d},Unpin(){this._SetPinInst(null);this._mode="";this._propSet.clear();this._pinI
 			const n3 = p._GetNode(3);
 			return () => (and((and((and((("[b]" + n0.ExpInstVar()) + " ("), n1.ExpInstVar()) + " survived, "), n2.ExpInstVar()) + " rep) #"), n3.ExpObject()) + "[/b]");
 		},
+		() => 16777215,
 		p => {
 			const n0 = p._GetNode(0);
 			const n1 = p._GetNode(1);
