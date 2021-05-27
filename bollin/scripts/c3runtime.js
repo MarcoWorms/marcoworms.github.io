@@ -2959,7 +2959,6 @@ const map=new WeakMap;self.IBulletBehaviorInstance=class IBulletBehaviorInstance
 		C3.Plugins.System.Cnds.EveryTick,
 		C3.Plugins.Sprite.Acts.SetPosToObject,
 		C3.Plugins.Touch.Cnds.HasNthTouch,
-		C3.Plugins.Sprite.Cnds.IsAnimPlaying,
 		C3.Plugins.Sprite.Acts.SetTowardPosition,
 		C3.Plugins.Mouse.Exps.X,
 		C3.Plugins.Mouse.Exps.Y,
@@ -2971,6 +2970,7 @@ const map=new WeakMap;self.IBulletBehaviorInstance=class IBulletBehaviorInstance
 		C3.Plugins.Sprite.Exps.Count,
 		C3.Plugins.Sprite.Acts.SetAnim,
 		C3.Plugins.Touch.Cnds.OnNthTouchEnd,
+		C3.Plugins.Sprite.Cnds.IsAnimPlaying,
 		C3.Behaviors.Physics.Acts.SetVelocity,
 		C3.Plugins.Sprite.Exps.X,
 		C3.Plugins.Sprite.Exps.Y,
@@ -3101,7 +3101,6 @@ const map=new WeakMap;self.IBulletBehaviorInstance=class IBulletBehaviorInstance
 
 	self.C3_ExpressionFuncs = [
 		() => 0,
-		() => "Animation 1",
 		p => {
 			const f0 = p._GetNode(0).GetBoundMethod();
 			return () => f0();
@@ -3116,6 +3115,7 @@ const map=new WeakMap;self.IBulletBehaviorInstance=class IBulletBehaviorInstance
 			return () => n0.ExpObject();
 		},
 		() => "Animation 2",
+		() => "Animation 1",
 		p => {
 			const n0 = p._GetNode(0);
 			const n1 = p._GetNode(1);
