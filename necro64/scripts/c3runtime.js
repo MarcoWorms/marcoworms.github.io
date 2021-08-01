@@ -2820,6 +2820,250 @@ Vendor(){return navigator.vendor},BatteryLevel(){return 1},BatteryTimeLeft(){ret
 WindowInnerWidth(){return this._runtime.GetCanvasManager().GetLastWidth()},WindowInnerHeight(){return this._runtime.GetCanvasManager().GetLastHeight()},WindowOuterWidth(){return this._windowOuterWidth},WindowOuterHeight(){return this._windowOuterWidth}}};
 
 
+"use strict";
+
+{
+	const DOM_COMPONENT_ID = "ppstudio_handy_DOM";
+	const C3=self.C3;
+	
+	C3.Plugins.ppstudio_handy_utilities = class ppstudio_handy_utilities_plugin extends C3.SDKPluginBase
+	{
+		constructor(opts)
+		{
+			//super(opts);
+			super(opts, DOM_COMPONENT_ID);
+		}
+		
+		Release()
+		{
+			super.Release();
+		}
+	};
+}
+
+"use strict";
+
+{
+	const C3=self.C3;
+	C3.Plugins.ppstudio_handy_utilities.Type = class DrawingType extends C3.SDKTypeBase
+	{
+		constructor(objectClass)
+		{
+			super(objectClass);
+		}
+		
+		Release()
+		{
+			super.Release();
+		}
+		
+		OnCreate()
+		{
+
+		}
+
+		LoadTextures(renderer)
+		{
+		}
+
+		ReleaseTextures()
+		{
+		}
+	};
+}
+
+"use strict";
+
+{
+	const DOM_COMPONENT_ID = "ppstudio_handy_DOM";
+	const C3=self.C3;
+	
+	C3.Plugins.ppstudio_handy_utilities.Instance = class ppstudio_handy_utilities_Instance extends C3.SDKInstanceBase
+	{		
+		constructor(inst, properties)
+		{
+			super(inst, DOM_COMPONENT_ID); //Registering the DOM component for the 
+			debugger;
+
+			if (properties){
+				this._gaID = properties[0];
+				this._trackPreview = properties[1];
+				this._GAEnabled=null;
+			}
+						
+			if ((this._trackPreview || !this._runtime.IsPreview())&&this._loadtype==0){
+				this._initAnalytics();
+			}
+		}
+		
+		createCSSData(data){
+			if (data){
+				this.PostToDOM("inject-css", data)
+			}
+		}
+		
+		Release()
+		{
+			super.Release();
+		}
+		
+		Draw(renderer)
+		{
+		}
+		
+		SaveToJson()
+		{
+			return {
+				// data to be saved for savegames
+			};
+		}
+		
+		LoadFromJson(o)
+		{
+			// load state for savegames
+		}
+
+		_initAnalytics(){
+			// Get initial state from DOM. Make runtime loading wait for the response.
+			const data = {
+				"gaID":this._gaID,
+				"GAEnabled":this._GAEnabled
+			}
+			// First we need to add a LoadPromise to make sure that GA is loaded before continuing
+			this._runtime.AddLoadPromise(
+				this.PostToDOMAsync("load", data)
+					.then((data) => {
+							this._GAEnabled = data["GAEnabled"];
+						})
+			)
+		}
+	};
+	
+}
+
+"use strict";
+
+{
+	const C3=self.C3;
+	C3.Plugins.ppstudio_handy_utilities.Cnds =
+	{
+		IsTracking(){
+			return this._GAEnabled;
+		}
+	};
+}
+
+"use strict";
+
+{
+	const C3=self.C3;
+	C3.Plugins.ppstudio_handy_utilities.Acts =
+	{
+		InitGA(){
+			if (!this._GAEnabled)
+				this._initAnalytics();
+		},
+
+		ImportCSSData(data)
+		{
+			const dat = {
+				"css-code":data
+			}
+			this.createCSSData(dat);
+		},
+		
+		ImportScriptData(data){
+			var head = document.getElementsByTagName("head")[0];
+			var scriptTag = document.createElement("script");
+			scriptTag.innerHTML = data;
+			head.appendChild(scriptTag);
+		},
+		
+		ImportScriptSrc(data){
+			var head = document.getElementsByTagName("head")[0];
+			var scriptTag = document.createElement("script");
+			scriptTag.setAttribute("src",data);
+			head.appendChild(scriptTag);
+		},
+		
+		GASendEvent(cat,act,lbl,val){
+			
+			if (this._GAEnabled){
+				const data = {
+					"category":cat,
+					"activity":act,
+					"label":lbl,
+					"value":val
+				}
+				
+				this.PostToDOM("send-event", data);
+			}
+		}
+	};
+}
+
+"use strict";
+
+{
+	const C3=self.C3;
+	C3.Plugins.ppstudio_handy_utilities.Exps =
+	{
+		GetCurrentTime()
+		{
+			return new Date().getTime();
+		},
+		
+		GetLocalTime(){
+			var dtime = new Date();
+			var time = dtime.getTimezoneOffset()+dtime.getTime();
+			return time;
+		},
+		
+		NowUTCTimestamp(){
+			var dTime = new Date();
+			var time = dTime.toUTCString();
+			return time;
+		},
+		
+		FormatUTCDate(milli){
+			var date = new Date(milli);
+			return date.toUTCString();
+		},
+		
+		FormatTime(number){
+			var d=new Date(number);
+			
+			//var time = Math.floor(number/1000);
+			var hours = Math.floor(number/3600000); //sd.getHours();
+			var seconds = d.getSeconds();
+			var minutes = d.getMinutes();
+			
+			var timeFormat = "";
+			var hoursStr = "";
+			var secondsStr = "";
+			var minutesStr = "";
+			
+			hoursStr = (hours<10)?"0"+hours.toString():hours.toString();
+			minutesStr = (minutes>=60)?"00": (minutes<10)?"0"+minutes.toString():minutes.toString();
+			secondsStr= (seconds>=60)?"00": (seconds<10)?"0"+seconds.toString():seconds.toString();
+			
+			timeFormat = hoursStr+":"+minutesStr+":"+secondsStr;
+			
+			return timeFormat;
+		},
+		
+		CreateDate(year, month, day, hours, minutes, seconds, milliseconds){
+			return new Date(year,month,day,hours,minutes,seconds,milliseconds).getTime();
+		},
+		
+		FormatISODate(milli){
+			return new Date(milli).toISOString();
+		}
+		
+	};
+	
+}
+
 'use strict';{const C3=self.C3;C3.Behaviors.Platform=class PlatformBehavior extends C3.SDKBehaviorBase{constructor(opts){super(opts)}Release(){super.Release()}}};
 
 
@@ -2978,6 +3222,7 @@ map.get(this)._SetGravity(g)}get angleOfMotion(){return map.get(this)._GetAngleO
 		C3.Plugins.TiledBg,
 		C3.Behaviors.Bullet,
 		C3.Plugins.Browser,
+		C3.Plugins.ppstudio_handy_utilities,
 		C3.Plugins.System.Cnds.OnLayoutStart,
 		C3.Plugins.Sprite.Acts.Spawn,
 		C3.Plugins.Sprite.Acts.MoveToTop,
@@ -3026,7 +3271,8 @@ map.get(this)._SetGravity(g)}get angleOfMotion(){return map.get(this)._GetAngleO
 		{TiledBackground: 0},
 		{DisplayTitle2: 0},
 		{DisplayTitle3: 0},
-		{Browser: 0}
+		{Browser: 0},
+		{HandyUtilitiesPlugin: 0}
 	];
 }
 
