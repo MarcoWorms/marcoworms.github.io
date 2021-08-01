@@ -3360,6 +3360,7 @@ map.get(this)._SetGravity(g)}get angleOfMotion(){return map.get(this)._GetAngleO
 		{DisplayTitle4: 0},
 		{DisplayTitle5: 0},
 		{SpriteFont2: 0},
+		{Death2: 0},
 		{deaths: 0},
 		{startTime: 0}
 	];
