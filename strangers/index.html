@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Fresca&display=swap");
+      * {
+        box-sizing: border-box;
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        font-family: "Fresca", sans-serif;
+      }
+      body {
+        padding: 0;
+        margin: 0;
+        background-color: black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .images {
+        max-width: 1000px;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 200px;
+      }
+      img {
+        padding: 20px;
+        max-width: 330px;
+      }
+      h1 {
+        z-index: 1;
+        font-size: 72px;
+        /* padding-top: 1px; */
+      }
+      .fade {
+        width: 100vw;
+        height: 200px;
+        position: fixed;
+      }
+      .bottom {
+        bottom: 0;
+        background: linear-gradient(transparent, black);
+      }
+      .top {
+        top: 0;
+        background: linear-gradient(black, transparent);
+      }
+    </style>
+
+    <h1>Welcome Stranger</h1>
+    
+    <div class="images">
+    </div>
+
+    <div class="fade top" />
+    <div class="fade bottom" />
+
+    <script type="text/javascript">
+      Array.from({ length: 15 }).forEach((_, i) => {
+        let img = document.createElement("img")
+        img.src = './images/' + i + '.gif'
+        document.querySelector(".images").appendChild(img)
+      })
+		</script>
+
+  </body>
+</html>
