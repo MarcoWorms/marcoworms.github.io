@@ -5,7 +5,7 @@
       @import url("https://fonts.googleapis.com/css2?family=Fresca&display=swap");
       * {
         box-sizing: border-box;
-        color: rgba(255, 255, 255, 0.685);
+        color: rgba(255, 255, 255, 0.8);
         text-align: center;
         font-family: "Fresca", sans-serif;
       }
@@ -13,16 +13,22 @@
         padding: 0;
         margin: 0;
         background-color: black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
       .images {
-        width: 100vw;
+        max-width: 1000px;
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
       }
       img {
         padding: 20px;
-        width: 330px;
+        max-width: 330px;
+      }
+      h1 {
+        padding-top: 20px;
       }
     </style>
 
@@ -35,6 +41,10 @@
       <img src="./2.gif" />
 
       <img src="./3.gif" />
+
+      <img src="./4.gif" />
+
+      <img src="./5.gif" />
     </div>
   </body>
 </html>
