@@ -26,8 +26,14 @@
       }
       img {
         padding: 20px;
-        max-width: 330px;
+        max-width: 300px;
       }
+      @media (max-width:1080px) {
+        img {
+          padding: 40px;
+          max-width: 440px;
+        }
+      } 
       h1 {
         z-index: 1;
         font-size: 72px;
@@ -38,6 +44,12 @@
         --color-3: rgba(255, 255, 255, 0.5);
         --color-4: rgba(255, 255, 255, 0.55);
       }
+      @media (max-width:1080px) {
+        h1 {
+          margin: 30px;
+          margin-top: 70px;
+        }
+      } 
       h1 > span {
         animation: color-animation 0.1s linear infinite;
       }
@@ -79,7 +91,7 @@
     <script type="text/javascript">
       var images = document.querySelector(".images")
 
-      Array.from({ length: 36 }).forEach((_, i) => {
+      Array.from({ length: 39 }).forEach((_, i) => {
         let img = document.createElement("img")
         img.src = './images/' + i + '.gif'
         images.append(img)
