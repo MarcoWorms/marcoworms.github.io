@@ -22,7 +22,7 @@
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        margin-bottom: 300px;
+        /* margin-bottom: 300px; */
       }
       img {
         padding: 20px;
@@ -78,6 +78,22 @@
         top: 0;
         background: linear-gradient(black, transparent);
       }
+      a {
+        text-decoration: none;
+        z-index: 1;
+        padding: 40px;
+        margin-top: 100px;
+        margin-bottom: 150px;
+      }
+      a > h1 {
+        margin: 0;
+        font-size: 32px;
+      }
+      @media (max-width:1080px) {
+        a > h1 {
+          font-size: 48px;
+        }
+      }
     </style>
 
     <h1><span>W</span>el<span>c</span>o<span>m</span>e S<span>t</span>ra<span>n</span>g<span>e</span>r</h1>
@@ -85,6 +101,11 @@
     <div class="images">
     </div>
 
+    
+    <a href="https://twitter.com/marcoworms/" target="_blank">
+      <h1><span>@</span>m<span>a</span>r<span>c</span>o<span>w</span>o<span>r</span>m<span>s</span></h1>
+    </a>
+      
     <div class="fade top" />
     <div class="fade bottom" />
 
