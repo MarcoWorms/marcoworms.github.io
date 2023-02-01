@@ -80,6 +80,8 @@
       }
       a {
         text-decoration: none;
+      }
+      .flicker-a {
         z-index: 1;
         padding: 40px;
         margin-top: 100px;
@@ -102,7 +104,7 @@
     </div>
 
     
-    <a href="https://twitter.com/marcoworms/" target="_blank">
+    <a class="flicker-a" href="https://twitter.com/marcoworms/" target="_blank">
       <h1><span>@</span>m<span>a</span>r<span>c</span>o<span>w</span>o<span>r</span>m<span>s</span></h1>
     </a>
       
@@ -112,11 +114,16 @@
     <script type="text/javascript">
       var images = document.querySelector(".images")
 
-      Array.from({ length: 39 }).forEach((_, i) => {
+      Array.from({ length: 45 }).forEach((_, i) => {
+        let a = document.createElement("a")
+        a.href = './images-fullres/' + i + '.gif'
+        a.target = '_blank'
+        a.style.display = 'inline'
         let img = document.createElement("img")
         img.src = './images-optimized/' + i + '.gif'
         img.alt = '#' + i
-        images.append(img)
+        a.append(img)
+        images.append(a)
       })
 
       for (var i = images.children.length; i >= 0; i--) {

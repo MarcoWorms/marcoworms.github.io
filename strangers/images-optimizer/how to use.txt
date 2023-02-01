@@ -1,0 +1,8 @@
+0) put full resolusion copy in `images-fullres` folder before proceeding
+> to avoid loosing fullres version
+
+1) put gifs in this folder
+
+2) run .ps1 script with powershell
+
+3) it will make them all optimized

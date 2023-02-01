@@ -1,0 +1,1 @@
+Get-ChildItem *.gif | ForEach-Object {./gifsicle.exe --resize 500x500 --optimize $_.FullName -o $_.FullName}
