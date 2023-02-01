@@ -22,7 +22,7 @@
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        margin-bottom: 200px;
+        margin-bottom: 300px;
       }
       img {
         padding: 20px;
@@ -32,10 +32,30 @@
         z-index: 1;
         font-size: 72px;
         /* padding-top: 1px; */
+        animation: color-animation 0.2s linear infinite;
+        --color-1: rgba(255, 255, 255, 0.6);
+        --color-2: rgba(255, 255, 255, 0.55);
+        --color-3: rgba(255, 255, 255, 0.5);
+        --color-4: rgba(255, 255, 255, 0.55);
+      }
+      h1 > span {
+        animation: color-animation 0.1s linear infinite;
+      }
+      @keyframes color-animation {
+        0%    {color: var(--color-1)}
+        24%   {color: var(--color-1)}
+        25%   {color: var(--color-2)}
+        49%   {color: var(--color-2)}
+        50%   {color: var(--color-3)}
+        74%   {color: var(--color-3)}
+        75%   {color: var(--color-4)}
+        99%   {color: var(--color-4)}
+        100%  {color: var(--color-1)}
       }
       .fade {
         width: 100vw;
-        height: 200px;
+        height: 20vh;
+        max-height: 200px;
         position: fixed;
       }
       .bottom {
@@ -48,7 +68,7 @@
       }
     </style>
 
-    <h1>Welcome Stranger</h1>
+    <h1><span>W</span>el<span>c</span>o<span>m</span>e S<span>t</span>ra<span>n</span>g<span>e</span>r</h1>
     
     <div class="images">
     </div>
@@ -57,11 +77,17 @@
     <div class="fade bottom" />
 
     <script type="text/javascript">
-      Array.from({ length: 15 }).forEach((_, i) => {
+      var images = document.querySelector(".images")
+
+      Array.from({ length: 36 }).forEach((_, i) => {
         let img = document.createElement("img")
         img.src = './images/' + i + '.gif'
-        document.querySelector(".images").appendChild(img)
+        images.append(img)
       })
+
+      for (var i = images.children.length; i >= 0; i--) {
+        images.appendChild(images.children[Math.random() * i | 0]);
+      }
 		</script>
 
   </body>
