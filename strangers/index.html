@@ -18,7 +18,7 @@
         align-items: center;
       }
       .images {
-        max-width: 1000px;
+        max-width: 1080px;
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
@@ -26,11 +26,11 @@
       }
       img {
         padding: 20px;
-        max-width: 300px;
+        max-width: 350px;
       }
       @media (max-width:1080px) {
         img {
-          padding: 40px;
+          padding: 20px;
           max-width: 440px;
         }
       } 
@@ -115,6 +115,7 @@
       Array.from({ length: 39 }).forEach((_, i) => {
         let img = document.createElement("img")
         img.src = './images/' + i + '.gif'
+        img.alt = '#' + i
         images.append(img)
       })
 
