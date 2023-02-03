@@ -2,86 +2,93 @@
 <html>
 
 <head>
-	<title>Parcel Sandbox</title>
-	<meta charset="UTF-8" />
+  <title>Parcel Sandbox</title>
+  <meta charset="UTF-8" />
 </head>
 
 <body>
-	<div class="app">
-		<div class="logo">
-			<img src="./yearn-logo.png" />
-			<h1>Genius Support Bar<h1>
-			</div>
-		<h3>GPT Index powered by yearn devdocs, proposals, and articles</h3>
-		<h2>Enter your question:</h2>
-		<input class="input" type="text" autofocus tabindex="0"></input>
-		<h2>Answer:</h2>
-		<input class="answer" type="text"></input>
-	</div>
+  <div class="app">
+    <div class="logo">
+      <img src="./yearn-logo.png" />
+      <h1>Genius Support Bar<h1>
+      </div>
+    <h3>GPT Index powered by yearn devdocs (soon: onchain data, proposals, and articles)</h3>
+    <h2>Enter your question:</h2>
+    <input class="input" type="text" autofocus tabindex="0"></input>
+    <h2>Answer:</h2>
+    <p class="answer"></p>
+  </div>
 
-	<script>
-			const input = document.querySelector('input[type="text"]');
-			const answerInput = document.querySelector('.answer');
-			let isLoading = false;
+  <script>
+      const input = document.querySelector('.input');
+      const answer = document.querySelector('.answer');
+      let isLoading = false;
 
-			input.addEventListener('keyup', (e) => {
-					if (e.keyCode === 13 && !isLoading) {
-							isLoading = true;
-							answerInput.value = 'loading...';
-							const query = input.value;
-							const url = `https://a1b2-2804-431-c7f3-9298-b9b2-78a-92d3-19f6.sa.ngrok.io/ask?query=${input.value}`;
-							fetch(url)
-									.then((response) => response.text())
-									.then((data) => {
-											answerInput.value = data;
-											isLoading = false;
-									});
-					}
-			});
-	</script>
+      input.addEventListener('keyup', (e) => {
+        if (e.keyCode === 13 && !isLoading) {
+              isLoading = true;
+              answer.innerHTML = 'Loading...';
+              const query = input.value;
+              const url = `https://a1b2-2804-431-c7f3-9298-b9b2-78a-92d3-19f6.sa.ngrok.io/ask?query=${input.value}`;
+              fetch(url)
+                  .then((response) => response.text())
+                  .then((data) => {
+                    console.log(data)
 
-	<style>
-		@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-		body {
-			margin: 0;
-			padding: 0;
-			background-color: #000000;
-			color: white;
-			font-family: 'Roboto', sans-serif;
-		}
-		.app {
-			display: flex;
-			flex-direction: column;
-			width: 100%;
-			align-items: center;
-		}
-		.logo {
-			display: flex;
-			align-items: center;
-		}
-		.logo img {
-			height: 70px;
-			margin-right: 15px;
-		}
-		h1 {
-			font-size: 50px;
-		}
-		input {
-			width: 80%;
-			background-color: #000000;
-			border: none;
-			caret-color: #0675F9;
-			color: #0675F9;
-			font-size: 48px;
-			text-align: center;
-		}
-		.answer {
-			font-size: 36px;
-		}
+                      answer.innerHTML = data;
+                      isLoading = false;
+                  });
+          }
+      });
+  </script>
 
-		input:focus {
-			outline: none;
-		}
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000000;
+      color: white;
+      font-family: 'Roboto', sans-serif;
+    }
+    .app {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      align-items: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+    .logo img {
+      height: 70px;
+      margin-right: 15px;
+    }
+    h1 {
+      font-size: 50px;
+    }
+    input {
+      width: 80%;
+      background-color: #000000;
+      border: none;
+      caret-color: #0675F9;
+      color: #0675F9;
+      font-size: 48px;
+      text-align: center;
+    }
+    .answer {
+      font-size: 36px;
+      width: 80%;
+      color: #0675F9;
+      font-size: 32px;
+      text-align: center;
+      margin: 0;
+    }
+
+    input:focus {
+      outline: none;
+    }
   </style>
 </body>
 
