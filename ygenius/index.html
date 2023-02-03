@@ -17,7 +17,7 @@
     <textarea rows="1" class="input" autofocus tabindex="0" placeholder=""></textarea>
     <button>Ask!</button>
     <h2>Answer:</h2>
-    <textarea disabled class="answer"></textarea>
+    <textarea class="answer"></textarea>
   </div>
 
   <script>
@@ -35,6 +35,7 @@
       button.addEventListener('click', (e) => {
         if (!isLoading) {
               isLoading = true;
+              button.disabled = true
               answer.innerHTML = 'Loading...';
               const query = input.value;
               const url = `https://a1b2-2804-431-c7f3-9298-b9b2-78a-92d3-19f6.sa.ngrok.io/ask?query=${input.value}`;
@@ -42,10 +43,11 @@
                   .then((response) => response.text())
                   .then((data) => {
                     console.log(data)
-                      answer.innerHTML = data;
+                      answer.value = data.replace(/\\n/g,'\n').replace(/^"|"$/g, '');
                       answer.style.height = `auto`;
                       answer.style.height = `${answer.scrollHeight}px`;
                       isLoading = false;
+                      button.disabled = false
                   });
           }
       });
@@ -110,6 +112,11 @@
       background-color: #000000;
       border: solid 1px #0675F9;
       margin-top: 20px;
+    }
+
+    button:disabled {
+      border: solid 1px #333333;
+      color: #333333;
     }
 
     textarea:focus {
