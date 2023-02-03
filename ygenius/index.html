@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Parcel Sandbox</title>
+  <title>yGenius</title>
   <meta charset="UTF-8" />
 </head>
 
@@ -10,22 +10,30 @@
   <div class="app">
     <div class="logo">
       <img src="./yearn-logo.png" />
-      <h1>Genius Support Bar<h1>
+      <h1>Genius Support Assistant<h1>
       </div>
     <h3>GPT Index powered by yearn devdocs (soon: onchain data, proposals, and articles)</h3>
     <h2>Enter your question:</h2>
-    <input class="input" type="text" autofocus tabindex="0"></input>
+    <textarea rows="1" class="input" autofocus tabindex="0" placeholder=""></textarea>
+    <button>Ask!</button>
     <h2>Answer:</h2>
-    <p class="answer"></p>
+    <textarea disabled class="answer"></textarea>
   </div>
 
   <script>
+      const button = document.querySelector('button');
       const input = document.querySelector('.input');
       const answer = document.querySelector('.answer');
       let isLoading = false;
-
-      input.addEventListener('keyup', (e) => {
-        if (e.keyCode === 13 && !isLoading) {
+      // on input change check height to set textarea rows
+      input.addEventListener('input', (e) => {
+          const target = e.target;
+          target.style.height = `auto`;
+          target.style.height = `${target.scrollHeight}px`;
+      });
+      // on click
+      button.addEventListener('click', (e) => {
+        if (!isLoading) {
               isLoading = true;
               answer.innerHTML = 'Loading...';
               const query = input.value;
@@ -34,8 +42,9 @@
                   .then((response) => response.text())
                   .then((data) => {
                     console.log(data)
-
                       answer.innerHTML = data;
+                      answer.style.height = `auto`;
+                      answer.style.height = `${answer.scrollHeight}px`;
                       isLoading = false;
                   });
           }
@@ -68,25 +77,42 @@
     h1 {
       font-size: 50px;
     }
-    input {
-      width: 80%;
+    textarea {
+      width: 70%;
       background-color: #000000;
       border: none;
       caret-color: #0675F9;
       color: #0675F9;
       font-size: 48px;
       text-align: center;
+      outline: none;
+      resize: none;
+      /* overflow: hidden; */
+      font-family: 'Roboto', sans-serif;
+
     }
     .answer {
       font-size: 36px;
       width: 80%;
       color: #0675F9;
-      font-size: 32px;
+      font-size: 28px;
       text-align: center;
       margin: 0;
     }
+    button {
+      font-size: 30px;
+      width: 200px;
+      height: 50px;
+      color: #0675F9;
+      font-size: 32px;
+      text-align: center;
+      margin: 0;
+      background-color: #000000;
+      border: solid 1px #0675F9;
+      margin-top: 20px;
+    }
 
-    input:focus {
+    textarea:focus {
       outline: none;
     }
   </style>
