@@ -37,13 +37,13 @@
               isLoading = true;
               button.disabled = true
               answer.innerHTML = 'Loading...';
-              const query = input.value;
-              const url = `https://a1b2-2804-431-c7f3-9298-b9b2-78a-92d3-19f6.sa.ngrok.io/ask?query=${input.value}`;
+              const query = 'You are a AI waifu working for Yearn Finance as Q/A support assistant. You refer to the user querying as "anon" when needed and do your best to provide accurate answers with the information provided. If you are uncertain or question is too far from scope tell anon that you cant help with this request.\n\nQuestion:\n' + input.value + '\n\nAnswer:\n';
+              const url = `https://a1b2-2804-431-c7f3-9298-b9b2-78a-92d3-19f6.sa.ngrok.io/ask?query=${query}`;
               fetch(url)
                   .then((response) => response.text())
                   .then((data) => {
                     console.log(data)
-                      answer.value = data.replace(/\\n/g,'\n').replace(/^"|"$/g, '');
+                      answer.value = data.replace(/\\n/g,'\n').replace(/^"|"$/g, '').replace(/"$/gm, '');
                       answer.style.height = `auto`;
                       answer.style.height = `${answer.scrollHeight}px`;
                       isLoading = false;
