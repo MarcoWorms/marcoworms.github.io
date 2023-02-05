@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.75d5778b.css",
-    "main.js": "/static/js/main.c23080dd.js",
+    "main.js": "/static/js/main.c083ef7d.js",
     "static/js/787.fbdf0f96.chunk.js": "/static/js/787.fbdf0f96.chunk.js",
     "static/media/Aeonik-BoldItalic.otf": "/static/media/Aeonik-BoldItalic.91f8ad6f19f40ae586df.otf",
     "static/media/Aeonik-Bold.otf": "/static/media/Aeonik-Bold.55f1d8879e42e7e26539.otf",
@@ -13,11 +13,11 @@
     "static/media/send.svg": "/static/media/send.83974daa325c81ea84bf5ff6a26bdf6f.svg",
     "index.html": "/index.html",
     "main.75d5778b.css.map": "/static/css/main.75d5778b.css.map",
-    "main.c23080dd.js.map": "/static/js/main.c23080dd.js.map",
+    "main.c083ef7d.js.map": "/static/js/main.c083ef7d.js.map",
     "787.fbdf0f96.chunk.js.map": "/static/js/787.fbdf0f96.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.75d5778b.css",
-    "static/js/main.c23080dd.js"
+    "static/js/main.c083ef7d.js"
   ]
 }
