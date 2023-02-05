@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/ygenius/static/css/main.659892cc.css",
+    "main.css": "/ygenius/static/css/main.9826127e.css",
     "main.js": "/ygenius/static/js/main.67972233.js",
     "static/js/787.fbdf0f96.chunk.js": "/ygenius/static/js/787.fbdf0f96.chunk.js",
     "static/media/Aeonik-BoldItalic.otf": "/ygenius/static/media/Aeonik-BoldItalic.91f8ad6f19f40ae586df.otf",
@@ -12,12 +12,12 @@
     "static/media/logo.svg": "/ygenius/static/media/logo.6bed1f1974327a2ac8b9fcb0d44d9125.svg",
     "static/media/send.svg": "/ygenius/static/media/send.83974daa325c81ea84bf5ff6a26bdf6f.svg",
     "index.html": "/ygenius/index.html",
-    "main.659892cc.css.map": "/ygenius/static/css/main.659892cc.css.map",
+    "main.9826127e.css.map": "/ygenius/static/css/main.9826127e.css.map",
     "main.67972233.js.map": "/ygenius/static/js/main.67972233.js.map",
     "787.fbdf0f96.chunk.js.map": "/ygenius/static/js/787.fbdf0f96.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.659892cc.css",
+    "static/css/main.9826127e.css",
     "static/js/main.67972233.js"
   ]
 }
