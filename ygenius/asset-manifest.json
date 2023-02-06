@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/ygenius/static/css/main.c26450b4.css",
-    "main.js": "/ygenius/static/js/main.4af0da6f.js",
+    "main.css": "/ygenius/static/css/main.344df4ca.css",
+    "main.js": "/ygenius/static/js/main.5f55c090.js",
     "static/js/787.fbdf0f96.chunk.js": "/ygenius/static/js/787.fbdf0f96.chunk.js",
     "static/media/Aeonik-BoldItalic.otf": "/ygenius/static/media/Aeonik-BoldItalic.91f8ad6f19f40ae586df.otf",
     "static/media/Aeonik-Bold.otf": "/ygenius/static/media/Aeonik-Bold.55f1d8879e42e7e26539.otf",
@@ -10,14 +10,14 @@
     "static/media/Aeonik-RegularItalic.otf": "/ygenius/static/media/Aeonik-RegularItalic.5a0a6afd774cadc5c190.otf",
     "static/media/Aeonik-Regular.otf": "/ygenius/static/media/Aeonik-Regular.6520c9562406cd9ac40c.otf",
     "static/media/logo.svg": "/ygenius/static/media/logo.6bed1f1974327a2ac8b9fcb0d44d9125.svg",
-    "static/media/send.svg": "/ygenius/static/media/send.83974daa325c81ea84bf5ff6a26bdf6f.svg",
+    "static/media/send.svg": "/ygenius/static/media/send.4985753d0c6ef869d1de22816e211908.svg",
     "index.html": "/ygenius/index.html",
-    "main.c26450b4.css.map": "/ygenius/static/css/main.c26450b4.css.map",
-    "main.4af0da6f.js.map": "/ygenius/static/js/main.4af0da6f.js.map",
+    "main.344df4ca.css.map": "/ygenius/static/css/main.344df4ca.css.map",
+    "main.5f55c090.js.map": "/ygenius/static/js/main.5f55c090.js.map",
     "787.fbdf0f96.chunk.js.map": "/ygenius/static/js/787.fbdf0f96.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c26450b4.css",
-    "static/js/main.4af0da6f.js"
+    "static/css/main.344df4ca.css",
+    "static/js/main.5f55c090.js"
   ]
 }
