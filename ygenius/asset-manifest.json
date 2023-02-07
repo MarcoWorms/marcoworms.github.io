@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/ygenius/static/css/main.6783ce50.css",
-    "main.js": "/ygenius/static/js/main.dfe3049e.js",
+    "main.css": "/ygenius/static/css/main.4102ebb6.css",
+    "main.js": "/ygenius/static/js/main.c697d69e.js",
     "static/js/787.fbdf0f96.chunk.js": "/ygenius/static/js/787.fbdf0f96.chunk.js",
     "static/media/Aeonik-BoldItalic.otf": "/ygenius/static/media/Aeonik-BoldItalic.91f8ad6f19f40ae586df.otf",
     "static/media/Aeonik-Bold.otf": "/ygenius/static/media/Aeonik-Bold.55f1d8879e42e7e26539.otf",
@@ -12,12 +12,12 @@
     "static/media/logo.svg": "/ygenius/static/media/logo.6bed1f1974327a2ac8b9fcb0d44d9125.svg",
     "static/media/send.svg": "/ygenius/static/media/send.4985753d0c6ef869d1de22816e211908.svg",
     "index.html": "/ygenius/index.html",
-    "main.6783ce50.css.map": "/ygenius/static/css/main.6783ce50.css.map",
-    "main.dfe3049e.js.map": "/ygenius/static/js/main.dfe3049e.js.map",
+    "main.4102ebb6.css.map": "/ygenius/static/css/main.4102ebb6.css.map",
+    "main.c697d69e.js.map": "/ygenius/static/js/main.c697d69e.js.map",
     "787.fbdf0f96.chunk.js.map": "/ygenius/static/js/787.fbdf0f96.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.6783ce50.css",
-    "static/js/main.dfe3049e.js"
+    "static/css/main.4102ebb6.css",
+    "static/js/main.c697d69e.js"
   ]
 }
