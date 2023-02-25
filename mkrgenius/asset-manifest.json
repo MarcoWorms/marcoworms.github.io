@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/worms.io/mkrgenius/static/css/main.1b187e88.css",
+    "main.js": "/worms.io/mkrgenius/static/js/main.e54cc4e3.js",
+    "static/js/787.fbdf0f96.chunk.js": "/worms.io/mkrgenius/static/js/787.fbdf0f96.chunk.js",
+    "static/media/Aeonik-BoldItalic.otf": "/worms.io/mkrgenius/static/media/Aeonik-BoldItalic.91f8ad6f19f40ae586df.otf",
+    "static/media/Aeonik-Bold.otf": "/worms.io/mkrgenius/static/media/Aeonik-Bold.55f1d8879e42e7e26539.otf",
+    "static/media/Aeonik-RegularItalic.otf": "/worms.io/mkrgenius/static/media/Aeonik-RegularItalic.5a0a6afd774cadc5c190.otf",
+    "static/media/Aeonik-Regular.otf": "/worms.io/mkrgenius/static/media/Aeonik-Regular.6520c9562406cd9ac40c.otf",
+    "static/media/logo.svg": "/worms.io/mkrgenius/static/media/logo.6c7a70bc17b6431341ee5125766ccf5e.svg",
+    "index.html": "/worms.io/mkrgenius/index.html",
+    "main.1b187e88.css.map": "/worms.io/mkrgenius/static/css/main.1b187e88.css.map",
+    "main.e54cc4e3.js.map": "/worms.io/mkrgenius/static/js/main.e54cc4e3.js.map",
+    "787.fbdf0f96.chunk.js.map": "/worms.io/mkrgenius/static/js/787.fbdf0f96.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1b187e88.css",
+    "static/js/main.e54cc4e3.js"
+  ]
+}
