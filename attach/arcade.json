@@ -1,0 +1,29 @@
+{
+	"name": "New project",
+	"version": "1.0.0.0",
+	"description": "",
+	"id": "",
+	"unique-id": "5tbuzh26wl5",
+	"viewport-width": 1920,
+	"viewport-height": 1080,
+	"author": "",
+	"email": "",
+	"website": "",
+	"orientations": "landscape",
+	"c2version": "244",
+	"c3version": "r358",
+	"ife": false,
+	"used-plugins": [
+		"Sprite",
+		"Mouse",
+		"Tilemap",
+		"Spritefont2",
+		"Text"
+	],
+	"used-behaviors": [
+		"Physics",
+		"Persist",
+		"Pin",
+		"Fade"
+	]
+}
