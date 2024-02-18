@@ -5107,6 +5107,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.System.Acts.SnapshotCanvas,
 		C3.Plugins.System.Cnds.OnCanvasSnapshot,
 		C3.Plugins.System.Exps.canvassnapshot,
+		C3.Plugins.Sprite.Cnds.IsOverlapping,
 		C3.Plugins.Sprite.Exps.X,
 		C3.Plugins.Sprite.Exps.Y,
 		C3.Plugins.System.Acts.SetBoolVar,
@@ -5127,9 +5128,9 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.gamepad.Cnds.OnButtonDown,
 		C3.Plugins.Touch.Cnds.OnTouchObject,
 		C3.Plugins.System.Cnds.OnLayoutStart,
-		C3.Plugins.Sprite.Acts.SetVisible,
 		C3.Plugins.LocalStorage.Acts.CheckItemExists,
 		C3.Plugins.LocalStorage.Cnds.OnItemExists,
+		C3.Plugins.Sprite.Acts.SetVisible,
 		C3.Plugins.LocalStorage.Cnds.OnItemMissing,
 		C3.Plugins.Sprite.Acts.MoveToTop,
 		C3.Plugins.System.Exps.time,
@@ -5146,8 +5147,8 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Audio.Cnds.IsTagPlaying,
 		C3.Plugins.System.Cnds.Compare,
 		C3.Plugins.Sprite.Cnds.IsOnScreen,
-		C3.Behaviors.Bullet.Acts.SetEnabled,
 		C3.Behaviors.Bullet.Acts.SetSpeed,
+		C3.Behaviors.Bullet.Acts.SetEnabled,
 		C3.Plugins.System.Cnds.IsGroupActive,
 		C3.Plugins.System.Acts.Scroll,
 		C3.Behaviors.Sin.Acts.SetPhase,
@@ -5163,13 +5164,12 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Sprite.Exps.UID,
 		C3.Plugins.Particles.Acts.SetDefaultColor,
 		C3.Plugins.Sprite.Exps.ColorValue,
-		C3.Plugins.Sprite.Cnds.IsOverlapping,
 		C3.Plugins.Sprite.Cnds.IsVisible,
 		C3.Plugins.Sprite.Exps.Width,
 		C3.Plugins.Sprite.Acts.SetEffectParam,
-		C3.Plugins.System.Acts.Wait,
 		C3.Behaviors.Timer.Acts.StartTimer,
 		C3.Behaviors.Timer.Cnds.OnTimer,
+		C3.Plugins.System.Acts.Wait,
 		C3.Plugins.Sprite.Acts.SetPosToObject,
 		C3.Behaviors.MoveTo.Acts.SetEnabled,
 		C3.Plugins.System.Cnds.PickAll,
@@ -5256,7 +5256,7 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.Sprite.Acts.SetDefaultColor,
 		C3.Behaviors.Sin.Acts.SetEnabled,
 		C3.Plugins.TiledBg.Acts.MoveToBottom,
-		C3.ScriptsInEvents.EventSheet1_Event458,
+		C3.ScriptsInEvents.EventSheet1_Event459,
 		C3.Plugins.Function.Acts.CallFunction,
 		C3.Plugins.TiledBg.Acts.MoveToTop,
 		C3.Plugins.Function.Cnds.OnFunction,
@@ -5307,6 +5307,7 @@ self.C3_JsPropNameTable = [
 	{Confirm: 0},
 	{ConfirmYes: 0},
 	{ConfirmNo: 0},
+	{prop_text_heaven2: 0},
 	{DevNotes: 0},
 	{LAST_INPUT_DIRECTION: 0},
 	{LAST_INPUT_TIME: 0},
@@ -5384,6 +5385,7 @@ self.C3_JsPropNameTable = [
 	{type: 0},
 	{ShouldMove: 0},
 	{Portal: 0},
+	{activationRadius: 0},
 	{Death3LerpBall: 0},
 	{targetObjectInsteadOfBullet: 0},
 	{imagepoint: 0},
@@ -5532,6 +5534,7 @@ self.C3_JsPropNameTable = [
 	{introtextfield2: 0},
 	{introtextfield3: 0},
 	{blackfade: 0},
+	{NoPause: 0},
 	{Destroyables: 0},
 	{bossFamily: 0},
 	{timee: 0},
@@ -5598,6 +5601,7 @@ self.InstanceType = {
 	Confirm: class extends self.ISpriteInstance {},
 	ConfirmYes: class extends self.ISpriteInstance {},
 	ConfirmNo: class extends self.ISpriteInstance {},
+	prop_text_heaven2: class extends self.ISpriteInstance {},
 	DevNotes: class extends self.ITextInstance {},
 	Player: class extends self.ISpriteInstance {},
 	Wall: class extends self.ISpriteInstance {},
@@ -5714,6 +5718,7 @@ self.InstanceType = {
 	introtextfield2: class extends self.ISpriteFontInstance {},
 	introtextfield3: class extends self.ISpriteFontInstance {},
 	blackfade: class extends self.ISpriteInstance {},
+	NoPause: class extends self.ISpriteInstance {},
 	Destroyables: class extends self.ISpriteInstance {},
 	bossFamily: class extends self.ISpriteInstance {}
 }
@@ -5897,6 +5902,13 @@ self.C3_ExpressionFuncs = [
 			const f5 = p._GetNode(5).GetBoundMethod();
 			return () => (1 + (n0.ExpInstVar() * (C3.distanceTo(n1.ExpObject(), n2.ExpObject(), n3.ExpObject(), n4.ExpObject()) * f5())));
 		},
+		p => {
+			const n0 = p._GetNode(0);
+			const n1 = p._GetNode(1);
+			const n2 = p._GetNode(2);
+			const n3 = p._GetNode(3);
+			return () => C3.distanceTo(n0.ExpObject(), n1.ExpObject(), n2.ExpObject(), n3.ExpObject());
+		},
 		() => "Camera",
 		p => {
 			const n0 = p._GetNode(0);
@@ -5913,8 +5925,8 @@ self.C3_ExpressionFuncs = [
 		},
 		() => "AdjustHSL",
 		() => 200,
-		() => 0.03,
 		() => 0.1,
+		() => 0.03,
 		() => "closed",
 		() => "open",
 		() => "door",
@@ -5928,13 +5940,6 @@ self.C3_ExpressionFuncs = [
 		() => "stuntime",
 		() => 28,
 		() => "Zombie",
-		p => {
-			const n0 = p._GetNode(0);
-			const n1 = p._GetNode(1);
-			const n2 = p._GetNode(2);
-			const n3 = p._GetNode(3);
-			return () => C3.distanceTo(n0.ExpObject(), n1.ExpObject(), n2.ExpObject(), n3.ExpObject());
-		},
 		p => {
 			const n0 = p._GetNode(0);
 			return () => (n0.ExpObject() - 0.1);
