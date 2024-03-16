@@ -6325,7 +6325,7 @@ self.C3_ExpressionFuncs = [
 			const n0 = p._GetNode(0);
 			const v1 = p._GetNode(1).GetVar();
 			const n2 = p._GetNode(2);
-			return () => ((and("get ", (n0.ExpInstVar() - v1.GetValue())) + " + ") + n2.ExpInstVar());
+			return () => ((and("get ", (n0.ExpInstVar() - v1.GetValue())) + " more + ") + n2.ExpInstVar());
 		},
 		() => "passage is open!",
 		p => {
