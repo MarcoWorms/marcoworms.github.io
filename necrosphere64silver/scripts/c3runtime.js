@@ -5147,9 +5147,9 @@ self.C3_GetObjectRefTable = function () {
 		C3.Plugins.System.Cnds.OnCanvasSnapshot,
 		C3.Plugins.System.Exps.canvassnapshot,
 		C3.Plugins.Sprite.Cnds.IsOverlapping,
+		C3.Plugins.System.Acts.SetBoolVar,
 		C3.Plugins.Sprite.Exps.X,
 		C3.Plugins.Sprite.Exps.Y,
-		C3.Plugins.System.Acts.SetBoolVar,
 		C3.Plugins.Sprite.Acts.SetPos,
 		C3.Plugins.System.Acts.SetObjectTimescale,
 		C3.Behaviors.Flash.Acts.StopFlashing,
@@ -5364,6 +5364,8 @@ self.C3_JsPropNameTable = [
 	{prop_spinner: 0},
 	{prop_bunting: 0},
 	{prop_spinner_small: 0},
+	{prop_fakewall: 0},
+	{prop_text_goback: 0},
 	{DevNotes: 0},
 	{Type: 0},
 	{CreditsText: 0},
@@ -5401,6 +5403,7 @@ self.C3_JsPropNameTable = [
 	{BOUNCYSHOOTER: 0},
 	{lastZap: 0},
 	{INVULNERABLE: 0},
+	{canPortal: 0},
 	{MoveTo: 0},
 	{Fade: 0},
 	{Flash: 0},
@@ -5471,6 +5474,7 @@ self.C3_JsPropNameTable = [
 	{reverse: 0},
 	{DOOR_X: 0},
 	{DOOR_Y: 0},
+	{special: 0},
 	{DoorOpener: 0},
 	{enabledBySaveUid: 0},
 	{enabled: 0},
@@ -5614,6 +5618,7 @@ self.C3_JsPropNameTable = [
 	{TextVersion: 0},
 	{Effector: 0},
 	{Death2MovingLavaDiamond: 0},
+	{BossSmall2: 0},
 	{Destroyables: 0},
 	{bossFamily: 0},
 	{timee: 0},
@@ -5693,6 +5698,8 @@ self.InstanceType = {
 	prop_spinner: class extends self.ISpriteInstance {},
 	prop_bunting: class extends self.ITiledBackgroundInstance {},
 	prop_spinner_small: class extends self.ISpriteInstance {},
+	prop_fakewall: class extends self.ISpriteInstance {},
+	prop_text_goback: class extends self.ISpriteInstance {},
 	DevNotes: class extends self.ITextInstance {},
 	CreditsText: class extends self.ISpriteFontInstance {},
 	creditscamera: class extends self.ISpriteInstance {},
@@ -5820,6 +5827,7 @@ self.InstanceType = {
 	TextVersion: class extends self.ISpriteFontInstance {},
 	Effector: class extends self.ISpriteInstance {},
 	Death2MovingLavaDiamond: class extends self.ISpriteInstance {},
+	BossSmall2: class extends self.ISpriteInstance {},
 	Destroyables: class extends self.ISpriteInstance {},
 	bossFamily: class extends self.ISpriteInstance {}
 }
@@ -6133,6 +6141,11 @@ self.C3_ExpressionFuncs = [
 		() => 2597,
 		p => {
 			const n0 = p._GetNode(0);
+			const n1 = p._GetNode(1);
+			return () => (n0.ExpInstVar() + n1.ExpObject());
+		},
+		p => {
+			const n0 = p._GetNode(0);
 			const f1 = p._GetNode(1).GetBoundMethod();
 			return () => (n0.ExpInstVar() * f1());
 		},
@@ -6294,7 +6307,6 @@ self.C3_ExpressionFuncs = [
 		() => "3",
 		() => "4",
 		() => "5",
-		() => "AD",
 		() => "Arrows",
 		() => "ZM",
 		p => {
