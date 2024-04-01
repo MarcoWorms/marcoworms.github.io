@@ -6179,10 +6179,6 @@ self.C3_ExpressionFuncs = [
 			const f1 = p._GetNode(1).GetBoundMethod();
 			return () => ((-n0.ExpInstVar()) * f1());
 		},
-		p => {
-			const n0 = p._GetNode(0);
-			return () => Math.ceil(n0.ExpObject());
-		},
 		() => "crouch",
 		p => {
 			const n0 = p._GetNode(0);
