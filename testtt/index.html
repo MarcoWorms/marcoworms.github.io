@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>360° VR Tour - Meta Quest Compatible</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/supermedium/superframe@master/components/environment/dist/aframe-environment-component.min.js"></script>
+    <style>
+        #enterVRButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        #enterVRButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .location-info {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 100;
+            font-family: Arial, sans-serif;
+        }
+        
+        .vr-instructions {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            z-index: 1000;
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .vr-instructions h2 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        
+        .vr-instructions ul {
+            text-align: left;
+            padding-left: 20px;
+        }
+        
+        .vr-instructions button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="location-info" id="locationInfo">Loading...</div>
+    
+    <div class="vr-instructions" id="vrInstructions">
+        <h2>🥽 Meta Quest VR Tour</h2>
+        <p>Welcome to your 360° VR Tour!</p>
+        <ul>
+            <li><strong>Desktop:</strong> Click and drag to look around</li>
+            <li><strong>Mobile:</strong> Move your device or touch and drag</li>
+            <li><strong>Meta Quest:</strong> Click "Enter VR" button or headset icon</li>
+        </ul>
+        <p><strong>In VR:</strong></p>
+        <ul>
+            <li>Look at blue circles to see navigation points</li>
+            <li>Point controller and press trigger to teleport</li>
+            <li>Use thumbstick to turn</li>
+        </ul>
+        <button onclick="document.getElementById('vrInstructions').style.display='none'">Start Tour</button>
+    </div>
+    
+    <button id="enterVRButton">🥽 Enter VR</button>
+    
+    <a-scene
+        vr-mode-ui="enabled: true; enterVRButton: #enterVRButton"
+        loading-screen="dotsColor: #667eea; backgroundColor: #1a1a1a"
+        stats>
+        
+        <!-- Assets -->
+        <a-assets>
+            <img id="panorama0" src="IMG_20250801_143140_00_122.jpg" crossorigin="anonymous">
+            <img id="panorama1" src="IMG_20250801_143509_00_123.jpg" crossorigin="anonymous">
+        </a-assets>
+        
+        <!-- Sky (360 image) -->
+        <a-sky 
+            id="tourSky"
+            src="#panorama0"
+            rotation="0 0 0">
+        </a-sky>
+        
+        <!-- Camera with controls -->
+        <a-entity id="cameraRig" position="0 1.6 0">
+            <a-camera
+                id="camera"
+                look-controls="pointerLockEnabled: false"
+                wasd-controls="enabled: false">
+                
+                <!-- Cursor for desktop/mobile -->
+                <a-cursor
+                    id="cursor"
+                    animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150"
+                    animation__fusing="property: scale; startEvents: fusing; from: 1 1 1; to: 0.1 0.1 0.1; dur: 1500"
+                    raycaster="objects: .clickable"
+                    geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                    material="color: white; shader: flat">
+                </a-cursor>
+                
+                <!-- VR Controllers -->
+                <a-entity 
+                    id="leftController"
+                    laser-controls="hand: left"
+                    raycaster="objects: .clickable"
+                    line="color: #667eea">
+                </a-entity>
+                
+                <a-entity 
+                    id="rightController"
+                    laser-controls="hand: right"
+                    raycaster="objects: .clickable"
+                    line="color: #667eea">
+                </a-entity>
+            </a-camera>
+        </a-entity>
+        
+        <!-- Navigation Links Container -->
+        <a-entity id="navigationLinks">
+            <!-- Links will be added dynamically -->
+        </a-entity>
+        
+        <!-- Ambient lighting -->
+        <a-light type="ambient" color="#FFFFFF" intensity="0.5"></a-light>
+    </a-scene>
+    
+    <script>
+        // Tour data
+        const tourData = {
+            markers: [{"id":1754600935488,"x":173,"y":423,"imageIndex":0,"rotation":0,"name":""},{"id":1754600936166,"x":404,"y":415,"imageIndex":1,"rotation":0,"name":""}],
+            connections: [{"from":1754600935488,"to":1754600936166}],
+            images: [{"filename":"IMG_20250801_143140_00_122.jpg","displayName":"IMG_20250801_143140_00_122","index":0},{"filename":"IMG_20250801_143509_00_123.jpg","displayName":"IMG_20250801_143509_00_123","index":1}]
+        };
+        
+        let currentLocationId = 1754600935488;
+        
+        // Component for navigation
+        AFRAME.registerComponent('navigate-on-click', {
+            schema: {
+                targetId: {type: 'number'}
+            },
+            init: function() {
+                this.el.addEventListener('click', () => {
+                    navigateToLocation(this.data.targetId);
+                });
+            }
+        });
+        
+        // Navigation function
+        function navigateToLocation(targetId) {
+            currentLocationId = targetId;
+            const marker = tourData.markers.find(m => m.id === targetId);
+            if (!marker) return;
+            
+            // Update sky with new panorama
+            const sky = document.querySelector('#tourSky');
+            sky.setAttribute('src', '#panorama' + marker.imageIndex);
+            
+            // Update rotation if specified
+            if (marker.rotation) {
+                sky.setAttribute('rotation', '0 ' + marker.rotation + ' 0');
+            }
+            
+            // Update location info
+            const image = tourData.images[marker.imageIndex];
+            const locationName = marker.name || (image && image.displayName) || 'Location ' + (marker.imageIndex + 1);
+            document.getElementById('locationInfo').textContent = locationName;
+            
+            // Update navigation links
+            updateNavigationLinks();
+            
+            // Haptic feedback for VR controllers
+            const controllers = document.querySelectorAll('[laser-controls]');
+            controllers.forEach(controller => {
+                const gamepad = controller.components['tracked-controls']?.controller;
+                if (gamepad && gamepad.hapticActuators && gamepad.hapticActuators.length > 0) {
+                    gamepad.hapticActuators[0].pulse(0.5, 100);
+                }
+            });
+        }
+        
+        // Update navigation links
+        function updateNavigationLinks() {
+            const container = document.querySelector('#navigationLinks');
+            container.innerHTML = '';
+            
+            const currentMarker = tourData.markers.find(m => m.id === currentLocationId);
+            if (!currentMarker) return;
+            
+            // Get connected markers
+            const connectedMarkers = [];
+            tourData.connections.forEach(conn => {
+                if (conn.from === currentLocationId) {
+                    const target = tourData.markers.find(m => m.id === conn.to);
+                    if (target) connectedMarkers.push(target);
+                } else if (conn.to === currentLocationId) {
+                    const target = tourData.markers.find(m => m.id === conn.from);
+                    if (target) connectedMarkers.push(target);
+                }
+            });
+            
+            // Create navigation links
+            connectedMarkers.forEach(target => {
+                const dx = target.x - currentMarker.x;
+                const dy = target.y - currentMarker.y;
+                let angle = Math.atan2(dx, -dy) * 180 / Math.PI;
+                angle -= currentMarker.rotation || 0;
+                
+                const targetImage = tourData.images[target.imageIndex];
+                const linkText = target.name || (targetImage && targetImage.displayName) || 'Location ' + (target.imageIndex + 1);
+                
+                // Calculate position in 3D space
+                const radius = 5;
+                const radians = angle * Math.PI / 180;
+                const x = Math.sin(radians) * radius;
+                const z = -Math.cos(radians) * radius;
+                
+                const linkEntity = document.createElement('a-entity');
+                linkEntity.setAttribute('position', x + ' 1.6 ' + z);
+                linkEntity.setAttribute('rotation', '0 ' + angle + ' 0');
+                
+                // Create inner HTML as string
+                const circleHTML = '<a-circle color="#4CC3D9" radius="0.5" material="shader: flat; opacity: 0.7" animation="property: scale; to: 1.2 1.2 1.2; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate"></a-circle>';
+                const textHTML = '<a-text value="' + linkText + '" position="0 0.8 0" align="center" color="#FFFFFF" width="4"></a-text>';
+                const boxHTML = '<a-box visible="false" width="1" height="2" depth="0.1" class="clickable" navigate-on-click="targetId: ' + target.id + '"></a-box>';
+                
+                linkEntity.innerHTML = circleHTML + textHTML + boxHTML;
+                container.appendChild(linkEntity);
+            });
+        }
+        
+        // Initialize on load
+        window.addEventListener('load', () => {
+            navigateToLocation(currentLocationId);
+            
+            // Hide instructions after a delay
+            setTimeout(() => {
+                const instructions = document.getElementById('vrInstructions');
+                if (instructions) {
+                    instructions.style.display = 'none';
+                }
+            }, 10000);
+        });
+        
+        // Handle VR enter/exit
+        document.querySelector('a-scene').addEventListener('enter-vr', () => {
+            document.getElementById('locationInfo').style.display = 'none';
+            document.getElementById('enterVRButton').style.display = 'none';
+        });
+        
+        document.querySelector('a-scene').addEventListener('exit-vr', () => {
+            document.getElementById('locationInfo').style.display = 'block';
+            document.getElementById('enterVRButton').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
