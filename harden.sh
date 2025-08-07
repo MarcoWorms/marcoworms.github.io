@@ -6,7 +6,7 @@
 # Run as root or with sudo
 #########################################
 
-set -euo pipefail
+set -uo pipefail  # Removed -e to prevent early exit on non-critical errors
 
 # Colors for output
 RED='\033[0;31m'
@@ -280,15 +280,22 @@ if [ "$ENABLE_CLOUDFLARE" = "yes" ]; then
     cat > /usr/local/bin/update-cloudflare-ips.sh <<'EOSCRIPT'
 #!/bin/bash
 
+echo "Updating Cloudflare IPs..."
+
 # Get Cloudflare IPs
 CF_IPV4=$(curl -s https://www.cloudflare.com/ips-v4)
 CF_IPV6=$(curl -s https://www.cloudflare.com/ips-v6)
+
+if [ -z "$CF_IPV4" ]; then
+    echo "Failed to fetch Cloudflare IPv4 addresses"
+    exit 1
+fi
 
 # Remove old Cloudflare rules
 while ufw status numbered | grep -q 'Cloudflare'; do
     RULE_NUM=$(ufw status numbered | grep 'Cloudflare' | head -1 | cut -d']' -f1 | cut -d'[' -f2)
     if [ ! -z "$RULE_NUM" ]; then
-        ufw --force delete $RULE_NUM
+        ufw --force delete $RULE_NUM 2>/dev/null || true
     else
         break
     fi
@@ -296,14 +303,14 @@ done
 
 # Add IPv4 ranges
 for ip in $CF_IPV4; do
-    ufw allow from $ip to any port 80 comment 'Cloudflare-IPv4'
-    ufw allow from $ip to any port 443 comment 'Cloudflare-IPv4'
+    ufw allow from $ip to any port 80 comment 'Cloudflare-IPv4' 2>/dev/null || true
+    ufw allow from $ip to any port 443 comment 'Cloudflare-IPv4' 2>/dev/null || true
 done
 
 # Add IPv6 ranges
 for ip in $CF_IPV6; do
-    ufw allow from $ip to any port 80 comment 'Cloudflare-IPv6'
-    ufw allow from $ip to any port 443 comment 'Cloudflare-IPv6'
+    ufw allow from $ip to any port 80 comment 'Cloudflare-IPv6' 2>/dev/null || true
+    ufw allow from $ip to any port 443 comment 'Cloudflare-IPv6' 2>/dev/null || true
 done
 
 ufw reload
@@ -312,13 +319,15 @@ EOSCRIPT
 
     chmod +x /usr/local/bin/update-cloudflare-ips.sh
     
-    # Run it
-    /usr/local/bin/update-cloudflare-ips.sh
+    # Run it in a way that doesn't exit the main script
+    log_message "Executing Cloudflare IP update..."
+    bash /usr/local/bin/update-cloudflare-ips.sh || log_warning "Cloudflare update had warnings"
     
     # Add cron job
     (crontab -l 2>/dev/null | grep -v update-cloudflare-ips; echo "0 0 * * 0 /usr/local/bin/update-cloudflare-ips.sh") | crontab -
     
     log_message "Cloudflare IP restrictions enabled"
+    log_message "Continuing with hardening..."
 else
     log_message "Cloudflare restrictions not enabled (set ENABLE_CLOUDFLARE=yes to enable)"
 fi
