@@ -1,0 +1,371 @@
+@font-face {
+    font-family: "Aeonik";
+    src: url("fonts/Aeonik-Regular.woff2");
+}
+
+@font-face {
+    font-family: "Aeonik Fono";
+    src: url("fonts/AeonikFono-Regular.woff2");
+}
+
+html {
+    scroll-padding-top: 7rem;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #15152b;
+    font-family: "Aeonik", Arial, sans-serif;
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+    min-width: 300px;
+}
+
+header {
+    background-color: #15152b;
+    position: fixed;
+    top: 0;
+    height: 7rem;
+    padding: .5rem 1rem;
+    width: 100%;
+    z-index: 1;
+    box-sizing: border-box;
+}
+
+section {
+    max-width: 70rem;
+    margin: auto;
+}
+
+.marque {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo {
+    width: 31px;
+    height: 36px;
+    background-image: url("images/YEARN_SYMBOL_WHITE_RGB.svg");
+    background-size: cover;
+    margin-right: .5rem;
+    margin-top: 8px;
+}
+
+nav {
+    margin: 0;
+    padding: .5rem 0 0;
+    font-size: .825rem;
+    line-height: 1.5rem;
+    text-align: center;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    display: inline-block;
+    padding-right: .5rem;
+}
+
+a {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+a:hover {
+    color: #5814fb;
+}
+
+main {
+    height: calc(100vh - 7rem);
+    margin-top: 7rem;
+    overflow: auto;
+    padding: 0 1rem 1rem;
+    scroll-behavior: smooth;
+    box-sizing: border-box;
+}
+
+article {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 1rem 0 3rem;
+}
+
+h1 {
+    font-weight: normal;
+    font-size: 1.6rem;
+    color: #ffffff;
+    margin: 0;
+}
+
+h2 {
+    font-family: "Aeonik Fono", Arial, sans-serif;
+    font-weight: normal;
+    font-size: 2rem;
+    line-height: 2.5rem;
+    color: #5814fb;
+    text-transform: uppercase;
+    text-align: justify;
+    margin: 0;
+}
+
+p {
+    font-weight: normal;
+    font-size: 1rem;
+    line-height: 1.6rem;
+    color: #ffffff;
+}
+
+.text {
+    flex: 3;
+    max-width: 35rem;
+}
+
+.separator {
+    flex: 2;
+}
+
+.oval {
+    width: calc(20rem / 1.86);
+    height: 20rem;
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+img {
+    height: 20rem;
+}
+
+footer p {
+    margin: 0;
+    text-align: center;
+    font-size: .85rem;
+    line-height: 1.25rem;
+}
+
+footer a {
+    text-decoration: underline;
+}
+
+/* small tablet */
+
+@media only screen and (min-width: 480px) {
+    html {
+        scroll-padding-top: 6rem;
+    }
+
+    header {
+        height: 6rem;
+        padding: .5rem 1rem;
+    }
+
+    main {
+        height: calc(100vh - 6rem);
+        margin-top: 6rem;
+        overflow: auto;
+        padding: 0 2rem 1rem 2rem;
+        scroll-behavior: smooth;
+        box-sizing: border-box;
+    }
+
+    article {
+        height: calc(100vh - 6rem);
+        flex-direction: row;
+        padding: 1rem 0 3rem;
+    }
+}
+
+
+/* tablet  */
+
+@media only screen and (min-width: 610px) {
+
+    html {
+        scroll-padding-top: 7rem;
+    }
+
+    header {
+        width: 100%;
+        height: 7rem;
+        padding: .5rem 2rem;
+    }
+
+    .marque {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo {
+        margin-right: .75rem;
+    }
+
+    nav {
+        font-size: 1rem;
+        padding: .5rem 0 0;
+    }
+
+    li {
+        padding-right: .75rem;
+    }
+
+    li:last-of-type {
+        padding-right: 0;
+    }
+
+    main {
+        height: calc(100vh - 6rem);
+        margin-top: 6rem;
+        overflow: auto;
+        padding: 0 2rem 1rem 2rem;
+        scroll-behavior: smooth;
+        box-sizing: border-box;
+    }
+
+    article {
+        height: calc(100vh - 6rem);
+        flex-direction: row;
+        padding: 1rem 0 3rem;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        font-size: 2.4rem;
+        line-height: 3rem;
+    }
+
+    p {
+        font-size: 1rem;
+    }
+
+    .text {
+        flex: 3;
+    }
+
+    .oval {
+        width: calc(30rem / 1.86);
+        height: 30rem;
+    }
+
+    img {
+        height: 30rem;
+    }
+
+    footer p {
+        padding-bottom: 1rem;
+    }
+}
+
+/* desktop (inherits much of tablet)  */
+
+@media only screen and (min-width: 860px) {
+
+    html {
+        scroll-padding-top: 5rem;
+    }
+
+    header {
+        height: 5rem;
+        padding: .75rem 2rem;
+    }
+
+    header > section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .marque {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    nav {
+        font-size: 1rem;
+        line-height: 2rem;
+        text-align: left;
+    }
+
+    main {
+        height: calc(100vh - 5rem);
+        margin-top: 5rem;
+    }
+
+    h2 {
+        font-size: 3rem;
+        line-height: 3.4rem;
+    }
+
+    p {
+        font-size: 1.5rem;
+        line-height: 2rem;
+    }
+}
+
+/* colors for each section */
+
+.fg-1 {
+    color: #5814fb;
+}
+
+.bg-1 {
+    background-color: #5814fb;
+}
+
+.fg-2 {
+    color: #fa3aa7;
+}
+
+.bg-2 {
+    background-color: #fa3aa7;
+}
+
+.fg-3 {
+    color: #ffdc53;
+}
+
+.bg-3 {
+    background-color: #f8a908;
+}
+
+.fg-4 {
+    color: #0dff2f;
+}
+
+.bg-4 {
+    background-color: #63c532;
+}
+
+.fg-5 {
+    color: #ff90a1;
+}
+
+.bg-5 {
+    background-color: #ff90a1;
+}
+
+.fg-6 {
+    color: #e00716;
+}
+
+.bg-6 {
+    background-color: #e00716;
+}
+
+.fg-7 {
+    color: #a446ba;
+}
+
+.bg-7 {
+    background-color: #a446ba;
+}
