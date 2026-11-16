@@ -1,6 +1,6 @@
 # Chief
 
-Chief is a set of instructions for one AI coordinator and a small durable task board. It uses your signed-in Codex and its existing tools. The core needs plain files, with no separate CLI, Python or model server.
+Chief by Templ is a set of instructions for one AI coordinator and a small durable task board. It uses your signed-in Codex and its existing tools. The core needs plain files, with no separate CLI, Python or model server.
 
 ## Begin
 
@@ -51,4 +51,4 @@ When asked for a report, show all saved `backlog`, `todo`, `doing` and human `re
 
 Use private storage for operational records, outside the public clone. Keep credentials and account sessions out of task files and Git. Never publish private state or histories during setup.
 
-This Chief has its own identity, board, accounts and optional bot. It inherits no access to Alfred or another installation. Interface documentation, a public link, a name or a thread ID grants no access. Another device needs verified transport, explicit enrollment and approved capabilities. Optional runtime helpers and Telegram adapters are private, unavailable from this pack, and unnecessary for the core.
+This Chief has its own identity, board, accounts and optional bot. It inherits no access to Alfred or another installation. Interface documentation, a public link, a name or a thread ID grants no access. Another device needs verified transport, explicit enrollment and approved capabilities. The optional Telegram adapter is available from [templ-fun/chief](https://github.com/templ-fun/chief); it is unnecessary for the core and requires its own setup. Device enrollment still needs a supported verified transport.
