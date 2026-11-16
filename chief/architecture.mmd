@@ -1,27 +1,28 @@
 flowchart TB
-    U["Authenticated user<br/>Telegram / trusted local entry / paired device"]
-    A{"Verify caller and scope<br/>Local Python + private binding/enrollment"}
-    D["Reject unknown caller<br/>No model access"]
-    Q["Save request + attribution<br/>Private SQLite"]
-    R{"Owner /report?"}
-    F["Read saved Markdown board<br/>Local Python · no model"]
-    P["Prepare attributed input<br/>Current message + relevant replied-to part<br/>Photos: native input · voice: readable native or on-device transcript"]
-    C{"Same Chief Codex thread<br/>Current model + existing context + relevant tool reads<br/>Answer directly or choose an existing owner?"}
-    O["Existing project owner<br/>Own model/context · repo · tools · useful specialists<br/>Implementation, checks and authorized release"]
-    E["Outcome or necessary missing input<br/>Retain original sender authority"]
-    B["Chief records task facts<br/>Same Markdown card + evidence + movement history<br/>Batched private Git recovery"]
-    T["Scoped reply → private SQLite outbox<br/>Complete text split to fit Telegram messages"]
-    S["Telegram API sends parts<br/>Local Python + network, no model"]
-    V{"Delivery receipt verified?"}
-    Y["Delivered to original recipient"]
-    N["Keep uncertain state<br/>Do not blindly replay"]
-    U --> A
-    A -->|no| D
-    A -->|yes| Q --> R
-    R -->|yes| F --> T
-    R -->|no| P --> C
-    C -->|direct answer| B
-    C -->|project task: one concise brief| O --> E --> B
-    B --> T --> S --> V
-    V -->|yes| Y
-    V -->|no| N
+    U["You<br/>Telegram · paired device"]
+    A["Access check<br/>Local Python · SQLite"]
+    C["Chief<br/>Model + current context<br/>Reads rules + board"]
+    P["Existing project lead<br/>Own model · repo · tools"]
+    R["Chief → You<br/>Update board · send reply"]
+    U --> A --> C
+    C -->|one brief| P
+    P -->|outcome / question| R
+    C -->|direct answer| R
+    subgraph M["Memory · read relevant facts"]
+      CT["Context<br/>Separate Codex threads<br/>Codex manages compaction"]
+      TF["Task facts<br/>Markdown cards"]
+      DL["Delivery<br/>SQLite receipts"]
+      BK["Recovery<br/>Private Git · files only"]
+    end
+    C -.-> CT
+    P -.-> CT
+    C -.-> TF
+    R -.-> TF
+    A -.-> DL
+    R -.-> DL
+    TF -.-> BK
+    N["Enrolled access only · /report uses no model"]
+    classDef model fill:#eaf1ff,stroke:#2465d8,color:#162538;
+    classDef memory fill:#eef8f3,stroke:#178269,color:#162538;
+    class C,P,R model;
+    class A,CT,TF,DL,BK memory;
