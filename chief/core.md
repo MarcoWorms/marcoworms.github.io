@@ -29,14 +29,17 @@ Propose the initial board, priorities and existing owners once for acceptance or
 
 `priorities.md`: the user's current priorities and release/access boundaries.
 
-Use one Markdown file per task. Its folder is its status. Move the same file when that status changes.
+Use one Markdown file per task. Its folder is its status. Move the same file when that status changes. Keep a movement history inside it: timestamp with UTC offset, old/new columns and a short reason. For existing cards, start with an observed baseline; never invent past movement times. Keep this history out of compact reports.
 
 | Folder | Meaning |
 | --- | --- |
-| `tasks/todo/` | Queued work or work waiting for a stated input. |
+| `tasks/backlog/` | Uncommitted ideas, research follow-ups and parked possibilities. |
+| `tasks/todo/` | Committed next work, plus recurring tasks waiting for their next scheduled date. |
 | `tasks/doing/` | Work an owner is actively implementing or checking. |
 | `tasks/review/` | A concrete result awaits a named human's review, acceptance or decision. |
 | `tasks/done/` | A verified outcome with completion evidence and any required human acceptance. |
+
+Research results enter Backlog unless the user commits to the next action. Promote a card to Todo when it will be done as capacity or a named dependency becomes available. Saved measurements without a task belong in reference reports.
 
 Record the goal, owner, current evidence/check time, next step and required input. A review card must name `Reviewer:` and the exact decision. AI reviews, technical blockers and unfinished fixes do not belong in human review. Keep their actual state and next action explicit. Do not maintain a second task database.
 
@@ -44,7 +47,7 @@ For an explicitly authorized recurring task, record the cadence, timezone, next 
 
 Update records when scope, assignment, outcome or a real blocker changes. Saved status is dated evidence, not a fresh live check. Keep implementation details with the project.
 
-When asked for a report, show all saved `todo`, `doing` and human `review` items, their next runs and five recent completions. Include completed recurring runs even after their cards return to `todo`. Keep reports concise and use pages when needed. The core does not install a `/report` bot command.
+When asked for a report, show all saved `backlog`, `todo`, `doing` and human `review` items, their next runs and five recent completions. Include completed recurring runs even after their cards return to `todo`. Keep reports concise and use pages when needed. The core does not install a `/report` bot command.
 
 Use private storage for operational records, outside the public clone. Keep credentials and account sessions out of task files and Git. Never publish private state or histories during setup.
 

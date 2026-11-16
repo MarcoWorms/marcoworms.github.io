@@ -1,0 +1,18 @@
+flowchart TD
+  A[User: Telegram / trusted local client / paired device] --> B[Authenticate sender and scope; save stable request ID]
+  B -->|Unknown sender or device| X[Refuse access]
+  B -->|Owner /report| R[Read saved board; no model call]
+  B -->|Work or question| C[Chief model reads priorities, relevant card and owner registry]
+  C -->|Direct answer| U[Update relevant evidence and task state]
+  C -->|Project work| D[Brief the existing project owner once]
+  D --> E[Owner plans, implements, checks and releases within authority]
+  E --> F[Return completed outcome or exact missing input]
+  F --> U
+  U --> G[Reply to original enrolled recipient through durable outbox]
+  G --> H[Confirm delivery; never blindly replay uncertain sends]
+  C <--> K[Markdown board: Backlog / Todo / Doing / Review / Done]
+  U --> K
+  S[Authorized recurring card becomes due] --> B
+  U -->|Recurring work completed| T[Record completion; return same card to Todo with next date]
+  T --> K
+  E --> W[Scoped tools / paired resources / specialists if useful]

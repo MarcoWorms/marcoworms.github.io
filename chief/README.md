@@ -13,7 +13,8 @@ Keep “Chief,” choose a nickname, or ask for a suggestion from consented hist
 | Guide | Use it to |
 | --- | --- |
 | [Start your own Chief](new.md) | Create an independent private workspace from your signed-in Codex. |
-| [Core instructions](core.md) | Maintain one owner per project and a `todo / doing / review / done` board. |
+| [Core instructions](core.md) | Maintain one owner per project and a `backlog / todo / doing / review / done` board. |
+| [How Chief works](map.md) | Follow a request from access checks to its project owner, board and reply. |
 | [Connect another device](device.md) | Request verified enrollment with your existing Chief. |
 | [Use Dot](dot.md) | Relay through an already authenticated connection, where available. |
 
