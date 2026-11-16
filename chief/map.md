@@ -1,9 +1,9 @@
-# Chief, at a glance
+# Chief by Templ
 
-![Chief request flow, resources and memory](overview-v3.png)
+![Chief by Templ: projects, task board and memory](overview-v4.png)
 
-[Full-size image](overview-v3.png) · [Editable Mermaid](architecture.mmd) · [Resource and memory details](architecture-details.md)
+[Full-size image](overview-v4.png) · [Editable Mermaid](architecture.mmd) · [Technical reference](architecture-details.md)
 
-Chief uses the model’s judgment to answer or choose an existing project lead. Small adapters check access and deliver the result. Each lead keeps its own context and tools.
+One Chief can coordinate many projects. Each project keeps its existing lead, repository, tools and context. The model chooses the lead; the adapters carry the request and result.
 
-This shows the installed flow, checked November 16, 2026. Public guides do not install the adapters or grant access.
+The board uses Backlog, Todo, Doing, Review and Done. Markdown stores tasks and timestamped moves; SQLite stores transport state; Codex manages each thread’s context and compaction. Private Git can preserve selected files and sanitized records.

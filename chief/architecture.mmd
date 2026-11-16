@@ -1,28 +1,21 @@
-flowchart TB
-    U["You<br/>Telegram · paired device"]
-    A["Access check<br/>Local Python · SQLite"]
-    C["Chief<br/>Model + current context<br/>Reads rules + board"]
-    P["Existing project lead<br/>Own model · repo · tools"]
-    R["Chief → You<br/>Update board · send reply"]
-    U --> A --> C
-    C -->|one brief| P
-    P -->|outcome / question| R
-    C -->|direct answer| R
-    subgraph M["Memory · read relevant facts"]
-      CT["Context<br/>Separate Codex threads<br/>Codex manages compaction"]
-      TF["Task facts<br/>Markdown cards"]
-      DL["Delivery<br/>SQLite receipts"]
-      BK["Recovery<br/>Private Git · files only"]
-    end
-    C -.-> CT
-    P -.-> CT
-    C -.-> TF
-    R -.-> TF
-    A -.-> DL
-    R -.-> DL
-    TF -.-> BK
-    N["Enrolled access only · /report uses no model"]
-    classDef model fill:#eaf1ff,stroke:#2465d8,color:#162538;
-    classDef memory fill:#eef8f3,stroke:#178269,color:#162538;
-    class C,P,R model;
-    class A,CT,TF,DL,BK memory;
+flowchart TD
+  U[You: Codex, Telegram or paired device] --> E[Entry: optional Python bridge<br/>enrolled identities, SQLite requests]
+  E --> C[Chief: Codex model chooses a lead<br/>AGENTS.md, projects.md, relevant cards]
+  C -->|focused brief| A[Project A: existing lead<br/>own repo, tools, context]
+  C -->|focused brief| B[Project B: existing lead<br/>own repo, tools, context]
+  C -->|focused brief| D[Project C: existing lead<br/>own repo, tools, context]
+  A -->|outcome or missing input| R[Chief to you: save result, send reply]
+  B --> R
+  D --> R
+  C -->|direct answer| R
+  R --> K[Private task board<br/>Backlog / Todo / Doing / Review / Done<br/>tasks/column/*.md, timestamped moves]
+  M[Context: separate Codex threads, compaction] -.-> C
+  Q[Delivery: SQLite requests, outbox, per-part receipts] -.-> R
+  G[Recovery: private Git, rules, cards, sanitized text] -.-> K
+  X[Codex app-server: thread/resume, turn/start, turn/steer] -.-> A
+  X -.-> B
+  X -.-> D
+  classDef primary fill:#99ff00,stroke:#000,color:#0b1220,stroke-width:3px;
+  classDef plain fill:#fff,stroke:#000,color:#0b1220,stroke-width:3px;
+  class C,K primary;
+  class U,E,A,B,D,R,M,Q,G,X plain;
