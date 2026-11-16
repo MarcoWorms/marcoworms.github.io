@@ -1,0 +1,21 @@
+flowchart TB
+    C["Continuing Chief Codex thread<br/>Instructions + conversation or compaction + tool results<br/>Codex manages the model context window"]
+    I["Private instructions and owner registry<br/>AGENTS.md · priorities.md · projects.md"]
+    B["Task facts: Markdown cards<br/>Folder = status · timestamped movement history"]
+    L["Transport facts: private SQLite<br/>Requests · attribution · dispatch · routes · delivery receipts"]
+    O["Existing owner thread<br/>Separate model context and project repository evidence"]
+    M["Optional Codex memory hints<br/>Verify changing facts; not new authority"]
+    G["Private Git recovery<br/>Instructions/cards/reports + scoped sanitized human-text exports"]
+    I -->|supplied or selectively read| C
+    B -->|read current task| C
+    C -->|record outcome / move same card| B
+    L -->|reconcile pending / uncertain action| C
+    C -->|one relevant brief| O
+    O -->|outcome or necessary missing input| C
+    M -.->|only relevant hints| C
+    I --> G
+    B --> G
+    O -->|link compact evidence| G
+    G -.->|recovery only, not routine context injection| C
+    X["Not covered by Git:<br/>live databases · credentials · browser sessions · media"]
+    G --- X

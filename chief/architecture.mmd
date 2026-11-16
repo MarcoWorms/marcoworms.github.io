@@ -1,18 +1,27 @@
-flowchart TD
-  A[User: Telegram / trusted local client / paired device] --> B[Authenticate sender and scope; save stable request ID]
-  B -->|Unknown sender or device| X[Refuse access]
-  B -->|Owner /report| R[Read saved board; no model call]
-  B -->|Work or question| C[Chief model reads priorities, relevant card and owner registry]
-  C -->|Direct answer| U[Update relevant evidence and task state]
-  C -->|Project work| D[Brief the existing project owner once]
-  D --> E[Owner plans, implements, checks and releases within authority]
-  E --> F[Return completed outcome or exact missing input]
-  F --> U
-  U --> G[Reply to original enrolled recipient through durable outbox]
-  G --> H[Confirm delivery; never blindly replay uncertain sends]
-  C <--> K[Markdown board: Backlog / Todo / Doing / Review / Done]
-  U --> K
-  S[Authorized recurring card becomes due] --> B
-  U -->|Recurring work completed| T[Record completion; return same card to Todo with next date]
-  T --> K
-  E --> W[Scoped tools / paired resources / specialists if useful]
+flowchart TB
+    U["Authenticated user<br/>Telegram / trusted local entry / paired device"]
+    A{"Verify caller and scope<br/>Local Python + private binding/enrollment"}
+    D["Reject unknown caller<br/>No model access"]
+    Q["Save request + attribution<br/>Private SQLite"]
+    R{"Owner /report?"}
+    F["Read saved Markdown board<br/>Local Python · no model"]
+    P["Prepare attributed input<br/>Current message + relevant replied-to part<br/>Photos: native input · voice: readable native or on-device transcript"]
+    C{"Same Chief Codex thread<br/>Current model + existing context + relevant tool reads<br/>Answer directly or choose an existing owner?"}
+    O["Existing project owner<br/>Own model/context · repo · tools · useful specialists<br/>Implementation, checks and authorized release"]
+    E["Outcome or necessary missing input<br/>Retain original sender authority"]
+    B["Chief records task facts<br/>Same Markdown card + evidence + movement history<br/>Batched private Git recovery"]
+    T["Scoped reply → private SQLite outbox<br/>Complete text split to fit Telegram messages"]
+    S["Telegram API sends parts<br/>Local Python + network, no model"]
+    V{"Delivery receipt verified?"}
+    Y["Delivered to original recipient"]
+    N["Keep uncertain state<br/>Do not blindly replay"]
+    U --> A
+    A -->|no| D
+    A -->|yes| Q --> R
+    R -->|yes| F --> T
+    R -->|no| P --> C
+    C -->|direct answer| B
+    C -->|project task: one concise brief| O --> E --> B
+    B --> T --> S --> V
+    V -->|yes| Y
+    V -->|no| N
