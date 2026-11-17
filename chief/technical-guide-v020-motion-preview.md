@@ -1,3 +1,5 @@
+[Watch or download the video on Google Drive](https://drive.google.com/file/d/1vAdHql0IZC659LuH1Ehv-b2wmum3GlA5/view?usp=drivesdk)
+
 # Chief by Templ — technical walkthrough (motion cut): transcript
 
 Narration: VoiceStudio, mlx-audio (Kokoro) voice am_michael, seed 7. Examples are fictional. Source: Chief v0.2.0 (commit 6bd36c5).
