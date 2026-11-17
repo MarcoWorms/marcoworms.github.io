@@ -2,7 +2,7 @@
 
 Paste into Codex on the new machine:
 
-> Read https://raw.githubusercontent.com/templ-fun/chief/main/docs/device.md. Help me connect this device to my existing Chief through a verified connection and approved enrollment. Keep one coordinator and verify a real request and answer.
+> Read https://raw.githubusercontent.com/usetempl/chief/main/docs/device.md. Help me connect this device to my existing Chief through a verified connection and approved enrollment. Keep one coordinator and verify a real request and answer.
 
 This guide explains the interface. Reading it does not approve a device or grant access to Alfred or any other Chief. Signing into your own Codex account does not grant access to someone else's installation.
 

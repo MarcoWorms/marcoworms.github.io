@@ -2,7 +2,7 @@
 
 Your AI chief of staff. Chief routes work to existing AI leads and keeps a private task board.
 
-**[Get Chief](https://github.com/templ-fun/chief)** — open source, MIT licensed.
+**[Get Chief](https://github.com/usetempl/chief)** — open source, MIT licensed.
 
 In your signed-in Codex, paste:
 
@@ -14,6 +14,6 @@ In your signed-in Codex, paste:
 | [Another device](device.md) | Connect to your existing Chief. |
 | [Dot/mobile](dot.md) | Use an existing verified remote connection. |
 
-[How Chief works](map.md) · [Core instructions](core.md) · [Optional Telegram setup](https://github.com/templ-fun/chief/blob/main/docs/telegram.md)
+[How Chief works](map.md) · [Core instructions](core.md) · [Optional Telegram setup](https://github.com/usetempl/chief/blob/main/docs/telegram.md)
 
 Each installation has its own identity, board and access. Public source grants no access to another Chief.

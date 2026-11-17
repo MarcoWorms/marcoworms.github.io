@@ -2,7 +2,7 @@
 
 Use this only if your Dot or mobile session already supports an authenticated connection to your Chief's host. Paste:
 
-> Read https://raw.githubusercontent.com/templ-fun/chief/main/docs/dot.md. Use my existing authorized connection to contact my Chief. Send this request once and return its saved answer: [request].
+> Read https://raw.githubusercontent.com/usetempl/chief/main/docs/dot.md. Use my existing authorized connection to contact my Chief. Send this request once and return its saved answer: [request].
 
 Instructions for the agent:
 
