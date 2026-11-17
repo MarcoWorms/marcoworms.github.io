@@ -1,0 +1,499 @@
+1
+00:00:00,800 --> 00:00:03,830
+Someone opens Telegram and sends one message:
+
+2
+00:00:03,900 --> 00:00:07,070
+please fix the broken signup link on the website.
+
+3
+00:00:07,220 --> 00:00:13,120
+This video follows that message through Chief by Templ, step by step, from the phone
+
+4
+00:00:13,120 --> 00:00:14,550
+to the project and back.
+
+5
+00:00:15,392 --> 00:00:20,112
+First, what is Chief? The core is a set of instructions and a few Markdown files in
+
+6
+00:00:20,112 --> 00:00:23,442
+a private folder. The agents file holds the rules.
+
+7
+00:00:23,532 --> 00:00:27,222
+The projects file lists each project and its existing lead.
+
+8
+00:00:27,292 --> 00:00:29,942
+The priorities file holds your priorities.
+
+9
+00:00:30,272 --> 00:00:34,242
+Task cards live in five folders, one for each board column.
+
+10
+00:00:34,292 --> 00:00:38,692
+There is no planning engine, no vector database and no model server.
+
+11
+00:00:38,692 --> 00:00:43,062
+Your own Codex model reads these files and makes the decisions.
+
+12
+00:00:43,971 --> 00:00:47,021
+Setup starts in the Codex app that you already use.
+
+13
+00:00:47,071 --> 00:00:50,401
+You paste one line that points Codex at the Chief guide.
+
+14
+00:00:50,571 --> 00:00:52,661
+Codex clones the public source.
+
+15
+00:00:52,711 --> 00:00:55,441
+It installs Git only if Git is missing.
+
+16
+00:00:55,511 --> 00:00:59,661
+Then it makes a separate private workspace, outside the public clone.
+
+17
+00:00:59,831 --> 00:01:02,781
+You can choose a nickname, or keep the name Chief.
+
+18
+00:01:03,051 --> 00:01:06,361
+Codex asks before it reads any project history.
+
+19
+00:01:06,391 --> 00:01:11,031
+It proposes your projects and their existing leads, and you accept the list or
+
+20
+00:01:11,031 --> 00:01:11,861
+change it.
+
+21
+00:01:12,493 --> 00:01:15,563
+Telegram is an optional adapter, and it needs more.
+
+22
+00:01:15,693 --> 00:01:21,593
+Python 3.12 or later, one pinned library called websockets, the Codex command line
+
+23
+00:01:21,593 --> 00:01:23,743
+tool, and a new bot from BotFather.
+
+24
+00:01:23,953 --> 00:01:26,063
+Three setup commands do the work.
+
+25
+00:01:26,233 --> 00:01:28,943
+Prepare copies the code and makes blank records.
+
+26
+00:01:29,233 --> 00:01:33,983
+Connect checks the bot and creates one coordinator thread, without a model turn.
+
+27
+00:01:34,533 --> 00:01:37,573
+Service installs one collector that starts at login.
+
+28
+00:01:37,573 --> 00:01:40,963
+On Linux, you run the collector in the foreground.
+
+29
+00:01:41,942 --> 00:01:44,032
+Authentication has three parts.
+
+30
+00:01:44,062 --> 00:01:47,692
+Codex keeps its own sign-in, and Chief never copies it.
+
+31
+00:01:47,742 --> 00:01:52,802
+The bot token goes in through a hidden prompt, into an owner-only file that Git
+
+32
+00:01:52,802 --> 00:01:58,432
+ignores. Then you open a private invitation link in your own Telegram and tap Start.
+
+33
+00:01:58,542 --> 00:02:00,532
+That enrolls your account.
+
+34
+00:02:00,822 --> 00:02:06,172
+Messages from anyone else get no reply, no storage and no model access.
+
+35
+00:02:07,111 --> 00:02:12,001
+Now the message arrives. The collector is a small Python process on your computer.
+
+36
+00:02:12,051 --> 00:02:14,721
+It long-polls Telegram for new updates.
+
+37
+00:02:14,791 --> 00:02:17,651
+While it waits, it makes no model calls.
+
+38
+00:02:17,651 --> 00:02:22,421
+It checks the sender, and it refuses text that looks like a password or a key.
+
+39
+00:02:22,491 --> 00:02:28,131
+Then it saves the request in a local SQLite database, with an ID made from the chat
+
+40
+00:02:28,131 --> 00:02:33,671
+and message numbers. A saved request survives a restart, and the same update is not
+
+41
+00:02:33,671 --> 00:02:34,641
+stored twice.
+
+42
+00:02:35,637 --> 00:02:37,857
+Next, the adapter gives the request to Chief.
+
+43
+00:02:37,857 --> 00:02:42,117
+It talks to the Codex app server on your computer, through a local socket.
+
+44
+00:02:42,117 --> 00:02:45,057
+Chief is one continuing Codex thread.
+
+45
+00:02:45,057 --> 00:02:49,857
+Setup created it once, and the adapter resumes the same thread every time.
+
+46
+00:02:49,857 --> 00:02:53,197
+If Chief is idle, the adapter starts a new turn.
+
+47
+00:02:53,197 --> 00:02:56,377
+If Chief is busy, it steers the active turn.
+
+48
+00:02:56,377 --> 00:03:00,397
+The input says who sent the message and what authority they have.
+
+49
+00:03:00,397 --> 00:03:03,317
+It adds the text and the part they replied to.
+
+50
+00:03:03,317 --> 00:03:08,667
+The model itself runs in the model service behind your Codex account.
+
+51
+00:03:09,534 --> 00:03:14,294
+Because the thread continues, a short message lands in a context that can already be
+
+52
+00:03:14,294 --> 00:03:20,284
+large. Codex manages that context window, and it compacts the context when needed.
+
+53
+00:03:20,754 --> 00:03:25,504
+Chief reads only the records it needs, but that does not erase earlier turns.
+
+54
+00:03:25,594 --> 00:03:28,704
+So each turn still uses model capacity.
+
+55
+00:03:28,794 --> 00:03:32,224
+Chief sets no token budget and no time limit.
+
+56
+00:03:32,917 --> 00:03:35,667
+Chief now decides. It can answer directly.
+
+57
+00:03:35,697 --> 00:03:39,527
+Or it can choose an existing project lead from the projects file.
+
+58
+00:03:39,537 --> 00:03:41,637
+Here, it chooses the website lead.
+
+59
+00:03:41,637 --> 00:03:44,527
+It sends one focused brief through its route tool.
+
+60
+00:03:44,637 --> 00:03:48,587
+The adapter resumes that lead's own thread and starts a turn there.
+
+61
+00:03:48,597 --> 00:03:53,367
+The lead keeps its own repository, tools, model settings and context.
+
+62
+00:03:53,597 --> 00:03:57,017
+If the lead is busy in the Codex app, the brief waits.
+
+63
+00:03:57,017 --> 00:03:59,737
+Chief does not create a replacement lead.
+
+64
+00:03:59,737 --> 00:04:02,267
+This adapter routes to Codex leads.
+
+65
+00:04:02,657 --> 00:04:07,307
+For a lead in another tool, Chief reports the gap and keeps that lead.
+
+66
+00:04:08,140 --> 00:04:11,470
+The website lead fixes the link and runs its checks.
+
+67
+00:04:11,500 --> 00:04:15,870
+When its turn completes, the adapter captures the final answer.
+
+68
+00:04:15,900 --> 00:04:19,500
+That answer comes back to Chief as evidence from the lead.
+
+69
+00:04:19,500 --> 00:04:24,070
+It is not a new instruction from you, and it grants no new authority.
+
+70
+00:04:24,924 --> 00:04:27,024
+Chief records the result on the board.
+
+71
+00:04:27,024 --> 00:04:29,534
+Each task is one Markdown file.
+
+72
+00:04:29,544 --> 00:04:31,234
+Its folder is its status.
+
+73
+00:04:31,644 --> 00:04:35,114
+Backlog holds ideas. Todo holds committed work.
+
+74
+00:04:35,244 --> 00:04:39,534
+Doing holds active work. Review waits for a named person's decision.
+
+75
+00:04:39,884 --> 00:04:41,794
+Done holds a verified outcome.
+
+76
+00:04:42,004 --> 00:04:44,894
+A move takes the same file to a new folder.
+
+77
+00:04:45,044 --> 00:04:49,064
+The move adds a line with the time, the old and new columns, and a reason.
+
+78
+00:04:49,064 --> 00:04:54,194
+Here, the card goes from Doing to Review, because you must accept the fix.
+
+79
+00:04:55,017 --> 00:05:00,027
+Then Chief replies. It calls the reply tool with the exact request ID.
+
+80
+00:05:00,197 --> 00:05:03,067
+The reply goes into a local outbox.
+
+81
+00:05:03,117 --> 00:05:06,107
+Chief's ordinary chat text is not sent.
+
+82
+00:05:06,197 --> 00:05:10,577
+The collector splits a long answer to fit Telegram's message limit.
+
+83
+00:05:10,577 --> 00:05:14,087
+It sends each part and saves a receipt for each one.
+
+84
+00:05:14,097 --> 00:05:18,307
+If a send is uncertain, the collector does not repeat it blindly.
+
+85
+00:05:19,153 --> 00:05:21,963
+At any time, you can send /report.
+
+86
+00:05:22,013 --> 00:05:25,693
+The adapter reads the saved cards and sends the board.
+
+87
+00:05:25,693 --> 00:05:29,203
+It makes no model call and no live project check.
+
+88
+00:05:30,001 --> 00:05:32,631
+So, what runs where? On your computer:
+
+89
+00:05:32,641 --> 00:05:37,641
+the Codex app and its app server, the collector, SQLite, the Markdown files, and the
+
+90
+00:05:37,641 --> 00:05:39,551
+project checkouts with their tools.
+
+91
+00:05:39,681 --> 00:05:44,231
+In the model service: every model turn, for Chief and for each lead.
+
+92
+00:05:44,501 --> 00:05:46,811
+Telegram's servers carry the messages.
+
+93
+00:05:47,341 --> 00:05:50,251
+Model turns use your existing Codex plan.
+
+94
+00:05:50,441 --> 00:05:54,071
+Chief adds no model of its own, but it does use the model.
+
+95
+00:05:54,833 --> 00:05:58,033
+Now, memory. Chief has no hidden memory store.
+
+96
+00:05:58,033 --> 00:06:00,743
+It has layers, and each layer has a place.
+
+97
+00:06:00,793 --> 00:06:04,683
+Your nickname goes in the coordinator instructions and the setup record.
+
+98
+00:06:04,893 --> 00:06:09,483
+With Telegram, a private profile file also holds it, to name the bot.
+
+99
+00:06:09,613 --> 00:06:13,713
+Your operating style and preferences go in the private instructions and the
+
+100
+00:06:13,713 --> 00:06:18,733
+priorities file. Choices about devices and leads go in the projects file.
+
+101
+00:06:18,733 --> 00:06:23,123
+Chief writes these records when you state a preference or accept a proposal.
+
+102
+00:06:23,553 --> 00:06:26,563
+It does not learn every preference by itself.
+
+103
+00:06:27,521 --> 00:06:32,401
+Runtime settings, such as the coordinator thread ID and the maintenance switch, stay
+
+104
+00:06:32,401 --> 00:06:34,611
+in a private folder on your computer.
+
+105
+00:06:34,801 --> 00:06:39,951
+Secrets stay there too: the bot token, the invitation and the message database.
+
+106
+00:06:40,421 --> 00:06:43,011
+Codex keeps its own sign-in and sessions.
+
+107
+00:06:43,321 --> 00:06:47,531
+Codex also keeps the thread context and its compaction summaries.
+
+108
+00:06:47,641 --> 00:06:52,741
+If your Codex supplies its own memory, Chief treats it as a hint to check against
+
+109
+00:06:52,741 --> 00:06:53,891
+the current files.
+
+110
+00:06:54,722 --> 00:06:56,612
+That gives three kinds of files.
+
+111
+00:06:56,622 --> 00:07:00,872
+Public source is the code and the guides, with no personal data.
+
+112
+00:07:00,922 --> 00:07:06,132
+An optional private Git backup can hold your instructions, project list, priorities,
+
+113
+00:07:06,162 --> 00:07:08,672
+cards, reports and cleaned chat exports.
+
+114
+00:07:08,942 --> 00:07:11,462
+Local-only state never goes into Git:
+
+115
+00:07:11,462 --> 00:07:15,052
+secrets, runtime settings, databases and sessions.
+
+116
+00:07:15,162 --> 00:07:17,702
+A Git backup restores your records.
+
+117
+00:07:17,702 --> 00:07:21,032
+It does not restore your sign-ins or pending deliveries.
+
+118
+00:07:22,003 --> 00:07:25,203
+To sum up, the core is plain files and your Codex.
+
+119
+00:07:25,203 --> 00:07:28,393
+It needs no Python and no SQLite.
+
+120
+00:07:28,443 --> 00:07:30,993
+The Telegram adapter is optional.
+
+121
+00:07:31,023 --> 00:07:36,693
+It adds sender checks, a durable inbox, delivery receipts and /report.
+
+122
+00:07:36,723 --> 00:07:39,653
+It does not plan, and it does not rank models.
+
+123
+00:07:40,535 --> 00:07:42,905
+One message. One continuing Chief.
+
+124
+00:07:42,935 --> 00:07:44,885
+Your existing project leads.
+
+125
+00:07:44,955 --> 00:07:47,425
+One private board. Chief, by Templ.
